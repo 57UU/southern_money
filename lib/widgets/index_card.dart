@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'styled_card.dart';
+
 class IndexCard extends StatelessWidget {
   final String name;
   final String value;
@@ -25,34 +27,24 @@ class IndexCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Text(
-              name,
-              style: const TextStyle(fontSize: 12),
+    return StyledCard(
+      child: Column(
+        children: [
+          Text(name, style: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            change,
+            style: TextStyle(
+              fontSize: 12,
+              color: _getChangeColor(),
+              fontWeight: FontWeight.w500,
             ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              change,
-              style: TextStyle(
-                fontSize: 12,
-                color: _getChangeColor(),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'pages/home_page.dart';
 import 'pages/community_page.dart';
 import 'pages/market_page.dart';
@@ -79,10 +80,6 @@ class _MainScreenState extends State<MainScreen> {
                     });
                   },
                   labelType: NavigationRailLabelType.all,
-                  selectedIconTheme: const IconThemeData(color: Colors.blue),
-                  unselectedIconTheme: const IconThemeData(color: Colors.grey),
-                  selectedLabelTextStyle: const TextStyle(color: Colors.blue),
-                  unselectedLabelTextStyle: const TextStyle(color: Colors.grey),
                   destinations: _navigationItems
                       .map(
                         (item) => NavigationRailDestination(
@@ -101,24 +98,38 @@ class _MainScreenState extends State<MainScreen> {
           // 竖屏模式：使用底部导航栏
           return Scaffold(
             body: _navigationItems[_currentIndex].page,
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: Colors.blue,
-              unselectedItemColor: Colors.grey,
-              items: _navigationItems
-                  .map(
-                    (item) => BottomNavigationBarItem(
-                      icon: Icon(item.icon),
-                      label: item.label,
-                    ),
-                  )
-                  .toList(),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15.0,
+                    vertical: 8,
+                  ),
+                  child: GNav(
+                    gap: 8,
+                    iconSize: 24,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    duration: Duration(milliseconds: 350),
+                    tabBackgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    tabs: _navigationItems
+                        .map(
+                          (item) => GButton(icon: item.icon, text: item.label),
+                        )
+                        .toList(),
+                    selectedIndex: _currentIndex,
+                    onTabChange: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                  ),
+                ),
+              ),
             ),
           );
         }

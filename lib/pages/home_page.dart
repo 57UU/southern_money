@@ -11,10 +11,12 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(title: const Text('南方财富'), elevation: 0),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          spacing: 10,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [QuickNavigation(), Discovery()],
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [QuickNavigation(), Discovery()],
+          ),
         ),
       ),
     );
@@ -63,18 +65,8 @@ class QuickNavigation extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: SizedBox(
         height: 80,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
