@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/post_card.dart';
+import 'open_an_account.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -102,6 +104,11 @@ class QuickNavigation extends StatelessWidget {
                 color: Colors.blue,
                 onTap: () {
                   // 处理开户点击事件
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const OpenAnAccount(),
+                    ),
+                  );
                 },
               ),
             ),

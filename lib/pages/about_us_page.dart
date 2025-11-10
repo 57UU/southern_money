@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/widgets/styled_card.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -27,7 +28,7 @@ class AboutUsPage extends StatelessWidget {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Icon(
@@ -50,7 +51,7 @@ class AboutUsPage extends StatelessWidget {
             // 项目介绍
             SizedBox(
               width: double.infinity,
-              child: const Card(
+              child: const StyledCard(
                 elevation: 2,
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
@@ -80,7 +81,7 @@ class AboutUsPage extends StatelessWidget {
             // 技术特点
             SizedBox(
               width: double.infinity,
-              child: const Card(
+              child: const StyledCard(
                 elevation: 2,
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
@@ -110,7 +111,7 @@ class AboutUsPage extends StatelessWidget {
             // 团队信息
             SizedBox(
               width: double.infinity,
-              child: const Card(
+              child: const StyledCard(
                 elevation: 2,
                 child: Padding(
                   padding: EdgeInsets.all(16.0),

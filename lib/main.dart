@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import 'pages/home_page.dart';
 import 'pages/community_page.dart';
 import 'pages/market_page.dart';
 import 'pages/profile_page.dart';
+import 'setting/app_config.dart';
+import 'widgets/common_widget.dart';
 
 // 导航项数据模型
 class NavigationItemData {
@@ -18,7 +21,8 @@ class NavigationItemData {
   });
 }
 
-void main() {
+void main() async {
+  await ensureInitialize();
   runApp(const MyApp());
 }
 
@@ -27,16 +31,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Southern Money',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
-      home: const MainScreen(),
-      debugShowCheckedModeBanner: false,
+    return ListenableBuilder(
+      listenable: appSetting,
+      builder: (context, _) {
+        final colorSeed = appSetting.value[theme_color];
+        return MaterialApp(
+          title: '南方财富',
+          theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
+          darkTheme: ThemeData(
+            colorSchemeSeed: colorSeed,
+            useMaterial3: true,
+            brightness: Brightness.dark,
+          ),
+          home: const MainScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
@@ -65,6 +75,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    logicRootContext = context;
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) {

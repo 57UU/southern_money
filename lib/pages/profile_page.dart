@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'about_us_page.dart';
+import 'my_collection.dart';
+import 'my_message.dart';
+import 'my_selections.dart';
+import 'my_transaction.dart';
+import 'setting.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -132,35 +137,36 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   _buildMenuItem(context, '我的自选', Icons.star_border, () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('我的自选')));
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const MySelections(),
+                      ),
+                    );
                   }),
                   _buildMenuItem(context, '交易记录', Icons.history, () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('交易记录')));
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const MyTransaction(),
+                      ),
+                    );
                   }),
                   _buildMenuItem(context, '我的收藏', Icons.bookmark_border, () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('我的收藏')));
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const MyCollection(),
+                      ),
+                    );
                   }),
                   _buildMenuItem(context, '消息通知', Icons.notifications_none, () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('消息通知')));
-                  }, showBadge: true),
-                  _buildMenuItem(context, '帮助中心', Icons.help_outline, () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('帮助中心')));
-                  }),
-                  _buildMenuItem(context, '关于我们', Icons.info_outline, () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AboutUsPage(),
+                      CupertinoPageRoute(
+                        builder: (context) => const MyMessage(),
                       ),
+                    );
+                  }),
+                  _buildMenuItem(context, '设置', Icons.settings, () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (context) => const Setting()),
                     );
                   }),
                 ],
