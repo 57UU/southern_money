@@ -8,7 +8,6 @@ class ProfileMenuItem extends StatelessWidget {
   final VoidCallback onTap;
   final bool showBadge;
   final Color? foreColor;
-  late Color defaultForeColor;
 
   ProfileMenuItem({
     super.key,
@@ -17,9 +16,7 @@ class ProfileMenuItem extends StatelessWidget {
     required this.onTap,
     this.showBadge = false,
     this.foreColor,
-  }) {
-    defaultForeColor = foreColor ?? _defaultForeColor;
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +26,7 @@ class ProfileMenuItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: foreColor ?? defaultForeColor),
+            Icon(icon, color: foreColor ?? _defaultForeColor),
             const SizedBox(width: 16),
             Expanded(child: Text(title, style: const TextStyle(fontSize: 16))),
             if (showBadge)
