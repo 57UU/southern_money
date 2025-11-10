@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:southern_money/pages/about_us_page.dart';
 import 'package:southern_money/pages/debug_page.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/version.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/profile_menu_item.dart';
 
@@ -63,6 +64,17 @@ class _SettingState extends State<Setting> {
             }
           },
           foreColor: Colors.red.withValues(alpha: 0.7),
+        ),
+        ProfileMenuItem(
+          title: '当前版本: ${currentVersion}',
+          icon: Icons.info_outline,
+          onTap: () async {
+            await showInfoDialog(
+              context: context,
+              title: '版本信息',
+              content: getVersionInfo(),
+            );
+          },
         ),
       ],
     );
