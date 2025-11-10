@@ -14,8 +14,5 @@ Future<void> ensureInitialize() async {
   }
   preferences = await SharedPreferences.getInstance();
   await Future.wait([initVersion(), loadConfig()]);
-
-  appSetting.addListener(() {
-    saveAppSetting();
-  });
+  addSaveCallback();
 }

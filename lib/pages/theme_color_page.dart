@@ -207,7 +207,7 @@ class BasicCard extends StatelessWidget {
           color: Theme.of(context).colorScheme.secondaryContainer,
           shadows: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1), //color of shadow
+              color: Colors.black.withValues(alpha: 0.1), //color of shadow
               spreadRadius: 0.1, //spread radius
               blurRadius: 10, // blur radius
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/app_config.dart';
 
 import 'login_page.dart';
 
@@ -16,6 +17,7 @@ class DebugPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: 10,
           children: [
+            Text("session key: ${sessionToken.value}"),
             OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(

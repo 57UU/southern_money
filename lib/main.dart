@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:southern_money/pages/login_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'pages/home_page.dart';
 import 'pages/community_page.dart';
@@ -29,23 +30,29 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Widget _build() {
+    final colorSeed = appSetting.value[theme_color];
+    return MaterialApp(
+      title: '南方财富',
+      theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
+      darkTheme: ThemeData(
+        colorSchemeSeed: colorSeed,
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
+      home: const MainScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    //app setting
     return ListenableBuilder(
       listenable: appSetting,
       builder: (context, _) {
-        final colorSeed = appSetting.value[theme_color];
-        return MaterialApp(
-          title: '南方财富',
-          theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
-          darkTheme: ThemeData(
-            colorSchemeSeed: colorSeed,
-            useMaterial3: true,
-            brightness: Brightness.dark,
-          ),
-          home: const MainScreen(),
-          debugShowCheckedModeBanner: false,
-        );
+        //session key
+        return _build();
       },
     );
   }
@@ -62,7 +69,7 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   // 导航项数据模型
-  static const List<NavigationItemData> _navigationItems = [
+  static final List<NavigationItemData> _navigationItems = [
     NavigationItemData(icon: Icons.home, label: '首页', page: HomePage()),
     NavigationItemData(icon: Icons.people, label: '社区', page: CommunityPage()),
     NavigationItemData(
@@ -76,6 +83,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     logicRootContext = context;
+    return ListenableBuilder(
+      listenable: sessionToken,
+      builder: (context, _) {
+        if (sessionToken.value == null) {
+          return const LoginPage();
+        }
+        return _buildMainScreen();
+      },
+    );
+  }
+
+  Widget _buildMainScreen() {
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) {

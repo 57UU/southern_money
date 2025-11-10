@@ -35,7 +35,7 @@ class _OpenAnAccountState extends State<OpenAnAccount> {
                 ),
                 child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildSectionTitle('1. 服务条款'),
                       _buildSectionContent('欢迎使用南方资金开户服务。在使用本服务前，请仔细阅读以下条款。'),
@@ -98,9 +98,15 @@ class _OpenAnAccountState extends State<OpenAnAccount> {
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -108,7 +114,13 @@ class _OpenAnAccountState extends State<OpenAnAccount> {
   Widget _buildSectionContent(String content) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(content, style: TextStyle(fontSize: 14, height: 1.5)),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(content, style: TextStyle(fontSize: 14, height: 1.5)),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/app_config.dart';
+import '../widgets/common_widget.dart';
+import '../widgets/profile_menu_item.dart';
 import 'my_collection.dart';
 import 'my_message.dart';
 import 'my_selections.dart';
@@ -51,7 +54,7 @@ class ProfilePage extends StatelessWidget {
                               'ID: 114514',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: Colors.grey[500],
                               ),
                             ),
                           ],
@@ -136,39 +139,77 @@ class ProfilePage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildMenuItem(context, '我的自选', Icons.star_border, () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const MySelections(),
-                      ),
-                    );
-                  }),
-                  _buildMenuItem(context, '交易记录', Icons.history, () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const MyTransaction(),
-                      ),
-                    );
-                  }),
-                  _buildMenuItem(context, '我的收藏', Icons.bookmark_border, () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const MyCollection(),
-                      ),
-                    );
-                  }),
-                  _buildMenuItem(context, '消息通知', Icons.notifications_none, () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const MyMessage(),
-                      ),
-                    );
-                  }),
-                  _buildMenuItem(context, '设置', Icons.settings, () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(builder: (context) => const Setting()),
-                    );
-                  }),
+                  ProfileMenuItem(
+                    title: '我的自选',
+                    icon: Icons.star_border,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const MySelections(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileMenuItem(
+                    title: '交易记录',
+                    icon: Icons.history,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const MyTransaction(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileMenuItem(
+                    title: '我的收藏',
+                    icon: Icons.bookmark_border,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const MyCollection(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileMenuItem(
+                    title: '消息通知',
+                    icon: Icons.notifications_none,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const MyMessage(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileMenuItem(
+                    title: '设置',
+                    icon: Icons.settings,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const Setting(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileMenuItem(
+                    title: '退出登录',
+                    icon: Icons.logout,
+                    onTap: () async {
+                      final confirm = await showYesNoDialog(
+                        context: context,
+                        title: '确认退出',
+                        content: '您确定要退出登录吗？',
+                      );
+                      if (confirm == true) {
+                        //退出登录
+                        sessionToken.value = null;
+                      }
+                    },
+                    foreColor: Colors.red.withValues(alpha: 0.7),
+                  ),
                 ],
               ),
             ),
@@ -195,39 +236,6 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildMenuItem(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap, {
-    bool showBadge = false,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.grey[700]),
-            const SizedBox(width: 16),
-            Expanded(child: Text(title, style: const TextStyle(fontSize: 16))),
-            if (showBadge)
-              Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.only(right: 8),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-          ],
-        ),
-      ),
     );
   }
 }

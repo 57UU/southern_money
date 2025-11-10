@@ -6,6 +6,7 @@ Widget TitleText(String title) {
     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
   );
 }
+
 late BuildContext logicRootContext;
 
 Future showInfoDialog({
@@ -27,6 +28,37 @@ Future showInfoDialog({
               Navigator.of(context).pop();
             },
             child: Text(button),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<bool?> showYesNoDialog({
+  BuildContext? context, //no need
+  String title = "",
+  String content = "",
+}) {
+  return showDialog(
+    context: logicRootContext,
+    useRootNavigator: false,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text("No"),
           ),
         ],
       );
