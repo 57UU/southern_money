@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/jewelry_page.dart';
+import 'package:southern_money/pages/futures_page.dart';
+import 'package:southern_money/pages/gold_page.dart';
+import 'package:southern_money/pages/crypto_currency_page.dart';
 
 import '../widgets/post_card.dart';
 import 'open_an_account.dart';
@@ -96,67 +99,66 @@ class QuickNavigation extends StatelessWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         Row(
-          spacing: 16,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(
-              child: _buildCardButton(
-                icon: Icons.account_balance,
-                label: '开户',
-                color: Colors.blue,
-                onTap: () {
-                  // 处理开户点击事件
-                  Navigator.of(context).push(
-                    CupertinoPageRoute(
-                      builder: (context) => const OpenAnAccount(),
-                    ),
-                  );
-                },
-              ),
+            _buildCardButton(
+              icon: Icons.account_balance,
+              label: '开户',
+              color: Colors.blue,
+              onTap: () {
+                // 处理开户点击事件
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    builder: (context) => const OpenAnAccount(),
+                  ),
+                );
+              },
             ),
-            Expanded(
-              child: _buildCardButton(
-                icon: Icons.videogame_asset,
-                label: 'CSGO饰品',
-                color: Colors.purple,
-                onTap: () {
-                  // 处理CSGO饰品点击事件
-                  Navigator.of(context).push(
-                    CupertinoPageRoute(
-                      builder: (context) => const JewelryPage(),
-                    ),
-                  );
-                },
-              ),
+            _buildCardButton(
+              icon: Icons.videogame_asset,
+              label: 'CSGO饰品',
+              color: Colors.purple,
+              onTap: () {
+                // 处理CSGO饰品点击事件
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const JewelryPage()),
+                );
+              },
             ),
-            Expanded(
-              child: _buildCardButton(
-                icon: Icons.trending_up,
-                label: '期货',
-                color: Colors.green,
-                onTap: () {
-                  // 处理期货点击事件
-                },
-              ),
+            _buildCardButton(
+              icon: Icons.trending_up,
+              label: '期货',
+              color: Colors.green,
+              onTap: () {
+                // 处理期货点击事件
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const FuturesPage()),
+                );
+              },
             ),
-            Expanded(
-              child: _buildCardButton(
-                icon: Icons.monetization_on,
-                label: '黄金',
-                color: Colors.amber,
-                onTap: () {
-                  // 处理黄金点击事件
-                },
-              ),
+            _buildCardButton(
+              icon: Icons.monetization_on,
+              label: '黄金',
+              color: Colors.amber,
+              onTap: () {
+                // 处理黄金点击事件
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const GoldPage()),
+                );
+              },
             ),
-            Expanded(
-              child: _buildCardButton(
-                icon: Icons.attach_money,
-                label: '虚拟货币',
-                color: Colors.orange,
-                onTap: () {
-                  // 处理股票点击事件
-                },
-              ),
+            _buildCardButton(
+              icon: Icons.attach_money,
+              label: '虚拟货币',
+              color: Colors.orange,
+              onTap: () {
+                // 处理虚拟货币点击事件
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    builder: (context) => const CryptoCurrencyPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),

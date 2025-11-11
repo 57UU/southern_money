@@ -38,6 +38,7 @@ dependencies:
   package_info_plus: 
   shared_preferences:
   flutter_colorpicker: 
+  image_picker: 
 
 dev_dependencies:
   flutter_test:

@@ -10,15 +10,21 @@ class CommunitySearchPage extends StatefulWidget {
 
 class _CommunitySearchPageState extends State<CommunitySearchPage> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    // 在页面初始化后自动聚焦到搜索框
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_searchFocusNode);
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -34,6 +40,7 @@ class _CommunitySearchPageState extends State<CommunitySearchPage> {
       appBar: AppBar(
         title: SearchBar(
           controller: _searchController,
+          focusNode: _searchFocusNode,
           hintText: '搜索社区内容',
           leading: const Icon(Icons.search),
           onChanged: (value) {

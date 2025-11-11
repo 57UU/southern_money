@@ -1,11 +1,11 @@
 {
-    "name": "southern_money",
-    "short_name": "southern_money",
+    "name": "南方财富",
+    "short_name": "南方财富",
     "start_url": ".",
-    "display": "standalone",
+    "display": "any",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "southern money",
+    "description": "南方财富理财软件",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

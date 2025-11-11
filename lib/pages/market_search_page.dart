@@ -11,6 +11,7 @@ class MarketSearchPage extends StatefulWidget {
 
 class _MarketSearchPageState extends State<MarketSearchPage> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   List<_StockData> _filteredStocks = [];
   List<_StockData> _allStocks = [];
   bool _isSearching = false;
@@ -21,6 +22,10 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
     // 初始化股票数据
     _initializeStockData();
     _filteredStocks = _allStocks;
+    // 在页面初始化后自动聚焦到搜索框
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_searchFocusNode);
+    });
   }
 
   void _initializeStockData() {
@@ -84,6 +89,7 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -94,6 +100,7 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
       appBar: AppBar(
         title: SearchBar(
           controller: _searchController,
+          focusNode: _searchFocusNode,
           hintText: '搜索商品行情',
           leading: const Icon(Icons.search),
           onChanged: (value) {
@@ -139,37 +146,35 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
         curve: Curves.easeOutQuart,
         child: _isSearching
             ? _filteredStocks.isEmpty
-                ? Center(
-                    child: Text(
-                      '未找到相关商品',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 14,
+                  ? Center(
+                      child: Text(
+                        '未找到相关商品',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filteredStocks.length,
-                    itemBuilder: (context, index) {
-                      final stock = _filteredStocks[index];
-                      return StockCard(
-                        stockName: stock.name,
-                        stockCode: stock.code,
-                        price: stock.price,
-                        changeAmount: stock.changeAmount,
-                        changePercent: stock.changePercent,
-                        isUp: stock.isUp,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('查看 ${stock.name} 详情'),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  )
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _filteredStocks.length,
+                      itemBuilder: (context, index) {
+                        final stock = _filteredStocks[index];
+                        return StockCard(
+                          stockName: stock.name,
+                          stockCode: stock.code,
+                          price: stock.price,
+                          changeAmount: stock.changeAmount,
+                          changePercent: stock.changePercent,
+                          isUp: stock.isUp,
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('查看 ${stock.name} 详情')),
+                            );
+                          },
+                        );
+                      },
+                    )
             : Center(
                 child: Text(
                   '请输入关键词搜索商品行情',

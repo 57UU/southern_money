@@ -173,10 +173,6 @@ class _LoginPageState extends State<LoginPage> {
       // 表单验证通过，执行登录逻辑
       //TODO: 登录逻辑
       sessionToken.value = "1919810";
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('请输入用户名和密码')));
     }
   }
 
