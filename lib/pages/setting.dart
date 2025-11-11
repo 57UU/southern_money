@@ -7,6 +7,7 @@ import 'package:southern_money/setting/version.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/profile_menu_item.dart';
 
+import 'setting_duration.dart';
 import 'theme_color_page.dart';
 
 class Setting extends StatefulWidget {
@@ -29,6 +30,15 @@ class _SettingState extends State<Setting> {
               CupertinoPageRoute(
                 builder: (context) => const ChangeThemeColorPage(),
               ),
+            );
+          },
+        ),
+        ProfileMenuItem(
+          title: '动画时长',
+          icon: Icons.timer_outlined,
+          onTap: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(builder: (context) => const SettingDuration()),
             );
           },
         ),

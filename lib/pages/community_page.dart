@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/community_search_page.dart';
+import 'package:southern_money/pages/post_page.dart';
 import '../widgets/post_card.dart';
 
 class CommunityPage extends StatelessWidget {
@@ -14,17 +17,21 @@ class CommunityPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              ScaffoldMessenger.of(
+              Navigator.push(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('搜索功能')));
+                CupertinoPageRoute(
+                  builder: (context) => const CommunitySearchPage(),
+                ),
+              );
             },
           ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              ScaffoldMessenger.of(
+              Navigator.push(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('发布新内容')));
+                CupertinoPageRoute(builder: (context) => const PostPage()),
+              );
             },
           ),
         ],

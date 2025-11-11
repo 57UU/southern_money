@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import '../widgets/stock_card.dart';
 import '../widgets/index_card.dart';
+import 'market_search_page.dart';
 
 class MarketPage extends StatelessWidget {
   const MarketPage({super.key});
@@ -81,9 +83,12 @@ class MarketPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              ScaffoldMessenger.of(
+              Navigator.push(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('搜索商品')));
+                CupertinoPageRoute(
+                  builder: (context) => const MarketSearchPage(),
+                ),
+              );
             },
           ),
         ],

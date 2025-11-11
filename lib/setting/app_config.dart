@@ -5,9 +5,10 @@ ValueNotifier<Map<String, dynamic>> appSetting = ValueNotifier({});
 ValueNotifier<String?> sessionToken = ValueNotifier(null);
 
 bool isFirstTime = true;
-
+int get animationTime => appSetting.value[animation_time]!;
 const String _sessionTokenKey = "session_token";
 const String theme_color = "theme_color";
+const String animation_time = "animation_time";
 late SharedPreferences preferences;
 //save
 void addSaveCallback() {
@@ -21,6 +22,7 @@ void addSaveCallback() {
 
   appSetting.addListener(() {
     preferences.setInt(theme_color, appSetting.value[theme_color]!.value);
+    preferences.setInt(animation_time, appSetting.value[animation_time]!);
   });
 }
 
@@ -35,6 +37,12 @@ Future<void> loadConfig() async {
     appSetting.value[theme_color] = Colors.blue;
   } else {
     appSetting.value[theme_color] = Color(color);
+  }
+  int? animationTime = preferences.getInt(animation_time);
+  if (animationTime == null) {
+    appSetting.value[animation_time] = 350;
+  } else {
+    appSetting.value[animation_time] = animationTime;
   }
   sessionToken.value = preferences.getString(_sessionTokenKey);
 }

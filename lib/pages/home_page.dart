@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/jewelry_page.dart';
 
 import '../widgets/post_card.dart';
 import 'open_an_account.dart';
@@ -119,6 +120,11 @@ class QuickNavigation extends StatelessWidget {
                 color: Colors.purple,
                 onTap: () {
                   // 处理CSGO饰品点击事件
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const JewelryPage(),
+                    ),
+                  );
                 },
               ),
             ),
