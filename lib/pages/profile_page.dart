@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/widgets/dialog.dart';
+import 'package:southern_money/widgets/router_utils.dart';
 import '../widgets/common_widget.dart';
 import '../widgets/profile_menu_item.dart';
 import 'my_collection.dart';
@@ -143,55 +145,35 @@ class ProfilePage extends StatelessWidget {
                     title: '我的自选',
                     icon: Icons.star_border,
                     onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => const MySelections(),
-                        ),
-                      );
+                      popupOrNavigate(context, const MySelections());
                     },
                   ),
                   ProfileMenuItem(
                     title: '交易记录',
                     icon: Icons.history,
                     onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => const MyTransaction(),
-                        ),
-                      );
+                      popupOrNavigate(context, const MyTransaction());
                     },
                   ),
                   ProfileMenuItem(
                     title: '我的收藏',
                     icon: Icons.bookmark_border,
                     onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => const MyCollection(),
-                        ),
-                      );
+                      popupOrNavigate(context, const MyCollection());
                     },
                   ),
                   ProfileMenuItem(
                     title: '消息通知',
                     icon: Icons.notifications_none,
                     onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => const MyMessage(),
-                        ),
-                      );
+                      popupOrNavigate(context, const MyMessage());
                     },
                   ),
                   ProfileMenuItem(
                     title: '设置',
                     icon: Icons.settings,
                     onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => const Setting(),
-                        ),
-                      );
+                      popupOrNavigate(context, const Setting());
                     },
                   ),
                   ProfileMenuItem(

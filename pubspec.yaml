@@ -39,6 +39,7 @@ dependencies:
   shared_preferences:
   flutter_colorpicker: 
   image_picker: 
+  async: 
 
 dev_dependencies:
   flutter_test:

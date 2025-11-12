@@ -57,7 +57,17 @@ class _ChangeThemeColorPageState extends State<ChangeThemeColorPage> {
                 ),
               ),
               backgroundColor: Theme.of(context).colorScheme.secondary,
+              actions: [
+                TextButton(
+                  onPressed: _confirmChanges,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                  child: Text("确认"),
+                ),
+              ],
             ),
+
             body: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -90,16 +100,18 @@ class _ChangeThemeColorPageState extends State<ChangeThemeColorPage> {
             ),
             floatingActionButton: FloatingActionButton(
               child: const Icon(Icons.check),
-              onPressed: () {
-                appSetting.value[theme_color] = pickerColor;
-                appSetting.notifyListeners();
-                Navigator.of(context).pop();
-              },
+              onPressed: _confirmChanges,
             ),
           );
         },
       ),
     );
+  }
+
+  void _confirmChanges() {
+    appSetting.value[theme_color] = pickerColor;
+    appSetting.notifyListeners();
+    Navigator.of(context).pop();
   }
 }
 

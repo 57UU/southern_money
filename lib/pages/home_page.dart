@@ -4,6 +4,7 @@ import 'package:southern_money/pages/jewelry_page.dart';
 import 'package:southern_money/pages/futures_page.dart';
 import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/widgets/router_utils.dart';
 
 import '../widgets/post_card.dart';
 import 'open_an_account.dart';
@@ -107,11 +108,7 @@ class QuickNavigation extends StatelessWidget {
               color: Colors.blue,
               onTap: () {
                 // 处理开户点击事件
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    builder: (context) => const OpenAnAccount(),
-                  ),
-                );
+                popupOrNavigate(context, const OpenAnAccount());
               },
             ),
             _buildCardButton(
@@ -120,7 +117,8 @@ class QuickNavigation extends StatelessWidget {
               color: Colors.purple,
               onTap: () {
                 // 处理CSGO饰品点击事件
-                Navigator.of(context).push(
+                Navigator.push(
+                  context,
                   CupertinoPageRoute(builder: (context) => const JewelryPage()),
                 );
               },
@@ -131,9 +129,7 @@ class QuickNavigation extends StatelessWidget {
               color: Colors.green,
               onTap: () {
                 // 处理期货点击事件
-                Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (context) => const FuturesPage()),
-                );
+                popupOrNavigate(context, const FuturesPage());
               },
             ),
             _buildCardButton(
@@ -142,9 +138,7 @@ class QuickNavigation extends StatelessWidget {
               color: Colors.amber,
               onTap: () {
                 // 处理黄金点击事件
-                Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (context) => const GoldPage()),
-                );
+                popupOrNavigate(context, const GoldPage());
               },
             ),
             _buildCardButton(
@@ -153,11 +147,7 @@ class QuickNavigation extends StatelessWidget {
               color: Colors.orange,
               onTap: () {
                 // 处理虚拟货币点击事件
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    builder: (context) => const CryptoCurrencyPage(),
-                  ),
-                );
+                popupOrNavigate(context, const CryptoCurrencyPage());
               },
             ),
           ],

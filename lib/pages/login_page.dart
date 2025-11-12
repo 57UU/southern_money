@@ -3,145 +3,69 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:southern_money/setting/app_config.dart';
 
-// 波浪绘制器类
-class WavePainter extends CustomPainter {
-  final Color color;
-  final double waveHeight;
-  final double waveLength;
-  final double offset;
-
-  WavePainter({
-    required this.color,
-    required this.waveHeight,
-    required this.waveLength,
-    this.offset = 0,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
-    final path = Path();
-
-    path.moveTo(0, size.height);
-
-    // 绘制波浪曲线
-    for (double i = 0; i <= size.width; i++) {
-      final y = waveHeight * sin((i / waveLength) + offset) + size.height / 2;
-      if (i == 0) {
-        path.moveTo(i, y);
-      } else {
-        path.lineTo(i, y);
-      }
-    }
-
-    path.lineTo(size.width, size.height);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class PaddingContainer extends StatelessWidget {
-  const PaddingContainer({super.key});
+class BrandHeader extends StatelessWidget {
+  const BrandHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+            colorScheme.primaryContainer,
+            colorScheme.secondaryContainer.withOpacity(0.3),
           ],
         ),
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 添加一些装饰性的波浪线条和形状
-            Container(
-              width: 200,
-              height: 200,
-              child: Stack(
-                children: [
-                  // 第一个波浪
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: CustomPaint(
-                      size: Size(200, 100),
-                      painter: WavePainter(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withOpacity(0.3),
-                        waveHeight: 15,
-                        waveLength: 40,
-                      ),
-                    ),
-                  ),
-                  // 第二个波浪
-                  Positioned(
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    child: CustomPaint(
-                      size: Size(200, 100),
-                      painter: WavePainter(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.secondary.withOpacity(0.2),
-                        waveHeight: 10,
-                        waveLength: 30,
-                        offset: 10,
-                      ),
-                    ),
-                  ),
-                  // 装饰性边框
-                  Positioned.fill(
-                    child: Container(
-                      margin: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.4),
-                          width: 2,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '南方财富',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Logo 图标
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            SizedBox(height: 40),
-            Text(
-              '智能理财，财富增长',
-              style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            child: Icon(
+              Icons.account_balance_wallet,
+              size: 64,
+              color: colorScheme.onPrimary,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 24),
+          // 应用名称
+          Text(
+            '南方财富',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 副标题
+          Text(
+            '理财有道，一夜暴富',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -183,6 +107,11 @@ class _LoginPageState extends State<LoginPage> {
     ).showSnackBar(const SnackBar(content: Text('注册功能待实现')));
   }
 
+  void _guestMode() {
+    // 游客模式逻辑
+    sessionToken.value = "114514";
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -195,92 +124,120 @@ class _LoginPageState extends State<LoginPage> {
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(height: 60),
-                // Login标题
-                const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 40),
-
-                // 用户名输入框
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.person_outline),
-                    border: UnderlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入用户名';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // 密码输入框
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _isObscure,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isObscure ? Icons.visibility : Icons.visibility_off,
+                // 上半部分：登录表单
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 60),
+                    // Login标题
+                    const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isObscure = !_isObscure;
-                        });
+                    ),
+                    const SizedBox(height: 40),
+
+                    // 用户名输入框
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person_outline),
+                        border: UnderlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '请输入用户名';
+                        }
+                        return null;
                       },
                     ),
-                    border: const UnderlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入密码';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 40),
+                    const SizedBox(height: 24),
 
-                // 登录按钮
+                    // 密码输入框
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _isObscure,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isObscure
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isObscure = !_isObscure;
+                            });
+                          },
+                        ),
+                        border: const UnderlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '请输入密码';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 40),
+
+                    // 登录按钮
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('登录', style: TextStyle(fontSize: 16)),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 注册按钮
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton(
+                        onPressed: _register,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('注册', style: TextStyle(fontSize: 16)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+
+                // 下半部分：游客模式按钮
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer,
+                  child: TextButton(
+                    onPressed: _guestMode,
+                    style: TextButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('登录', style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // 注册按钮
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
-                    onPressed: _register,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('注册', style: TextStyle(fontSize: 16)),
+                    child: const Text('游客模式', style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ],
@@ -302,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 左侧填充内容，
-                    Expanded(flex: 6, child: PaddingContainer()),
+                    Expanded(flex: 6, child: BrandHeader()),
                     // 右侧登录表单，
                     Expanded(
                       flex: 4,
