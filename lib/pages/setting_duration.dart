@@ -9,15 +9,14 @@ class SettingDuration extends StatefulWidget {
 }
 
 class _SettingDurationState extends State<SettingDuration> {
-  late int _currentAnimationTime; // 用于实时预览的值
   late int _tempAnimationTime; // 临时存储未确认的值
   bool _isAnimating = false; // 动画状态
+  bool _shouldAnimate = true; // 控制动画循环的标志位
 
   @override
   void initState() {
     super.initState();
     // 初始化当前动画时长为配置中的值
-    _currentAnimationTime = animationTime;
     _tempAnimationTime = animationTime;
 
     // 启动预览动画
@@ -26,32 +25,35 @@ class _SettingDurationState extends State<SettingDuration> {
 
   @override
   void dispose() {
+    _shouldAnimate = false; // 停止动画循环
     super.dispose();
   }
 
-  void _startAnimation() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _isAnimating = true;
-        });
+  Future<void> _startAnimation() async {
+    while (_shouldAnimate && mounted) {
+      // 等待500ms后开始动画
+      await Future.delayed(Duration(milliseconds: _tempAnimationTime + 100));
 
-        Future.delayed(Duration(milliseconds: _currentAnimationTime + 500), () {
-          if (mounted) {
-            setState(() {
-              _isAnimating = false;
-            });
-            _startAnimation(); // 循环动画
-          }
-        });
-      }
-    });
+      if (!_shouldAnimate || !mounted) break;
+
+      setState(() {
+        _isAnimating = true;
+      });
+
+      // 等待动画时长 + 500ms后结束动画
+      await Future.delayed(Duration(milliseconds: _tempAnimationTime + 100));
+
+      if (!_shouldAnimate || !mounted) break;
+
+      setState(() {
+        _isAnimating = false;
+      });
+    }
   }
 
   void _updateAnimationTime(double value) {
     setState(() {
       _tempAnimationTime = value.round();
-      _currentAnimationTime = _tempAnimationTime; // 实时更新预览动画时长
     });
   }
 
@@ -141,7 +143,7 @@ class _SettingDurationState extends State<SettingDuration> {
                         _isAnimating ? 30 : 10,
                       ),
                     ),
-                    duration: Duration(milliseconds: _currentAnimationTime),
+                    duration: Duration(milliseconds: _tempAnimationTime),
                     curve: Curves.easeInOut,
                     child: const Icon(
                       Icons.flutter_dash,
