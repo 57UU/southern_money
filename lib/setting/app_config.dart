@@ -26,7 +26,7 @@ void addSaveCallback() {
   });
 }
 
-void clearAllData() async {
+Future<void> clearAllData() async {
   await preferences.clear();
   await loadConfig();
 }

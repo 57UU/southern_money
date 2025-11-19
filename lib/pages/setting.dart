@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/data/local_store.dart';
 import 'package:southern_money/pages/about_us_page.dart';
 import 'package:southern_money/pages/debug_page.dart';
 import 'package:southern_money/setting/app_config.dart';
@@ -71,7 +72,8 @@ class _SettingState extends State<Setting> {
               content: '您确定要清除全部数据吗？',
             );
             if (confirm == true) {
-              clearAllData();
+              await LocalStore.instance.clearAll();
+              await clearAllData();
             }
           },
           foreColor: Colors.red.withValues(alpha: 0.7),
