@@ -104,9 +104,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     logicRootContext = context;
     return ListenableBuilder(
-      listenable: appConfigService.sessionToken,
+      listenable: appConfigService.tokenService.sessionToken,
       builder: (context, _) {
-        if (appConfigService.sessionToken.value == null) {
+        if (appConfigService.tokenService.sessionToken.value == null) {
           return const LoginPage();
         }
         return _buildMainScreen();

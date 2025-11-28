@@ -22,13 +22,18 @@ Future<void> ensureInitialize() async {
   getIt.registerSingletonAsync<SharedPreferences>(
     () => SharedPreferences.getInstance(),
   );
-  getIt.registerSingletonAsync<AppConfigService>(() async {
+  getIt.registerSingletonAsync<TokenService>(() async {
     await getIt.isReady<SharedPreferences>();
-    final appConfigService = AppConfigService(getIt<SharedPreferences>());
-    await appConfigService.initalize();
-    appConfigService.onBaseUrlChange = (newUrl) {
-      getIt<JwtDio>().options.baseUrl = newUrl;
-    };
+    final tokenService = TokenService(getIt<SharedPreferences>());
+    return tokenService;
+  });
+  getIt.registerSingletonAsync<AppConfigService>(() async {
+    await getIt.isReady<TokenService>();
+    final appConfigService = AppConfigService(
+      getIt<SharedPreferences>(),
+      getIt<TokenService>(),
+    );
+    // 注意：onBaseUrlChange 回调将在 JwtDio 注册后设置
     return appConfigService;
   });
   getIt.registerSingletonAsync<PackageInfo>(() async {
@@ -39,18 +44,31 @@ Future<void> ensureInitialize() async {
     return VersionService(getIt<PackageInfo>());
   });
   getIt.registerSingleton<Dio>(Dio());
+  getIt.registerSingletonAsync<ApiLoginService>(() async {
+    await getIt.isReady<AppConfigService>();
+    return ApiLoginService(getIt<Dio>(), getIt<AppConfigService>());
+  });
   getIt.registerSingletonAsync<JwtDio>(() async {
     await getIt.isReady<AppConfigService>();
+    await getIt.isReady<ApiLoginService>();
     final jwtDio = JwtDio(
       BaseOptions(baseUrl: getIt<AppConfigService>().baseUrl),
     );
     jwtDio.interceptors.add(
       JwtInterceptor(
         onTokenExpired: () async {
-          getIt<AppConfigService>().clearSessionToken();
+          getIt<TokenService>().clearTokens();
         },
+        tokenService: getIt<TokenService>(),
+        apiLoginService: getIt<ApiLoginService>(),
       ),
     );
+
+    // 设置 AppConfigService 的 onBaseUrlChange 回调，现在 JwtDio 已经注册
+    getIt<AppConfigService>().onBaseUrlChange = (newUrl) {
+      jwtDio.options.baseUrl = newUrl;
+    };
+
     return jwtDio;
   });
   getIt.registerSingletonAsync<ApiTestService>(() async {
@@ -61,9 +79,6 @@ Future<void> ensureInitialize() async {
     await getIt.isReady<JwtDio>();
     return ApiPostService(getIt<JwtDio>());
   });
-  getIt.registerSingletonAsync<ApiLoginService>(() async {
-    await getIt.isReady<JwtDio>();
-    return ApiLoginService(getIt<JwtDio>());
-  });
+
   await getIt.allReady();
 }

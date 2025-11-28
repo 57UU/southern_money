@@ -187,7 +187,7 @@ class ProfilePage extends StatelessWidget {
                       );
                       if (confirm == true) {
                         //退出登录
-                        appConfigService.sessionToken.value = null;
+                        appConfigService.tokenService.clearTokens();
                       }
                     },
                     foreColor: Colors.red.withValues(alpha: 0.7),

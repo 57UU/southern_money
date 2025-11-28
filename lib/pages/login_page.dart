@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       // 表单验证通过，执行登录逻辑
       //TODO: 登录逻辑
-      appConfigService.sessionToken.value = "1919810";
+      appConfigService.tokenService.sessionToken.value = "1919810";
     }
   }
 
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _guestMode() {
     // 游客模式逻辑
-    appConfigService.sessionToken.value = "114514";
+    appConfigService.tokenService.sessionToken.value = "114514";
   }
 
   @override

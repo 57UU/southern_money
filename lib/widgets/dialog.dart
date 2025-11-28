@@ -76,22 +76,22 @@ Future showLoadingDialog({
   void Function()? onError,
 }) {
   ContextWrapper contextWrapper = ContextWrapper();
-  var future = func()
-      .then((v) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (contextWrapper.context.mounted) {
-          Navigator.pop(contextWrapper.context);
-        }
-      })
-      .onError((error, stackTrace) {
-        //await Future.delayed(const Duration(microseconds: 5000));
-        if (contextWrapper.context.mounted) {
-          Navigator.pop(contextWrapper.context);
-        }
-        if (onError != null) {
-          onError();
-        }
-      });
+  var future =
+      Future.wait([func(), Future.delayed(const Duration(milliseconds: 100))])
+          .then((v) async {
+            if (contextWrapper.context.mounted) {
+              Navigator.pop(contextWrapper.context);
+            }
+          })
+          .onError((error, stackTrace) {
+            //await Future.delayed(const Duration(microseconds: 5000));
+            if (contextWrapper.context.mounted) {
+              Navigator.pop(contextWrapper.context);
+            }
+            if (onError != null) {
+              onError();
+            }
+          });
   var myCancelableFuture = CancelableOperation.fromFuture(future);
 
   return showDialog(
