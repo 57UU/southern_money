@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
-import '../widgets/common_widget.dart';
 import '../widgets/profile_menu_item.dart';
 import 'my_collection.dart';
 import 'my_message.dart';

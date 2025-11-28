@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/register_page.dart';
 import 'package:southern_money/pages/set_api_page.dart';

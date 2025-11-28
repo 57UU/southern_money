@@ -63,8 +63,7 @@ class _SettingDurationState extends State<SettingDuration> {
   void _confirmChanges() {
     // 只有在确认时才真正更新appSetting中的值
 
-    appConfigService.appSetting.value[animation_time] = _tempAnimationTime;
-    appConfigService.appSetting.notifyListeners();
+    appConfigService.setConfig(animation_time, _tempAnimationTime);
 
     Navigator.pop(context);
     // 显示成功提示

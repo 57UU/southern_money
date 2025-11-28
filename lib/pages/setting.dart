@@ -6,7 +6,6 @@ import 'package:southern_money/pages/debug_page.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/setting/version.dart';
-import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/profile_menu_item.dart';
 
