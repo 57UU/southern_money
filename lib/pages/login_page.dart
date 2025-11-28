@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/set_api_page.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/widgets/router_utils.dart';
 
 class BrandHeader extends StatelessWidget {
   const BrandHeader({super.key});
@@ -114,167 +116,168 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: sessionToken,
-      builder: (context, _) {
-        // 登录表单部分
-        final loginForm = Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
+    // 登录表单部分
+    final loginForm = Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 上半部分：登录表单
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 上半部分：登录表单
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 60),
-                    // Login标题
-                    const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // 用户名输入框
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline),
-                        border: UnderlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return '请输入用户名';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-
-                    // 密码输入框
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _isObscure,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isObscure
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isObscure = !_isObscure;
-                            });
-                          },
-                        ),
-                        border: const UnderlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return '请输入密码';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 40),
-
-                    // 登录按钮
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primaryContainer,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('登录', style: TextStyle(fontSize: 16)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // 注册按钮
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton(
-                        onPressed: _register,
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('注册', style: TextStyle(fontSize: 16)),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                const SizedBox(height: 60),
+                // Login标题
+                const Text(
+                  'Login',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 40),
 
-                // 下半部分：游客模式按钮
+                // 用户名输入框
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: UnderlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入用户名';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // 密码输入框
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _isObscure,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscure ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                    ),
+                    border: const UnderlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入密码';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 40),
+
+                // 登录按钮
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: TextButton(
-                    onPressed: _guestMode,
-                    style: TextButton.styleFrom(
+                  child: ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('游客模式', style: TextStyle(fontSize: 16)),
+                    child: const Text('登录', style: TextStyle(fontSize: 16)),
                   ),
                 ),
+                const SizedBox(height: 20),
+
+                // 注册按钮
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: _register,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('注册', style: TextStyle(fontSize: 16)),
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
             ),
-          ),
-        );
 
-        final loginFormWithScroll = SingleChildScrollView(child: loginForm);
-        // 使用LayoutBuilder根据屏幕方向调整布局
-        return Scaffold(
-          body: OrientationBuilder(
-            builder: (context, orientation) {
-              // 判断是否为横屏
-              final isLandscape = orientation == Orientation.landscape;
+            // 下半部分：游客模式按钮
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: TextButton(
+                onPressed: _guestMode,
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('游客模式', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
-              if (isLandscape) {
-                // 横屏模式：左右分栏
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 左侧填充内容，
-                    Expanded(flex: 6, child: BrandHeader()),
-                    // 右侧登录表单，
-                    Expanded(
-                      flex: 4,
-                      child: SingleChildScrollView(child: loginFormWithScroll),
-                    ),
-                  ],
-                );
-              } else {
-                // 竖屏模式：保持原有的单列布局
-                return loginFormWithScroll;
-              }
-            },
-          ),
-        );
-      },
+    final loginFormWithScroll = SingleChildScrollView(child: loginForm);
+    final loginFormWithApi = Column(
+      children: [
+        Expanded(child: loginFormWithScroll),
+        TextButton(
+          onPressed: () {
+            popupOrNavigate(context, SetApiUrlPage());
+          },
+          child: Text("API: ${baseUrl}"),
+        ),
+      ],
+    );
+    // 使用LayoutBuilder根据屏幕方向调整布局
+    return Scaffold(
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          // 判断是否为横屏
+          final isLandscape = orientation == Orientation.landscape;
+
+          if (isLandscape) {
+            // 横屏模式：左右分栏
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 左侧填充内容，
+                Expanded(flex: 6, child: BrandHeader()),
+                // 右侧登录表单，
+                Expanded(
+                  flex: 4,
+                  child: loginFormWithApi,
+                ),
+              ],
+            );
+          } else {
+            // 竖屏模式：保持原有的单列布局
+            return loginFormWithApi;
+          }
+        },
+      ),
     );
   }
 }

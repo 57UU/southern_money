@@ -2,6 +2,10 @@
 
 一个功能丰富的金融投资移动应用，提供股票行情、社区讨论、投资组合管理等核心功能。
 
+## dev
+### build json support
+- 运行 `dart run build_runner build` 生成 JSON 序列化代码
+
 ## 📱 应用截图
 
 *（请在此处添加应用截图）*
