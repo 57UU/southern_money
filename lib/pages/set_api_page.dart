@@ -35,6 +35,7 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
             ),
             titleText("Quick Set"),
             _buildQuickSet("http://localhost:5062"),
+            _buildQuickSet("https://server.57u.tech:48404"),
           ],
         ),
       ),
