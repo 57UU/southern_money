@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import '../setting/app_config.dart';
 
 class CommunitySearchPage extends StatefulWidget {
@@ -11,6 +12,7 @@ class CommunitySearchPage extends StatefulWidget {
 class _CommunitySearchPageState extends State<CommunitySearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final appConfigService = getIt<AppConfigService>();
 
   @override
   void initState() {
@@ -81,7 +83,7 @@ class _CommunitySearchPageState extends State<CommunitySearchPage> {
         ],
       ),
       body: AnimatedContainer(
-        duration: Duration(milliseconds: animationTime),
+        duration: Duration(milliseconds: appConfigService.animationTime),
         curve: Curves.easeOutQuart,
         child: Center(
           child: Text(

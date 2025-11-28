@@ -1,8 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/register_page.dart';
 import 'package:southern_money/pages/set_api_page.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
 class BrandHeader extends StatelessWidget {
@@ -85,6 +87,7 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isObscure = true;
+  final appConfigService = getIt<AppConfigService>();
 
   @override
   void dispose() {
@@ -98,20 +101,18 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       // 表单验证通过，执行登录逻辑
       //TODO: 登录逻辑
-      sessionToken.value = "1919810";
+      appConfigService.sessionToken.value = "1919810";
     }
   }
 
   void _register() {
     // 注册逻辑
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('注册功能待实现')));
+    popupOrNavigate(context, RegisterPage());
   }
 
   void _guestMode() {
     // 游客模式逻辑
-    sessionToken.value = "114514";
+    appConfigService.sessionToken.value = "114514";
   }
 
   @override
@@ -247,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () {
             popupOrNavigate(context, SetApiUrlPage());
           },
-          child: Text("API: ${baseUrl}"),
+          child: Text("API: ${appConfigService.baseUrl}"),
         ),
       ],
     );
@@ -266,10 +267,7 @@ class _LoginPageState extends State<LoginPage> {
                 // 左侧填充内容，
                 Expanded(flex: 6, child: BrandHeader()),
                 // 右侧登录表单，
-                Expanded(
-                  flex: 4,
-                  child: loginFormWithApi,
-                ),
+                Expanded(flex: 4, child: loginFormWithApi),
               ],
             );
           } else {

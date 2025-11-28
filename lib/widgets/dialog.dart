@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 
+import '../setting/ensure_initialized.dart' show getIt;
+
+final appConfigService = getIt<AppConfigService>();
+
 Future showInfoDialog({
   BuildContext? context, //this is no need anymore
   String title = "",
@@ -158,7 +162,7 @@ Future showLoadingDialogWithErrorString({
       return AlertDialog(
         title: Text(isError ? onErrorTitle : title),
         content: AnimatedSize(
-          duration: Duration(milliseconds: animationTime),
+          duration: Duration(milliseconds: appConfigService.animationTime),
           curve: Curves.easeOutQuart,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),

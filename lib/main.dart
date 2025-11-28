@@ -26,14 +26,15 @@ class NavigationItemData {
 
 void main() async {
   await ensureInitialize();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final appConfigService = getIt<AppConfigService>();
 
   Widget _build() {
-    final colorSeed = appSetting.value[theme_color];
+    final colorSeed = appConfigService.appSetting.value[theme_color];
     return MaterialApp(
       title: '南方财富',
       theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //app setting
     return ListenableBuilder(
-      listenable: appSetting,
+      listenable: appConfigService.appSetting,
       builder: (context, _) {
         //session key
         return _build();
@@ -69,6 +70,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  final appConfigService = getIt<AppConfigService>();
 
   // 导航项数据模型
   static final List<NavigationItemData> _navigationItems = [
@@ -102,9 +104,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     logicRootContext = context;
     return ListenableBuilder(
-      listenable: sessionToken,
+      listenable: appConfigService.sessionToken,
       builder: (context, _) {
-        if (sessionToken.value == null) {
+        if (appConfigService.sessionToken.value == null) {
           return const LoginPage();
         }
         return _buildMainScreen();

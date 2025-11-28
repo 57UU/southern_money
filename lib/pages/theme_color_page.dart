@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 
 class ChangeThemeColorPage extends StatefulWidget {
   const ChangeThemeColorPage({super.key});
@@ -10,8 +11,13 @@ class ChangeThemeColorPage extends StatefulWidget {
 }
 
 class _ChangeThemeColorPageState extends State<ChangeThemeColorPage> {
-  Color pickerColor = (appSetting.value[theme_color]);
+  final appConfigService = getIt<AppConfigService>();
+
+  late Color pickerColor;
   ColorScheme? colorScheme;
+  _ChangeThemeColorPageState() {
+    pickerColor = (appConfigService.getConfig(theme_color)) as Color;
+  }
 
   @override
   void initState() {
@@ -109,8 +115,7 @@ class _ChangeThemeColorPageState extends State<ChangeThemeColorPage> {
   }
 
   void _confirmChanges() {
-    appSetting.value[theme_color] = pickerColor;
-    appSetting.notifyListeners();
+    appConfigService.setConfig(theme_color, pickerColor);
     Navigator.of(context).pop();
   }
 }

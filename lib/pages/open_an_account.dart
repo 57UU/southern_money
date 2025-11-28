@@ -179,7 +179,7 @@ Future<bool?> openAnAccountDialog() {
           DialogState.error => '开户失败',
         }),
         content: AnimatedSize(
-          duration: Duration(milliseconds: animationTime),
+          duration: Duration(milliseconds: appConfigService.animationTime),
           curve: Curves.easeOutQuart,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),

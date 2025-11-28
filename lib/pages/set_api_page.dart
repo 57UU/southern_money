@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/setting/app_config.dart';
-import 'package:southern_money/webapi/definitions_response.dart';
-import 'package:southern_money/webapi/test.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/webapi/api_test.dart';
 import 'package:southern_money/widgets/dialog.dart';
 
 class SetApiUrlPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class SetApiUrlPage extends StatefulWidget {
 }
 
 class _SetApiUrlPageState extends State<SetApiUrlPage> {
+  final appConfigService = getIt<AppConfigService>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +26,7 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
           spacing: 10,
           children: [
             titleText("Current API:"),
-            Text("${baseUrl}"),
+            Text("${appConfigService.apiBaseUrl.value}"),
             Row(
               spacing: 10,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -52,7 +54,7 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
 
   void _displayEditApiPopup() {
     final TextEditingController controller = TextEditingController(
-      text: baseUrl,
+      text: appConfigService.baseUrl,
     );
     showDialog(
       context: context,
@@ -72,7 +74,7 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
           TextButton(
             onPressed: () {
               setState(() {
-                apiBaseUrl.value = controller.text;
+                appConfigService.apiBaseUrl.value = controller.text;
               });
               Navigator.of(context).pop();
             },
@@ -87,7 +89,7 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
     final btn = OutlinedButton(
       onPressed: () {
         setState(() {
-          apiBaseUrl.value = apiUrl;
+          appConfigService.apiBaseUrl.value = apiUrl;
         });
       },
       child: Text(apiUrl),
@@ -99,9 +101,13 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
     return OutlinedButton(onPressed: _testApi, child: Text("Test API"));
   }
 
+  final testApiService = getIt<ApiTestService>();
+
   Future _testApi() async {
     ApiResponse<TestResponse>? result;
-    await showLoadingDialog(func: () async => result = await testApi());
+    await showLoadingDialog(
+      func: () async => result = await testApiService.testApi(),
+    );
     bool success = result?.success == true;
     if (success) {
       showInfoDialog(title: 'Success', content: result?.data?.message ?? "");

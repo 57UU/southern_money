@@ -43,6 +43,8 @@ dependencies:
   cached_network_image:
   http:
   json_annotation: ^4.9.0
+  get_it:
+  dio: 
 
 dev_dependencies:
   flutter_test:

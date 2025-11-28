@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-
-import '../setting/app_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 
 const String _selectionsKey = 'local_store_selections';
 const String _collectionsKey = 'local_store_collections';
 const String _transactionsKey = 'local_store_transactions';
+
+final preferences = getIt<SharedPreferences>();
 
 class SelectionItem {
   final String id;
@@ -139,10 +141,7 @@ class LocalStore {
     );
   }
 
-  List<T> _loadList<T>(
-    String key,
-    T Function(Map<String, dynamic>) converter,
-  ) {
+  List<T> _loadList<T>(String key, T Function(Map<String, dynamic>) converter) {
     final raw = preferences.getString(key);
     if (raw == null || raw.isEmpty) {
       return <T>[];

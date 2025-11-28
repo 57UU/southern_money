@@ -4,6 +4,7 @@ import 'package:southern_money/data/local_store.dart';
 import 'package:southern_money/pages/about_us_page.dart';
 import 'package:southern_money/pages/debug_page.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/setting/version.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
@@ -20,6 +21,9 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  final appConfigService = getIt<AppConfigService>();
+  final versionService = getIt<VersionService>();
+
   @override
   Widget build(BuildContext context) {
     final body = Column(
@@ -59,7 +63,7 @@ class _SettingState extends State<Setting> {
           onTap: () {
             Navigator.of(
               context,
-            ).push(CupertinoPageRoute(builder: (context) => const DebugPage()));
+            ).push(CupertinoPageRoute(builder: (context) => DebugPage()));
           },
         ),
         ProfileMenuItem(
@@ -73,19 +77,19 @@ class _SettingState extends State<Setting> {
             );
             if (confirm == true) {
               await LocalStore.instance.clearAll();
-              await clearAllData();
+              await appConfigService.clearAllData();
             }
           },
           foreColor: Colors.red.withValues(alpha: 0.7),
         ),
         ProfileMenuItem(
-          title: '当前版本: ${currentVersion}',
+          title: '当前版本: ${versionService.currentVersion}',
           icon: Icons.info_outline,
           onTap: () async {
             await showInfoDialog(
               context: context,
               title: '版本信息',
-              content: getVersionInfo(),
+              content: versionService.getVersionInfo(),
             );
           },
         ),

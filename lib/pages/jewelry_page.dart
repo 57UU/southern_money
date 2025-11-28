@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 
 import '../setting/app_config.dart';
 
@@ -11,6 +12,7 @@ class JewelryPage extends StatefulWidget {
 
 class _JewelryPageState extends State<JewelryPage> {
   bool openFilter = false;
+  final appConfigService = getIt<AppConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _JewelryPageState extends State<JewelryPage> {
         children: [
           // 过滤器区域，根据openFilter状态显示或隐藏，移到顶部
           AnimatedContainer(
-            duration: Duration(milliseconds: animationTime),
+            duration: Duration(milliseconds: appConfigService.animationTime),
             curve: Curves.easeOutQuart,
             height: openFilter ? 200 : 0,
             child: SingleChildScrollView(
