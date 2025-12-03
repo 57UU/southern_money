@@ -3,6 +3,8 @@ import 'package:southern_money/pages/register_page.dart';
 import 'package:southern_money/pages/set_api_page.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_login.dart';
+import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
 class BrandHeader extends StatelessWidget {
@@ -94,12 +96,21 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
+  final loginService = getIt<ApiLoginService>();
+
+  Future<void> _login() async {
     // 验证表单
     if (_formKey.currentState!.validate()) {
       // 表单验证通过，执行登录逻辑
-      //TODO: 登录逻辑
-      appConfigService.tokenService.sessionToken.value = "1919810";
+      try {
+        final (token, refreshToken) = await loginService.login(
+          _usernameController.text,
+          _passwordController.text,
+        );
+        appConfigService.tokenService.updateTokens(token, refreshToken);
+      } catch (e) {
+        showInfoDialog(title: "登录失败", content: "登录失败: $e");
+      }
     }
   }
 

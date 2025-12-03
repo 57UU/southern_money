@@ -15,7 +15,10 @@ class ApiLoginService {
     try {
       final response = await dio.post(
         "${appConfigService.baseUrl}${LoginByPasswordRequest.route}",
-        data: LoginByPasswordRequest(username: username, password: password),
+        data: LoginByPasswordRequest(
+          username: username,
+          password: password,
+        ).toJson(),
       );
 
       final apiResponse = ApiResponse.fromJson(
@@ -40,7 +43,7 @@ class ApiLoginService {
     try {
       final response = await dio.post(
         "${appConfigService.baseUrl}${RefreshTokenRequest.route}",
-        data: RefreshTokenRequest(refreshToken: refreshToken),
+        data: RefreshTokenRequest(refreshToken: refreshToken).toJson(),
       );
 
       final apiResponse = ApiResponse.fromJson(
