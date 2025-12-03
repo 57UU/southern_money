@@ -79,6 +79,26 @@ Future<void> ensureInitialize() async {
     await getIt.isReady<JwtDio>();
     return ApiPostService(getIt<JwtDio>());
   });
+  getIt.registerSingletonAsync<ApiUserService>(() async {
+    await getIt.isReady<JwtDio>();
+    return ApiUserService(getIt<JwtDio>());
+  });
+  getIt.registerSingletonAsync<ApiImageService>(() async {
+    await getIt.isReady<JwtDio>();
+    return ApiImageService(getIt<JwtDio>());
+  });
+  getIt.registerSingletonAsync<ApiStoreService>(() async {
+    await getIt.isReady<JwtDio>();
+    return ApiStoreService(getIt<JwtDio>());
+  });
+  getIt.registerSingletonAsync<ApiTransactionService>(() async {
+    await getIt.isReady<JwtDio>();
+    return ApiTransactionService(getIt<JwtDio>());
+  });
+  getIt.registerSingletonAsync<ApiAdminService>(() async {
+    await getIt.isReady<JwtDio>();
+    return ApiAdminService(getIt<JwtDio>());
+  });
 
   await getIt.allReady();
 }
