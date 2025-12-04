@@ -63,9 +63,9 @@ class ApiPostService {
     try {
       final request = PostPageRequest(page: page, pageSize: pageSize);
 
-      final response = await jwtDio.post(
+      final response = await jwtDio.get(
         PostPageRequest.route,
-        data: request.toJson(),
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(

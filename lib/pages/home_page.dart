@@ -4,6 +4,9 @@ import 'package:southern_money/pages/jewelry_page.dart';
 import 'package:southern_money/pages/futures_page.dart';
 import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_post.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
 import '../widgets/post_card.dart';
@@ -45,30 +48,63 @@ class Discovery extends StatefulWidget {
   @override
   State<Discovery> createState() => _DiscoveryState();
 }
-
+// get post by hr
 class _DiscoveryState extends State<Discovery> {
+  final postService = getIt<ApiPostService>();
+
+  late Future<ApiResponse<PagedResponse<PostPageItemResponse>>> futurePosts;
+
+  @override
+  void initState() {
+    super.initState();
+    futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      spacing: 10,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('发现', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        PostCard(
-          title: '重磅利好来袭！国办发文 事关新场景大规模应用',
-          author: '证券时报网',
-          timeAgo: '1小时前',
-        ),
-        PostCard(
-          title: 'CSGO饰品市场分析：龙狙价格创历史新高',
-          author: '游戏投资分析师',
-          timeAgo: '2小时前',
-        ),
-        PostCard(title: '黄金下破3930美元，发生什么事了？', author: "派大星皮皮", timeAgo: '3小时前'),
-      ],
+    return FutureBuilder<ApiResponse<PagedResponse<PostPageItemResponse>>>(
+      future: futurePosts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Text("加载失败");
+        }
+
+        final response = snapshot.data!;
+
+        if (!response.success || response.data == null) {
+          return Text("获取帖子失败：${response.message}");
+        }
+
+        final posts = response.data!.items;
+
+        return Column(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '发现',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+
+            // 🔥 从后端渲染动态帖子（只显示 content + author）
+            for (var p in posts)
+              PostCard(
+                title: p.content, // ← 显示内容
+                author: p.uploader.name, // ← 显示作者
+                timeAgo: "", // ← 你不需要时间，传空字符串
+              ),
+          ],
+        );
+      },
     );
   }
 }
+// get post finish by hr
+
 
 class QuickNavigation extends StatelessWidget {
   const QuickNavigation({super.key});
