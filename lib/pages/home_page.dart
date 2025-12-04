@@ -9,11 +9,20 @@ import 'package:southern_money/widgets/router_utils.dart';
 import '../widgets/post_card.dart';
 import 'open_an_account.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
     return Scaffold(
       appBar: AppBar(title: const Text('南方财富'), elevation: 0),
       body: Padding(
@@ -22,7 +31,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [QuickNavigation(), Discovery()],
+            children: [const QuickNavigation(), const Discovery()],
           ),
         ),
       ),

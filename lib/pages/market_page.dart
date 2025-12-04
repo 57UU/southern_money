@@ -5,11 +5,21 @@ import '../widgets/stock_card.dart';
 import '../widgets/index_card.dart';
 import 'market_search_page.dart';
 
-class MarketPage extends StatelessWidget {
+class MarketPage extends StatefulWidget {
   const MarketPage({super.key});
 
   @override
+  State<MarketPage> createState() => _MarketPageState();
+}
+
+class _MarketPageState extends State<MarketPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
     final body = Column(
       children: [
         // 市场指数概览

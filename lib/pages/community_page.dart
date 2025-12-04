@@ -4,11 +4,20 @@ import 'package:southern_money/pages/community_search_page.dart';
 import 'package:southern_money/pages/post_page.dart';
 import '../widgets/post_card.dart';
 
-class CommunityPage extends StatelessWidget {
+class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
 
   @override
+  State<CommunityPage> createState() => _CommunityPageState();
+}
+
+class _CommunityPageState extends State<CommunityPage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
     return Scaffold(
       appBar: AppBar(
         title: const Text('社区'),

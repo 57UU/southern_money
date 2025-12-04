@@ -19,12 +19,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool showPassword = false;
 
-  bool get isDialog {
-    /// 当页面是由 popupContent(Fragment + Dialog) 打开时
-    /// 内部子导航器栈为空，canPop() == false
-    return Navigator.of(context).canPop() == false;
-  }
-
   @override
   Widget build(BuildContext context) {
     final content = Padding(

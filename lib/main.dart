@@ -71,6 +71,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final appConfigService = getIt<AppConfigService>();
+  final PageController _pageController = PageController();
 
   // 导航项数据模型
   static final List<NavigationItemData> _navigationItems = [
@@ -127,6 +128,7 @@ class _MainScreenState extends State<MainScreen> {
                   onDestinationSelected: (index) {
                     setState(() {
                       _currentIndex = index;
+                      _pageController.jumpToPage(_currentIndex);
                     });
                   },
                   labelType: NavigationRailLabelType.all,
@@ -141,19 +143,44 @@ class _MainScreenState extends State<MainScreen> {
                       .toList(),
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: _navigationItems[_currentIndex].page),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    children: _navigationItems
+                        .map((item) => item.page)
+                        .toList(),
+                  ),
+                ),
               ],
             ),
           );
         } else {
           // 竖屏模式：使用底部导航栏
           return Scaffold(
-            body: _navigationItems[_currentIndex].page,
+            body: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              children: _navigationItems.map((item) => item.page).toList(),
+            ),
             bottomNavigationBar: NavigationBar(
               selectedIndex: _currentIndex,
               onDestinationSelected: (index) {
                 setState(() {
                   _currentIndex = index;
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
                 });
               },
               destinations: _navigationItems

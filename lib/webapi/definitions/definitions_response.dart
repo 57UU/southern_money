@@ -258,7 +258,7 @@ class UserProfileResponse {
   @JsonKey(name: "Email")
   final String email;
   @JsonKey(name: "Avatar")
-  final String? avatar;
+  final String avatar;
   @JsonKey(name: "IsBlocked")
   final bool isBlocked;
   @JsonKey(name: "CreatedAt")
@@ -270,7 +270,7 @@ class UserProfileResponse {
     required this.id,
     required this.name,
     required this.email,
-    this.avatar,
+    required this.avatar,
     required this.isBlocked,
     required this.createdAt,
     required this.asset,

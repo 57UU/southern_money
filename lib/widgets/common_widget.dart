@@ -9,3 +9,11 @@ Widget TitleText(String title) {
 
 late BuildContext logicRootContext;
 
+class PlaceholderImage extends StatelessWidget {
+  const PlaceholderImage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset('assets/images/avatar.png');
+  }
+}

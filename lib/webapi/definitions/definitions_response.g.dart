@@ -232,7 +232,7 @@ UserProfileResponse _$UserProfileResponseFromJson(Map<String, dynamic> json) =>
       id: (json['Id'] as num).toInt(),
       name: json['Name'] as String,
       email: json['Email'] as String,
-      avatar: json['Avatar'] as String?,
+      avatar: json['Avatar'] as String,
       isBlocked: json['IsBlocked'] as bool,
       createdAt: DateTime.parse(json['CreatedAt'] as String),
       asset: UserAssetResponse.fromJson(json['Asset'] as Map<String, dynamic>),

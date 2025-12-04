@@ -1,5 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_user.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 
@@ -150,11 +152,13 @@ Future<bool?> openAnAccountDialog() {
     }
   }
 
+  final userService = getIt<ApiUserService>();
+
   String errorMessage = "";
   String successMessage = "开户成功";
   late CancelableOperation myCancelableFuture;
   Future<dynamic> future() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await userService.openAccount();
 
     // 检查操作是否已被取消，如果已取消则不再更新状态
     if (!myCancelableFuture.isCanceled) {
