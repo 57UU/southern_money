@@ -76,10 +76,7 @@ class _JewelryPageState extends State<JewelryPage> {
   Future<void> _loadPage({required bool reset}) async {
     setState(() => _loading = true);
 
-    final res = await storeApi.getProductList(
-      page: _page,
-      pageSize: _pageSize,
-    );
+    final res = await storeApi.getProductList(page: _page, pageSize: _pageSize);
 
     if (res.success && res.data != null) {
       final data = res.data!;
@@ -116,7 +113,7 @@ class _JewelryPageState extends State<JewelryPage> {
         id: "",
         name: p.categoryName,
         coverImageId: "",
-        createdAt: DateTime.now(),
+        CreateTime: DateTime.now(),
       ),
     );
   }
@@ -160,12 +157,12 @@ class _JewelryPageState extends State<JewelryPage> {
 
                     TextButton.icon(
                       icon: const Icon(Icons.image),
-                      label:
-                          Text(pickedImage == null ? "选择封面图片" : "重新选择"),
+                      label: Text(pickedImage == null ? "选择封面图片" : "重新选择"),
                       onPressed: () async {
                         final picker = ImagePicker();
                         final res = await picker.pickImage(
-                            source: ImageSource.gallery);
+                          source: ImageSource.gallery,
+                        );
                         if (res != null) {
                           pickedImage = File(res.path);
                           setDialogState(() {});
@@ -185,8 +182,7 @@ class _JewelryPageState extends State<JewelryPage> {
                     final name = nameController.text.trim();
 
                     if (name.isEmpty) {
-                      showInfoDialog(
-                          title: "错误", content: "请输入分类名称");
+                      showInfoDialog(title: "错误", content: "请输入分类名称");
                       return;
                     }
 
@@ -285,18 +281,17 @@ class _JewelryPageState extends State<JewelryPage> {
                     DropdownButtonFormField<CategoryResponse>(
                       value: selectedCategory,
                       items: _categories
-                          .map((c) => DropdownMenuItem(
-                                value: c,
-                                child: Text(c.name),
-                              ))
+                          .map(
+                            (c) =>
+                                DropdownMenuItem(value: c, child: Text(c.name)),
+                          )
                           .toList(),
                       onChanged: (v) {
                         if (v != null) {
                           setDialogState(() => selectedCategory = v);
                         }
                       },
-                      decoration:
-                          const InputDecoration(labelText: "分类"),
+                      decoration: const InputDecoration(labelText: "分类"),
                     ),
 
                     const SizedBox(height: 16),
@@ -315,12 +310,12 @@ class _JewelryPageState extends State<JewelryPage> {
 
                     TextButton.icon(
                       icon: const Icon(Icons.image),
-                      label:
-                          Text(pickedImage == null ? "选择商品图片" : "重新选择"),
+                      label: Text(pickedImage == null ? "选择商品图片" : "重新选择"),
                       onPressed: () async {
                         final picker = ImagePicker();
                         final res = await picker.pickImage(
-                            source: ImageSource.gallery);
+                          source: ImageSource.gallery,
+                        );
                         if (res != null) {
                           pickedImage = File(res.path);
                           setDialogState(() {});
@@ -339,13 +334,11 @@ class _JewelryPageState extends State<JewelryPage> {
                 TextButton(
                   onPressed: () async {
                     final name = nameController.text.trim();
-                    final price =
-                        double.tryParse(priceController.text.trim());
+                    final price = double.tryParse(priceController.text.trim());
                     final desc = descController.text.trim();
 
                     if (name.isEmpty || price == null || desc.isEmpty) {
-                      showInfoDialog(
-                          title: "错误", content: "请填写完整信息");
+                      showInfoDialog(title: "错误", content: "请填写完整信息");
                       return;
                     }
 
@@ -366,7 +359,7 @@ class _JewelryPageState extends State<JewelryPage> {
                         "/store/category/updateCover",
                         data: {
                           "CategoryId": selectedCategory.id,
-                          "ImageId": uploadedImageId
+                          "ImageId": uploadedImageId,
                         },
                       );
 
@@ -479,16 +472,16 @@ class _JewelryPageState extends State<JewelryPage> {
                 : RefreshIndicator(
                     onRefresh: _loadFirstPage,
                     child: ListView.builder(
-                      itemCount:
-                          products.length + (_hasMore ? 1 : 0),
+                      itemCount: products.length + (_hasMore ? 1 : 0),
                       itemBuilder: (ctx, i) {
                         if (i >= products.length) {
                           _loadMore();
                           return const Center(
-                              child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(),
-                          ));
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
                         }
 
                         final item = products[i];
@@ -502,8 +495,7 @@ class _JewelryPageState extends State<JewelryPage> {
                           leading: imageUrl == null
                               ? const Icon(Icons.image)
                               : ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
                                     imageUrl,
                                     width: 48,
@@ -513,7 +505,8 @@ class _JewelryPageState extends State<JewelryPage> {
                                 ),
                           title: Text(item.name),
                           subtitle: Text(
-                              "${item.categoryName}  ￥${item.price}"),
+                            "${item.categoryName}  ￥${item.price}",
+                          ),
                           trailing: TextButton(
                             child: const Text("购买"),
                             onPressed: () => _buy(item),
@@ -522,7 +515,7 @@ class _JewelryPageState extends State<JewelryPage> {
                       },
                     ),
                   ),
-          )
+          ),
         ],
       ),
     );
@@ -563,22 +556,10 @@ class _JewelryFilterState extends State<JewelryFilter> {
           const SizedBox(height: 16),
           SegmentedButton<JewelryCategory>(
             segments: const [
-              ButtonSegment(
-                value: JewelryCategory.rifle,
-                label: Text("步枪"),
-              ),
-              ButtonSegment(
-                value: JewelryCategory.pistol,
-                label: Text("手枪"),
-              ),
-              ButtonSegment(
-                value: JewelryCategory.knife,
-                label: Text("刀具"),
-              ),
-              ButtonSegment(
-                value: JewelryCategory.glove,
-                label: Text("手套"),
-              ),
+              ButtonSegment(value: JewelryCategory.rifle, label: Text("步枪")),
+              ButtonSegment(value: JewelryCategory.pistol, label: Text("手枪")),
+              ButtonSegment(value: JewelryCategory.knife, label: Text("刀具")),
+              ButtonSegment(value: JewelryCategory.glove, label: Text("手套")),
             ],
             selected: selected,
             multiSelectionEnabled: true,
