@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart' show DioForNative;
+import 'package:dio/browser.dart' show DioForBrowser;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/webapi/api_login.dart';
 
@@ -104,9 +107,14 @@ class _RetryRequest {
 }
 
 abstract class JwtDio implements Dio {
-  factory JwtDio(BaseOptions? baseOptions) => _jwtDio(baseOptions);
+  factory JwtDio(BaseOptions? baseOptions) =>
+      kIsWeb ? _jwtDioBrowser(baseOptions) : _jwtDio(baseOptions);
 }
 
 class _jwtDio extends DioForNative implements JwtDio {
   _jwtDio(BaseOptions? baseOptions) : super(baseOptions);
+}
+
+class _jwtDioBrowser extends DioForBrowser implements JwtDio {
+  _jwtDioBrowser(BaseOptions? baseOptions) : super(baseOptions);
 }
