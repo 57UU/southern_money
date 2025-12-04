@@ -99,7 +99,7 @@ class _JewelryPageState extends State<JewelryPage> {
     setState(() => _loading = false);
   }
 
-  // ======================== 前端筛选 ========================
+  // ======================== 前端过滤 ========================
   List<ProductResponse> get _filteredProducts {
     if (_selectedCategories.isEmpty) return _allProducts;
     final labels = _selectedCategories.map((e) => e.label).toList();
@@ -121,17 +121,121 @@ class _JewelryPageState extends State<JewelryPage> {
     );
   }
 
-  // ======================= 发布商品 + 上传图片 ========================
+  // ======================= 分类创建 ==========================
+  Future<void> _showCreateCategoryDialog() async {
+    final nameController = TextEditingController();
+    File? pickedImage;
+    String? uploadedImageId;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              title: const Text("创建分类"),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: "分类名称",
+                        prefixIcon: Icon(Icons.label),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    if (pickedImage != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          pickedImage!,
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                    TextButton.icon(
+                      icon: const Icon(Icons.image),
+                      label:
+                          Text(pickedImage == null ? "选择封面图片" : "重新选择"),
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final res = await picker.pickImage(
+                            source: ImageSource.gallery);
+                        if (res != null) {
+                          pickedImage = File(res.path);
+                          setDialogState(() {});
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("取消"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final name = nameController.text.trim();
+
+                    if (name.isEmpty) {
+                      showInfoDialog(
+                          title: "错误", content: "请输入分类名称");
+                      return;
+                    }
+
+                    // ---- 上传封面图 ----
+                    if (pickedImage != null) {
+                      final res = await imageApi.uploadImage(
+                        imageFile: pickedImage!,
+                        imageType: "category",
+                      );
+                      if (res.success && res.data != null) {
+                        uploadedImageId = res.data!.imageId;
+                      }
+                    }
+
+                    // ---- 创建分类 ----
+                    await showLoadingDialog(
+                      title: "正在创建分类",
+                      func: () async {
+                        await storeApi.createCategory(
+                          category: name,
+                          cover: uploadedImageId ?? "",
+                        );
+                      },
+                    );
+
+                    if (ctx.mounted) Navigator.pop(ctx);
+
+                    await _loadCategories();
+
+                    showInfoDialog(title: "成功", content: "分类创建成功！");
+                  },
+                  child: const Text("创建"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ======================= 发布商品 ========================
   Future<void> _showPublishDialog() async {
     final nameController = TextEditingController();
     final priceController = TextEditingController();
     final descController = TextEditingController();
 
     if (_categories.isEmpty) {
-      await showInfoDialog(
-        title: "提示",
-        content: "尚未创建任何分类，请先添加分类。",
-      );
+      showInfoDialog(title: "错误", content: "尚未创建分类");
       return;
     }
 
@@ -152,19 +256,30 @@ class _JewelryPageState extends State<JewelryPage> {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: "名称"),
+                      decoration: const InputDecoration(
+                        labelText: "名称",
+                        prefixIcon: Icon(Icons.label),
+                      ),
                     ),
                     TextField(
                       controller: priceController,
-                      decoration: const InputDecoration(labelText: "价格"),
                       keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: "价格",
+                        prefixIcon: Icon(Icons.money),
+                      ),
                     ),
                     TextField(
                       controller: descController,
                       maxLines: 3,
-                      decoration: const InputDecoration(labelText: "描述"),
+                      decoration: const InputDecoration(
+                        labelText: "描述",
+                        alignLabelWithHint: true,
+                        prefixIcon: Icon(Icons.description),
+                      ),
                     ),
-                    const SizedBox(height: 12),
+
+                    const SizedBox(height: 16),
 
                     // 分类选择
                     DropdownButtonFormField<CategoryResponse>(
@@ -177,35 +292,35 @@ class _JewelryPageState extends State<JewelryPage> {
                           .toList(),
                       onChanged: (v) {
                         if (v != null) {
-                          setDialogState(() {
-                            selectedCategory = v;
-                          });
+                          setDialogState(() => selectedCategory = v);
                         }
                       },
-                      decoration: const InputDecoration(labelText: "分类"),
+                      decoration:
+                          const InputDecoration(labelText: "分类"),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
-                    // 图片预览
+                    // 商品图片
                     if (pickedImage != null)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.file(
                           pickedImage!,
-                          width: 160,
-                          height: 160,
+                          width: 140,
+                          height: 140,
                           fit: BoxFit.cover,
                         ),
                       ),
 
                     TextButton.icon(
                       icon: const Icon(Icons.image),
-                      label: Text(pickedImage == null ? "选择封面图片" : "重新选择"),
+                      label:
+                          Text(pickedImage == null ? "选择商品图片" : "重新选择"),
                       onPressed: () async {
                         final picker = ImagePicker();
-                        final res =
-                            await picker.pickImage(source: ImageSource.gallery);
+                        final res = await picker.pickImage(
+                            source: ImageSource.gallery);
                         if (res != null) {
                           pickedImage = File(res.path);
                           setDialogState(() {});
@@ -215,6 +330,7 @@ class _JewelryPageState extends State<JewelryPage> {
                   ],
                 ),
               ),
+
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -227,41 +343,39 @@ class _JewelryPageState extends State<JewelryPage> {
                         double.tryParse(priceController.text.trim());
                     final desc = descController.text.trim();
 
-                    if (name.isEmpty || desc.isEmpty || price == null) {
+                    if (name.isEmpty || price == null || desc.isEmpty) {
                       showInfoDialog(
-                        title: "提示",
-                        content: "请输入完整信息！",
-                      );
+                          title: "错误", content: "请填写完整信息");
                       return;
                     }
 
-                    // ------------ 如果选择了图片，则上传 ------------
+                    // ---- 上传封面图 ----
                     if (pickedImage != null) {
-                      final uploadRes = await imageApi.uploadImage(
+                      final res = await imageApi.uploadImage(
                         imageFile: pickedImage!,
-                        imageType: "categoryCover",
+                        imageType: "product",
                       );
-
-                      if (uploadRes.success && uploadRes.data != null) {
-                        uploadedImageId = uploadRes.data!.imageId;
-
-                        // -------- 自动更新分类封面 --------
-                        await getIt<JwtDio>().post(
-                          "/store/category/updateCover",
-                          data: {
-                            "CategoryId": selectedCategory.id,
-                            "ImageId": uploadedImageId
-                          },
-                        );
-
-                        // 重新加载分类（拿到新的 CoverImageId）
-                        await _loadCategories();
+                      if (res.success && res.data != null) {
+                        uploadedImageId = res.data!.imageId;
                       }
                     }
 
-                    // ------------ 发布商品 ------------
+                    // ---- 自动更新分类封面图 ----
+                    if (uploadedImageId != null) {
+                      await getIt<JwtDio>().post(
+                        "/store/category/updateCover",
+                        data: {
+                          "CategoryId": selectedCategory.id,
+                          "ImageId": uploadedImageId
+                        },
+                      );
+
+                      await _loadCategories();
+                    }
+
+                    // ---- 发布商品 ----
                     await showLoadingDialog(
-                      title: "正在发布",
+                      title: "正在发布商品",
                       func: () async {
                         await storeApi.publishProduct(
                           name: name,
@@ -274,16 +388,12 @@ class _JewelryPageState extends State<JewelryPage> {
 
                     if (ctx.mounted) Navigator.pop(ctx);
 
-                    // 刷新商品列表
                     await _loadFirstPage();
 
-                    await showInfoDialog(
-                      title: "成功",
-                      content: "商品发布成功！",
-                    );
+                    showInfoDialog(title: "成功", content: "商品发布成功！");
                   },
                   child: const Text("发布"),
-                )
+                ),
               ],
             );
           },
@@ -331,16 +441,23 @@ class _JewelryPageState extends State<JewelryPage> {
         title: const Text("CSGO饰品"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.category),
+            tooltip: "创建分类",
+            onPressed: _showCreateCategoryDialog,
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
             tooltip: "发布商品",
             onPressed: _showPublishDialog,
           ),
           IconButton(
             icon: const Icon(Icons.filter_list),
+            tooltip: "筛选",
             onPressed: () => setState(() => openFilter = !openFilter),
           ),
         ],
       ),
+
       body: Column(
         children: [
           // 筛选区域
@@ -362,7 +479,8 @@ class _JewelryPageState extends State<JewelryPage> {
                 : RefreshIndicator(
                     onRefresh: _loadFirstPage,
                     child: ListView.builder(
-                      itemCount: products.length + (_hasMore ? 1 : 0),
+                      itemCount:
+                          products.length + (_hasMore ? 1 : 0),
                       itemBuilder: (ctx, i) {
                         if (i >= products.length) {
                           _loadMore();
@@ -384,7 +502,8 @@ class _JewelryPageState extends State<JewelryPage> {
                           leading: imageUrl == null
                               ? const Icon(Icons.image)
                               : ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius:
+                                      BorderRadius.circular(8),
                                   child: Image.network(
                                     imageUrl,
                                     width: 48,
@@ -393,8 +512,8 @@ class _JewelryPageState extends State<JewelryPage> {
                                   ),
                                 ),
                           title: Text(item.name),
-                          subtitle:
-                              Text("${item.categoryName}  ￥${item.price}"),
+                          subtitle: Text(
+                              "${item.categoryName}  ￥${item.price}"),
                           trailing: TextButton(
                             child: const Text("购买"),
                             onPressed: () => _buy(item),
