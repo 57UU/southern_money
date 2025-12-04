@@ -30,29 +30,10 @@ class _RegisterPageState extends State<RegisterPage> {
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        mainAxisSize: MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () =>
-                    Navigator.of(context, rootNavigator: true).pop(),
-              ),
-
-              const Text("Register", style: TextStyle(fontSize: 20)),
-
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () =>
-                    Navigator.of(context, rootNavigator: true).pop(),
-              ),
-            ],
-          ),
-
           titleText("Nickname"),
           TextField(
             controller: nicknameController,
@@ -96,20 +77,15 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
 
-    if (!isDialog) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Register'),
-          leading: BackButton(
-            onPressed: () =>
-                Navigator.of(context, rootNavigator: true).pop(),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+        leading: BackButton(
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
         ),
-        body: content,
-      );
-    }
-
-    return content;
+      ),
+      body: content,
+    );
   }
 
   Future<void> _register() async {
@@ -117,9 +93,9 @@ class _RegisterPageState extends State<RegisterPage> {
     final password = passwordController.text.trim();
 
     if (nickname.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("请输入昵称和密码")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("请输入昵称和密码")));
       return;
     }
 
@@ -136,15 +112,9 @@ class _RegisterPageState extends State<RegisterPage> {
     if (apiResponse.success) {
       Navigator.of(context, rootNavigator: true).pop();
 
-      showInfoDialog(
-        title: "注册成功",
-        content: "您可以使用 $nickname 登录",
-      );
+      showInfoDialog(title: "注册成功", content: "您可以使用 $nickname 登录");
     } else {
-      showInfoDialog(
-        title: "注册失败",
-        content: apiResponse.message ?? "注册失败",
-      );
+      showInfoDialog(title: "注册失败", content: apiResponse.message ?? "注册失败");
     }
   }
 }

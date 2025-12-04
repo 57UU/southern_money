@@ -4,6 +4,7 @@ import 'package:southern_money/pages/set_api_page.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_login.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
@@ -103,17 +104,26 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       // 表单验证通过，执行登录逻辑
       try {
-        late String token;
-        late String refreshToken;
+        ApiResponse<LoginByPasswordResponse>? apiResponse;
         await showLoadingDialog(
           func: () async => {
-            (token, refreshToken) = await loginService.login(
+            apiResponse = await loginService.loginRaw(
               _usernameController.text,
               _passwordController.text,
             ),
           },
         );
-        appConfigService.tokenService.updateTokens(token, refreshToken);
+        if (apiResponse == null) {
+          throw Exception("登录请求失败");
+        } else if (!apiResponse!.success) {
+          throw Exception(apiResponse?.message ?? "登录失败");
+        }
+        if (apiResponse!.success) {
+          appConfigService.tokenService.updateTokens(
+            apiResponse!.data!.token,
+            apiResponse!.data!.refreshToken,
+          );
+        }
       } catch (e) {
         showInfoDialog(title: "登录失败", content: "登录失败: $e");
       }

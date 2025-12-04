@@ -37,6 +37,26 @@ class ApiLoginService {
     }
   }
 
+  Future<ApiResponse<LoginByPasswordResponse>> loginRaw(
+    String nickname,
+    String password,
+  ) async {
+    final response = await dio.post(
+      "${appConfigService.baseUrl}${LoginByPasswordRequest.route}",
+      data: LoginByPasswordRequest(
+        username: nickname,
+        password: password,
+      ).toJson(),
+    );
+
+    final apiResponse = ApiResponse.fromJson(
+      response.data,
+      (dataJson) =>
+          LoginByPasswordResponse.fromJson(dataJson as Map<String, dynamic>),
+    );
+    return apiResponse;
+  }
+
   Future<(String token, String refreshToken)> refreshToken(
     String refreshToken,
   ) async {
