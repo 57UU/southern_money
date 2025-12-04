@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:southern_money/pages/login_page.dart';
@@ -123,6 +125,11 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildMainScreen() {
+    scheduleMicrotask(() {
+      if (_currentIndex != _pageController.page?.round()) {
+        _pageController.jumpToPage(_currentIndex);
+      }
+    });
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) {
@@ -183,11 +190,7 @@ class _MainScreenState extends State<MainScreen> {
               onDestinationSelected: (index) {
                 setState(() {
                   _currentIndex = index;
-                  _pageController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
+                  _pageController.jumpToPage(index);
                 });
               },
               destinations: _navigationItems

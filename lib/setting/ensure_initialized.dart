@@ -27,6 +27,10 @@ Future<void> ensureInitialize() async {
     final tokenService = TokenService(getIt<SharedPreferences>());
     return tokenService;
   });
+  getIt.registerSingletonAsync<PasswordService>(() async {
+    await getIt.isReady<SharedPreferences>();
+    return PasswordService(getIt<SharedPreferences>());
+  });
   getIt.registerSingletonAsync<AppConfigService>(() async {
     await getIt.isReady<TokenService>();
     final appConfigService = AppConfigService(

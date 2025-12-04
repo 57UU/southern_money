@@ -98,6 +98,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   final loginService = getIt<ApiLoginService>();
+  final passwordService = getIt<PasswordService>();
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.text = passwordService.nicknameValue ?? "";
+    _passwordController.text = passwordService.passwordValue ?? "";
+  }
 
   Future<void> _login() async {
     // 验证表单
@@ -122,6 +129,10 @@ class _LoginPageState extends State<LoginPage> {
           appConfigService.tokenService.updateTokens(
             apiResponse!.data!.token,
             apiResponse!.data!.refreshToken,
+          );
+          passwordService.updatePassword(
+            _usernameController.text,
+            _passwordController.text,
           );
         }
       } catch (e) {

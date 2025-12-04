@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:southern_money/pages/theme_color_page.dart';
 import 'dart:io';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -10,7 +11,12 @@ import 'package:southern_money/widgets/dialog.dart'
 
 class ProfileEditPage extends StatefulWidget {
   final UserProfileResponse userProfileResponse;
-  const ProfileEditPage({super.key, required this.userProfileResponse});
+  final void Function()? onUpdateSuccess;
+  const ProfileEditPage({
+    super.key,
+    required this.userProfileResponse,
+    this.onUpdateSuccess,
+  });
 
   @override
   State<ProfileEditPage> createState() => _ProfileEditPageState();
@@ -24,6 +30,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _avatarPath;
+  bool _isAvatarChanged = false;
 
   @override
   void initState() {
@@ -47,6 +54,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (pickedFile != null) {
       setState(() {
         _avatarPath = pickedFile.path;
+        _isAvatarChanged = true;
       });
     }
   }
@@ -62,7 +70,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     });
 
     try {
-      await apiRequestDialog(userService.uploadAvatar(_avatarPath!));
+      await apiRequestDialog(
+        userService.uploadAvatar(_avatarPath!),
+        onSuccess: widget.onUpdateSuccess,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -94,6 +105,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           name: nameController.text,
           email: emailController.text,
         ),
+        onSuccess: widget.onUpdateSuccess,
       );
       if (mounted) {
         ScaffoldMessenger.of(
@@ -125,7 +137,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
             children: [
+              titleText("Avatar Edit"),
               // 头像编辑
               Center(
                 child: Column(
@@ -137,14 +151,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           CircleAvatar(
                             radius: 60,
                             backgroundImage: _avatarPath != null
-                                ? (_avatarPath!.startsWith('http')
-                                      ? CachedNetworkImageProvider(
+                                ? (_isAvatarChanged
+                                      ? FileImage(File(_avatarPath!))
+                                            as ImageProvider
+                                      : CachedNetworkImageProvider(
                                           imageService.getImageUrl(
                                             _avatarPath!,
                                           ),
-                                        )
-                                      : FileImage(File(_avatarPath!))
-                                            as ImageProvider)
+                                        ))
                                 : null,
                             child: _avatarPath == null
                                 ? const Icon(Icons.person, size: 60)
@@ -181,6 +195,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 ),
               ),
               const SizedBox(height: 24),
+              titleText("Personal Information"),
 
               // 姓名输入框
               TextFormField(
@@ -233,7 +248,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   onPressed: _isLoading ? null : _updateUserInfo,
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('更新信息', style: TextStyle(fontSize: 16)),
+                      : const Text('更新个人信息', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ],

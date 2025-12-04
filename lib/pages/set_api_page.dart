@@ -104,15 +104,6 @@ class _SetApiUrlPageState extends State<SetApiUrlPage> {
   final testApiService = getIt<ApiTestService>();
 
   Future _testApi() async {
-    ApiResponse<TestResponse>? result;
-    await showLoadingDialog(
-      func: () async => result = await testApiService.testApi(),
-    );
-    bool success = result?.success == true;
-    if (success) {
-      showInfoDialog(title: 'Success', content: result?.data?.message ?? "");
-    } else {
-      showInfoDialog(title: 'Error', content: result?.message ?? "");
-    }
+    await apiRequestDialog(testApiService.testApi());
   }
 }

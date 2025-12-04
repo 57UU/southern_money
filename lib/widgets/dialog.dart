@@ -198,6 +198,7 @@ enum DialogState { conform, loading, success, error }
 Future<bool?> apiRequestDialog(
   Future<ApiResponse> awaitable, {
   String? confirmMessage,
+  void Function()? onSuccess,
 }) {
   DialogState dialogState = DialogState.conform;
   ContextWrapper contextWrapper = ContextWrapper();
@@ -219,6 +220,7 @@ Future<bool?> apiRequestDialog(
         rebuildDialog();
       }
       if (response.success == true) {
+        onSuccess?.call();
         if (!myCancelableFuture.isCanceled) {
           //change state
           dialogState = DialogState.success;

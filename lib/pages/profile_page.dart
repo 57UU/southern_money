@@ -108,7 +108,14 @@ class _ProfilePageState extends State<ProfilePage>
                           onPressed: () {
                             popupOrNavigate(
                               context,
-                              ProfileEditPage(userProfileResponse: data),
+                              ProfileEditPage(
+                                userProfileResponse: data,
+                                onUpdateSuccess: () {
+                                  setState(() {
+                                    loadUserProfile();
+                                  });
+                                },
+                              ),
                             );
                           },
                         ),

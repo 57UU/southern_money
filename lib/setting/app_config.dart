@@ -13,19 +13,20 @@ class TokenService {
   SharedPreferences preferences;
   TokenService(this.preferences) {
     //init
-    sessionToken.value = preferences.getString(_sessionTokenKey);
+    sessionToken = ValueNotifier(preferences.getString(_sessionTokenKey));
     _refreshToken = preferences.getString(_refreshTokenKey);
   }
-  ValueNotifier<String?> sessionToken = ValueNotifier(null);
+  late ValueNotifier<String?> sessionToken;
   String? _refreshToken;
   void updateTokens(String sessionToken, String refreshToken) {
-    this.sessionToken.value = sessionToken;
     _refreshToken = refreshToken;
+    this.sessionToken.value = sessionToken;
+    _addSaveCallback();
   }
 
   String? get refreshTokenValue => _refreshToken;
   String? get sessionTokenValue => sessionToken.value;
-  void addSaveCallback() {
+  void _addSaveCallback() {
     sessionToken.addListener(() {
       if (sessionToken.value != null) {
         preferences.setString(_sessionTokenKey, sessionToken.value!);
@@ -40,6 +41,27 @@ class TokenService {
   void clearTokens() {
     sessionToken.value = null;
     _refreshToken = null;
+  }
+}
+
+class PasswordService {
+  SharedPreferences preferences;
+  PasswordService(this.preferences) {
+    //try load
+    nickname = preferences.getString(_nicknameKey);
+    password = preferences.getString(_passwordKey);
+  }
+  static const String _passwordKey = "password";
+  static const String _nicknameKey = "nickname";
+  String? nickname, password;
+  String? get nicknameValue => nickname;
+  String? get passwordValue => password;
+  void updatePassword(String nickname, String password) {
+    this.nickname = nickname;
+    this.password = password;
+    //save
+    preferences.setString(_nicknameKey, nickname);
+    preferences.setString(_passwordKey, password);
   }
 }
 
