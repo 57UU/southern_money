@@ -61,4 +61,15 @@ class ApiLoginService {
       throw Exception("刷新令牌请求失败: $e");
     }
   }
+
+  Future<ApiResponse> register(String nickname, String password) async {
+    final response = await dio.post(
+      "${appConfigService.baseUrl}${RegisterRequest.route}",
+      data: RegisterRequest(username: nickname, password: password).toJson(),
+    );
+
+    final apiResponse = ApiResponse.fromJson(response.data, (dataJson) => null);
+
+    return apiResponse;
+  }
 }

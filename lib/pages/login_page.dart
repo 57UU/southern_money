@@ -103,9 +103,15 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       // 表单验证通过，执行登录逻辑
       try {
-        final (token, refreshToken) = await loginService.login(
-          _usernameController.text,
-          _passwordController.text,
+        late String token;
+        late String refreshToken;
+        await showLoadingDialog(
+          func: () async => {
+            (token, refreshToken) = await loginService.login(
+              _usernameController.text,
+              _passwordController.text,
+            ),
+          },
         );
         appConfigService.tokenService.updateTokens(token, refreshToken);
       } catch (e) {
