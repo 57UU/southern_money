@@ -16,63 +16,135 @@ class _RegisterPageState extends State<RegisterPage> {
   final ApiLoginService apiLoginService = getIt<ApiLoginService>();
   final nicknameController = TextEditingController();
   final passwordController = TextEditingController();
+
+  bool showPassword = false;
+
+  bool get isDialog {
+    /// 当页面是由 popupContent(Fragment + Dialog) 打开时
+    /// 内部子导航器栈为空，canPop() == false
+    return Navigator.of(context).canPop() == false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10,
-          children: [
-            titleText("Nickname"),
-            TextField(
-              controller: nicknameController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: "请输入昵称",
+    final content = Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min, 
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(),
+              ),
+
+              const Text("Register", style: TextStyle(fontSize: 20)),
+
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(),
+              ),
+            ],
+          ),
+
+          titleText("Nickname"),
+          TextField(
+            controller: nicknameController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.person),
+              hintText: "请输入昵称",
+            ),
+          ),
+
+          titleText("Password"),
+          TextField(
+            controller: passwordController,
+            obscureText: !showPassword,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock),
+              hintText: "请输入密码",
+              suffixIcon: IconButton(
+                icon: Icon(
+                  showPassword ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    showPassword = !showPassword;
+                  });
+                },
               ),
             ),
-            titleText("Password"),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.lock),
-                hintText: "请输入密码",
-              ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: FloatingActionButton(
+              mini: true,
+              onPressed: _register,
+              child: const Icon(Icons.arrow_forward),
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final nickname = nicknameController.text.trim();
-          final password = passwordController.text.trim();
-          if (nickname.isEmpty || password.isEmpty) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text("请输入昵称和密码")));
-            return;
-          }
-          late ApiResponse apiResponse;
-          await showLoadingDialog(
-            func: () async => {
-              apiResponse = await apiLoginService.register(nickname, password),
-            },
-          );
-          if (apiResponse.success) {
-            showInfoDialog(title: "注册成功", content: "您可以使用${nickname}登录");
-          } else {
-            showInfoDialog(
-              title: "注册失败",
-              content: apiResponse.message ?? "注册失败",
-            );
-          }
-        },
-        child: const Icon(Icons.arrow_forward),
+          ),
+        ],
       ),
     );
+
+    if (!isDialog) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Register'),
+          leading: BackButton(
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(),
+          ),
+        ),
+        body: content,
+      );
+    }
+
+    return content;
+  }
+
+  Future<void> _register() async {
+    final nickname = nicknameController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (nickname.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("请输入昵称和密码")),
+      );
+      return;
+    }
+
+    late ApiResponse apiResponse;
+
+    await showLoadingDialog(
+      func: () async {
+        apiResponse = await apiLoginService.register(nickname, password);
+      },
+    );
+
+    if (!mounted) return;
+
+    if (apiResponse.success) {
+      Navigator.of(context, rootNavigator: true).pop();
+
+      showInfoDialog(
+        title: "注册成功",
+        content: "您可以使用 $nickname 登录",
+      );
+    } else {
+      showInfoDialog(
+        title: "注册失败",
+        content: apiResponse.message ?? "注册失败",
+      );
+    }
   }
 }
