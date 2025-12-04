@@ -1,10 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart' show DioForNative;
-import 'package:dio/browser.dart' show DioForBrowser;
-
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/webapi/api_login.dart';
+import 'package:southern_money/webapi/jwt_dio/jwt_dio_native.dart'
+    if (dart.library.js_interop) 'package:southern_money/webapi/jwt_dio/jwt_dio_web.dart';
 
 class JwtInterceptor extends Interceptor {
   final Future<void> Function() onTokenExpired;
@@ -107,14 +105,5 @@ class _RetryRequest {
 }
 
 abstract class JwtDio implements Dio {
-  factory JwtDio(BaseOptions? baseOptions) =>
-      kIsWeb ? _jwtDioBrowser(baseOptions) : _jwtDio(baseOptions);
-}
-
-class _jwtDio extends DioForNative implements JwtDio {
-  _jwtDio(BaseOptions? baseOptions) : super(baseOptions);
-}
-
-class _jwtDioBrowser extends DioForBrowser implements JwtDio {
-  _jwtDioBrowser(BaseOptions? baseOptions) : super(baseOptions);
+  factory JwtDio(BaseOptions? baseOptions) => createJwtDio(baseOptions);
 }

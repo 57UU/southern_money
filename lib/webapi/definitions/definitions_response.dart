@@ -102,15 +102,15 @@ class ImageGetResponse {
   final String imageType;
   @JsonKey(name: "Description")
   final String? description;
-  @JsonKey(name: "CreatedAt")
-  final DateTime createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime CreateTime;
 
   ImageGetResponse({
     required this.id,
     required this.data,
     required this.imageType,
     this.description,
-    required this.createdAt,
+    required this.CreateTime,
   });
   factory ImageGetResponse.fromJson(Map<String, dynamic> json) =>
       _$ImageGetResponseFromJson(json);
@@ -261,8 +261,8 @@ class UserProfileResponse {
   final String avatar;
   @JsonKey(name: "IsBlocked")
   final bool isBlocked;
-  @JsonKey(name: "CreatedAt")
-  final DateTime createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime CreateTime;
   @JsonKey(name: "Asset")
   final UserAssetResponse asset;
 
@@ -272,7 +272,7 @@ class UserProfileResponse {
     required this.email,
     required this.avatar,
     required this.isBlocked,
-    required this.createdAt,
+    required this.CreateTime,
     required this.asset,
   });
   factory UserProfileResponse.fromJson(Map<String, dynamic> json) =>
@@ -297,8 +297,8 @@ class ProductResponse {
   final int uploaderUserId;
   @JsonKey(name: "UploaderName")
   final String uploaderName;
-  @JsonKey(name: "CreatedAt")
-  final DateTime createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime CreateTime;
 
   ProductResponse({
     required this.id,
@@ -309,7 +309,7 @@ class ProductResponse {
     required this.categoryName,
     required this.uploaderUserId,
     required this.uploaderName,
-    required this.createdAt,
+    required this.CreateTime,
   });
   factory ProductResponse.fromJson(Map<String, dynamic> json) =>
       _$ProductResponseFromJson(json);
@@ -353,8 +353,8 @@ class ProductDetailResponse {
   final int? uploaderUserId;
   @JsonKey(name: "UploaderName")
   final String? uploaderName;
-  @JsonKey(name: "CreatedAt")
-  final DateTime? createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime? CreateTime;
 
   ProductDetailResponse({
     required this.id,
@@ -366,7 +366,7 @@ class ProductDetailResponse {
     this.uploader,
     this.uploaderUserId,
     this.uploaderName,
-    this.createdAt,
+    this.CreateTime,
   });
   factory ProductDetailResponse.fromJson(Map<String, dynamic> json) =>
       _$ProductDetailResponseFromJson(json);
@@ -380,14 +380,14 @@ class CategoryResponse {
   final String name;
   @JsonKey(name: "CoverImageId")
   final String coverImageId;
-  @JsonKey(name: "CreatedAt")
-  final DateTime createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime CreateTime;
 
   CategoryResponse({
     required this.id,
     required this.name,
     required this.coverImageId,
-    required this.createdAt,
+    required this.CreateTime,
   });
   factory CategoryResponse.fromJson(Map<String, dynamic> json) =>
       _$CategoryResponseFromJson(json);
@@ -479,8 +479,8 @@ class AdminReportedPostResponse {
   final String title;
   @JsonKey(name: "Content")
   final String content;
-  @JsonKey(name: "CreatedAt")
-  final DateTime createdAt;
+  @JsonKey(name: "CreateTime")
+  final DateTime CreateTime;
   @JsonKey(name: "ReportCount")
   final int reportCount;
   @JsonKey(name: "ViewCount")
@@ -502,7 +502,7 @@ class AdminReportedPostResponse {
     required this.id,
     required this.title,
     required this.content,
-    required this.createdAt,
+    required this.CreateTime,
     required this.reportCount,
     required this.viewCount,
     required this.likeCount,

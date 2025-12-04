@@ -335,7 +335,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
     "Email": "用户邮箱",
     "Avatar": "图片ID",
     "IsBlocked": false, //bool
-    "CreatedAt": "2023-01-01T00:00:00Z", //datetime
+    "CreateTime": "2023-01-01T00:00:00Z", //datetime
     "Asset": {
         "Total":10000,
         "TodayEarn":100,
@@ -427,7 +427,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "CategoryName": "分类名称",
             "UploaderUserId": 123,
             "UploaderName": "用户名",
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         },
     ]
 }
@@ -457,7 +457,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "CategoryName": "分类名称",
             "UploaderUserId": 123,
             "UploaderName": "用户名",
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         },
     ]
 }
@@ -486,7 +486,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "CategoryName": "分类名称",
             "UploaderUserId": 123,
             "UploaderName": "用户名",
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         },
     ]
 }
@@ -515,7 +515,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "CategoryName": "分类名称",
             "UploaderUserId": 123,
             "UploaderName": "用户名",
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         },
     ]
 }
@@ -580,7 +580,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
     "CategoryName": "商品分类名称",
     "UploaderUserId": 123123,
     "UploaderName": "用户名",
-    "CreatedAt": "创建时间"
+    "CreateTime": "创建时间"
 }
 ```
 
@@ -609,7 +609,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "Id": "分类ID",
             "Name": "分类名称",
             "CoverImageId": "封面图片ID",
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         },
         ...
     ],
@@ -631,7 +631,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
         "Id": "分类ID",
         "Name": "分类名称",
         "CoverImageId": "封面图片ID",
-        "CreatedAt": "创建时间"
+        "CreateTime": "创建时间"
     },
     "Timestamp": "时间戳"
 }
@@ -688,7 +688,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "Id": "分类ID", //Guid格式
             "Name": "分类名称",
             "CoverImageId": "封面图片ID", //Guid格式
-            "CreatedAt": "创建时间"
+            "CreateTime": "创建时间"
         }
     ]
 }
@@ -850,7 +850,7 @@ dotnet run --project SouthernMoneyBackend/SouthernMoneyBackend.csproj
             "Id": "帖子ID",
             "Title": "帖子标题",
             "Content": "帖子内容",
-            "CreatedAt": "2023-01-01T00:00:00Z",
+            "CreateTime": "2023-01-01T00:00:00Z",
             "ReportCount": 3,
             "ViewCount": 100,
             "LikeCount": 10,

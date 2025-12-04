@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/profile_edit_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_user.dart';
@@ -59,6 +60,7 @@ class _ProfilePageState extends State<ProfilePage>
           );
         } else {
           final data = userProfileResponse!.data!;
+          final imgUrl = imageService.getImageUrl(data.avatar);
           //ok
           return Column(
             children: [
@@ -76,9 +78,7 @@ class _ProfilePageState extends State<ProfilePage>
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          backgroundImage: CachedNetworkImageProvider(
-                            imageService.getImageUrl(data.avatar),
-                          ),
+                          backgroundImage: CachedNetworkImageProvider(imgUrl),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -106,8 +106,9 @@ class _ProfilePageState extends State<ProfilePage>
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('编辑个人资料')),
+                            popupOrNavigate(
+                              context,
+                              ProfileEditPage(userProfileResponse: data),
                             );
                           },
                         ),
@@ -251,7 +252,17 @@ class _ProfilePageState extends State<ProfilePage>
       },
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('我的'), elevation: 0, actions: [
+      appBar: AppBar(
+        title: const Text('我的'),
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              userProfileResponse = null;
+              loadUserProfile();
+            },
+            icon: Icon(Icons.refresh),
+          ),
         ],
       ),
       body: SingleChildScrollView(child: body),

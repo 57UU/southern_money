@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/webapi/JwtService.dart';
 import 'package:southern_money/webapi/definitions/definitions_request.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 
 class ApiImageService {
   final JwtDio jwtDio;
-  ApiImageService(this.jwtDio);
+  final AppConfigService appConfigService;
+  ApiImageService(this.jwtDio, this.appConfigService);
 
   /// 上传图片
   Future<ApiResponse<ImageUploadResponse>> uploadImage({
@@ -42,7 +44,7 @@ class ApiImageService {
   }
 
   String getImageUrl(String imageId) {
-    return "${ImageGetRequest.route}?id=$imageId";
+    return "${appConfigService.baseUrl}${ImageGetRequest.route}?id=$imageId";
   }
 
   /// 获取图片

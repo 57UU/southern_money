@@ -25,7 +25,7 @@ class _MyCollectionState extends State<MyCollection> {
         id: 'collection_$_counter',
         title: '收藏的帖子 $_counter',
         note: '这是一个示例收藏，方便测试本地缓存。',
-        createdAt: DateTime.now(),
+        CreateTime: DateTime.now(),
       ),
     );
   }
@@ -52,7 +52,7 @@ class _MyCollectionState extends State<MyCollection> {
               return ListTile(
                 title: Text(item.title),
                 subtitle: Text(
-                  '${item.note}\n收藏于: ${item.createdAt.toLocal()}',
+                  '${item.note}\n收藏于: ${item.CreateTime.toLocal()}',
                 ),
                 isThreeLine: true,
                 trailing: IconButton(

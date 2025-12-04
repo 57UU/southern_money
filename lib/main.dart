@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:southern_money/pages/login_page.dart';
+import 'package:southern_money/pages/setting.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'pages/home_page.dart';
 import 'pages/community_page.dart';
@@ -98,6 +99,12 @@ class _MainScreenState extends State<MainScreen> {
       selectedIcon: Icons.person,
       label: '我的',
       page: ProfilePage(),
+    ),
+    NavigationItemData(
+      icon: Icons.settings_outlined,
+      selectedIcon: Icons.settings,
+      label: '设置',
+      page: Setting(),
     ),
   ];
 

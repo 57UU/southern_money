@@ -140,8 +140,6 @@ class _OpenAnAccountState extends State<OpenAnAccount> {
   }
 }
 
-enum DialogState { conform, loading, success, error }
-
 //the return value is true if the user agreed to open an account
 Future<bool?> openAnAccountDialog() {
   DialogState dialogState = DialogState.conform;

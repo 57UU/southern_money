@@ -99,7 +99,7 @@ class ApiUserService {
       final request = UserUploadAvatarRequest();
 
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(avatarFile),
+        'File': await MultipartFile.fromFile(avatarFile),
       });
 
       final response = await jwtDio.post(

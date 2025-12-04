@@ -92,6 +92,20 @@ class _SettingState extends State<Setting> {
           foreColor: Colors.red.withValues(alpha: 0.7),
         ),
         ProfileMenuItem(
+          title: '退出登录',
+          icon: Icons.logout_outlined,
+          onTap: () async {
+            final confirm = await showYesNoDialog(
+              context: context,
+              title: '确认退出登录',
+              content: '您确定要退出登录吗？',
+            );
+            if (confirm == true) {
+              appConfigService.tokenService.clearTokens();
+            }
+          },
+        ),
+        ProfileMenuItem(
           title: '当前版本: ${versionService.currentVersion}',
           icon: Icons.info_outline,
           onTap: () async {

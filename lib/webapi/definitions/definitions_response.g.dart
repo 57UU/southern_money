@@ -105,7 +105,7 @@ ImageGetResponse _$ImageGetResponseFromJson(Map<String, dynamic> json) =>
       data: json['Data'] as String,
       imageType: json['ImageType'] as String,
       description: json['Description'] as String?,
-      createdAt: DateTime.parse(json['CreatedAt'] as String),
+      CreateTime: DateTime.parse(json['CreateTime'] as String),
     );
 
 Map<String, dynamic> _$ImageGetResponseToJson(ImageGetResponse instance) =>
@@ -114,7 +114,7 @@ Map<String, dynamic> _$ImageGetResponseToJson(ImageGetResponse instance) =>
       'Data': instance.data,
       'ImageType': instance.imageType,
       'Description': instance.description,
-      'CreatedAt': instance.createdAt.toIso8601String(),
+      'CreateTime': instance.CreateTime.toIso8601String(),
     };
 
 PostUploaderResponse _$PostUploaderResponseFromJson(
@@ -234,7 +234,7 @@ UserProfileResponse _$UserProfileResponseFromJson(Map<String, dynamic> json) =>
       email: json['Email'] as String,
       avatar: json['Avatar'] as String,
       isBlocked: json['IsBlocked'] as bool,
-      createdAt: DateTime.parse(json['CreatedAt'] as String),
+      CreateTime: DateTime.parse(json['CreateTime'] as String),
       asset: UserAssetResponse.fromJson(json['Asset'] as Map<String, dynamic>),
     );
 
@@ -246,7 +246,7 @@ Map<String, dynamic> _$UserProfileResponseToJson(
   'Email': instance.email,
   'Avatar': instance.avatar,
   'IsBlocked': instance.isBlocked,
-  'CreatedAt': instance.createdAt.toIso8601String(),
+  'CreateTime': instance.CreateTime.toIso8601String(),
   'Asset': instance.asset,
 };
 
@@ -260,7 +260,7 @@ ProductResponse _$ProductResponseFromJson(Map<String, dynamic> json) =>
       categoryName: json['CategoryName'] as String,
       uploaderUserId: (json['UploaderUserId'] as num).toInt(),
       uploaderName: json['UploaderName'] as String,
-      createdAt: DateTime.parse(json['CreatedAt'] as String),
+      CreateTime: DateTime.parse(json['CreateTime'] as String),
     );
 
 Map<String, dynamic> _$ProductResponseToJson(ProductResponse instance) =>
@@ -273,7 +273,7 @@ Map<String, dynamic> _$ProductResponseToJson(ProductResponse instance) =>
       'CategoryName': instance.categoryName,
       'UploaderUserId': instance.uploaderUserId,
       'UploaderName': instance.uploaderName,
-      'CreatedAt': instance.createdAt.toIso8601String(),
+      'CreateTime': instance.CreateTime.toIso8601String(),
     };
 
 ProductDetailUploaderResponse _$ProductDetailUploaderResponseFromJson(
@@ -308,9 +308,9 @@ ProductDetailResponse _$ProductDetailResponseFromJson(
         ),
   uploaderUserId: (json['UploaderUserId'] as num?)?.toInt(),
   uploaderName: json['UploaderName'] as String?,
-  createdAt: json['CreatedAt'] == null
+  CreateTime: json['CreateTime'] == null
       ? null
-      : DateTime.parse(json['CreatedAt'] as String),
+      : DateTime.parse(json['CreateTime'] as String),
 );
 
 Map<String, dynamic> _$ProductDetailResponseToJson(
@@ -325,7 +325,7 @@ Map<String, dynamic> _$ProductDetailResponseToJson(
   'Uploader': instance.uploader,
   'UploaderUserId': instance.uploaderUserId,
   'UploaderName': instance.uploaderName,
-  'CreatedAt': instance.createdAt?.toIso8601String(),
+  'CreateTime': instance.CreateTime?.toIso8601String(),
 };
 
 CategoryResponse _$CategoryResponseFromJson(Map<String, dynamic> json) =>
@@ -333,7 +333,7 @@ CategoryResponse _$CategoryResponseFromJson(Map<String, dynamic> json) =>
       id: json['Id'] as String,
       name: json['Name'] as String,
       coverImageId: json['CoverImageId'] as String,
-      createdAt: DateTime.parse(json['CreatedAt'] as String),
+      CreateTime: DateTime.parse(json['CreateTime'] as String),
     );
 
 Map<String, dynamic> _$CategoryResponseToJson(CategoryResponse instance) =>
@@ -341,7 +341,7 @@ Map<String, dynamic> _$CategoryResponseToJson(CategoryResponse instance) =>
       'Id': instance.id,
       'Name': instance.name,
       'CoverImageId': instance.coverImageId,
-      'CreatedAt': instance.createdAt.toIso8601String(),
+      'CreateTime': instance.CreateTime.toIso8601String(),
     };
 
 TransactionRecordResponse _$TransactionRecordResponseFromJson(
@@ -412,7 +412,7 @@ AdminReportedPostResponse _$AdminReportedPostResponseFromJson(
   id: json['Id'] as String,
   title: json['Title'] as String,
   content: json['Content'] as String,
-  createdAt: DateTime.parse(json['CreatedAt'] as String),
+  CreateTime: DateTime.parse(json['CreateTime'] as String),
   reportCount: (json['ReportCount'] as num).toInt(),
   viewCount: (json['ViewCount'] as num).toInt(),
   likeCount: (json['LikeCount'] as num).toInt(),
@@ -433,7 +433,7 @@ Map<String, dynamic> _$AdminReportedPostResponseToJson(
   'Id': instance.id,
   'Title': instance.title,
   'Content': instance.content,
-  'CreatedAt': instance.createdAt.toIso8601String(),
+  'CreateTime': instance.CreateTime.toIso8601String(),
   'ReportCount': instance.reportCount,
   'ViewCount': instance.viewCount,
   'LikeCount': instance.likeCount,

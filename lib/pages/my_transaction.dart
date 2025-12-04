@@ -29,7 +29,7 @@ class _MyTransactionState extends State<MyTransaction> {
         id: 'txn_${DateTime.now().millisecondsSinceEpoch}',
         action: action,
         amount: double.parse(amount.toStringAsFixed(2)),
-        createdAt: DateTime.now(),
+        CreateTime: DateTime.now(),
       ),
     );
   }
@@ -58,8 +58,10 @@ class _MyTransactionState extends State<MyTransaction> {
                   leading: CircleAvatar(
                     child: Text(txn.action.substring(0, 1)),
                   ),
-                  title: Text('${txn.action} · ¥${txn.amount.toStringAsFixed(2)}'),
-                  subtitle: Text('时间：${txn.createdAt.toLocal()}'),
+                  title: Text(
+                    '${txn.action} · ¥${txn.amount.toStringAsFixed(2)}',
+                  ),
+                  subtitle: Text('时间：${txn.CreateTime.toLocal()}'),
                 ),
               );
             },

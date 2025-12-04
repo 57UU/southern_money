@@ -50,13 +50,13 @@ class CollectionItem {
   final String id;
   final String title;
   final String note;
-  final DateTime createdAt;
+  final DateTime CreateTime;
 
   const CollectionItem({
     required this.id,
     required this.title,
     required this.note,
-    required this.createdAt,
+    required this.CreateTime,
   });
 
   Map<String, dynamic> toMap() {
@@ -64,7 +64,7 @@ class CollectionItem {
       'id': id,
       'title': title,
       'note': note,
-      'createdAt': createdAt.toIso8601String(),
+      'CreateTime': CreateTime.toIso8601String(),
     };
   }
 
@@ -73,7 +73,7 @@ class CollectionItem {
       id: map['id'] as String,
       title: map['title'] as String,
       note: map['note'] as String,
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      CreateTime: DateTime.parse(map['CreateTime'] as String),
     );
   }
 }
@@ -82,13 +82,13 @@ class TransactionRecord {
   final String id;
   final String action;
   final double amount;
-  final DateTime createdAt;
+  final DateTime CreateTime;
 
   const TransactionRecord({
     required this.id,
     required this.action,
     required this.amount,
-    required this.createdAt,
+    required this.CreateTime,
   });
 
   Map<String, dynamic> toMap() {
@@ -96,7 +96,7 @@ class TransactionRecord {
       'id': id,
       'action': action,
       'amount': amount,
-      'createdAt': createdAt.toIso8601String(),
+      'CreateTime': CreateTime.toIso8601String(),
     };
   }
 
@@ -105,7 +105,7 @@ class TransactionRecord {
       id: map['id'] as String,
       action: map['action'] as String,
       amount: (map['amount'] as num).toDouble(),
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      CreateTime: DateTime.parse(map['CreateTime'] as String),
     );
   }
 }
