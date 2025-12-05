@@ -15,13 +15,13 @@ class TokenService {
     //init
     sessionToken = ValueNotifier(preferences.getString(_sessionTokenKey));
     _refreshToken = preferences.getString(_refreshTokenKey);
+    _addSaveCallback();
   }
   late ValueNotifier<String?> sessionToken;
   String? _refreshToken;
   void updateTokens(String sessionToken, String refreshToken) {
     _refreshToken = refreshToken;
     this.sessionToken.value = sessionToken;
-    _addSaveCallback();
   }
 
   String? get refreshTokenValue => _refreshToken;
