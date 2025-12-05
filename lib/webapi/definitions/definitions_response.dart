@@ -175,6 +175,8 @@ class PostGetResponse {
 @JsonSerializable()
 class PostPageItemResponse {
   // 与PostGetResponse结构相同，复用该类
+  @JsonKey(name: "Id")
+  final String id;
   @JsonKey(name: "Title")
   final String title;
   @JsonKey(name: "Content")
@@ -199,6 +201,7 @@ class PostPageItemResponse {
   final PostUploaderResponse uploader;
 
   PostPageItemResponse({
+    required this.id,
     required this.title,
     required this.content,
     required this.createTime,

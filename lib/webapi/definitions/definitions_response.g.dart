@@ -170,6 +170,7 @@ Map<String, dynamic> _$PostGetResponseToJson(PostGetResponse instance) =>
 PostPageItemResponse _$PostPageItemResponseFromJson(
   Map<String, dynamic> json,
 ) => PostPageItemResponse(
+  id: json['Id'] as String,
   title: json['Title'] as String,
   content: json['Content'] as String,
   createTime: DateTime.parse(json['CreateTime'] as String),
@@ -190,6 +191,7 @@ PostPageItemResponse _$PostPageItemResponseFromJson(
 Map<String, dynamic> _$PostPageItemResponseToJson(
   PostPageItemResponse instance,
 ) => <String, dynamic>{
+  'Id': instance.id,
   'Title': instance.title,
   'Content': instance.content,
   'CreateTime': instance.createTime.toIso8601String(),

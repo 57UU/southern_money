@@ -72,7 +72,8 @@ class ApiPostService {
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -81,7 +82,9 @@ class ApiPostService {
   }
 
   /// 搜索帖子
-  Future<ApiResponse<PagedResponse<PostPageItemResponse>>> searchPosts(String query) async {
+  Future<ApiResponse<PagedResponse<PostPageItemResponse>>> searchPosts(
+    String query,
+  ) async {
     try {
       final request = PostSearchRequest(query: query);
 
@@ -94,7 +97,8 @@ class ApiPostService {
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -131,7 +135,7 @@ class ApiPostService {
 
       final response = await jwtDio.post(
         PostLikeRequest.route,
-        data: request.toJson(),
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(
@@ -211,7 +215,8 @@ class ApiPostService {
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {

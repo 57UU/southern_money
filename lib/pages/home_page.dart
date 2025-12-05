@@ -4,6 +4,7 @@ import 'package:southern_money/pages/jewelry_page.dart';
 import 'package:southern_money/pages/futures_page.dart';
 import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/pages/post_viewer.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
@@ -115,6 +116,7 @@ class _DiscoveryState extends State<Discovery> {
                           title: p.content, // ← 显示内容
                           author: p.uploader.name, // ← 显示作者
                           timeAgo: "", // ← 你不需要时间，传空字符串
+                          onTap: () => PostViewer.show(context, p),
                         ),
                     ],
                   );
