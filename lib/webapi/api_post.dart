@@ -68,7 +68,7 @@ class ApiPostService {
         queryParameters: request.toJson(),
       );
 
-      return ApiResponse.fromJson(
+      final result = ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
@@ -76,6 +76,7 @@ class ApiPostService {
               PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
+      return result;
     } catch (e) {
       return ApiResponse.fail(message: "获取帖子列表失败: $e");
     }

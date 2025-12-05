@@ -4,6 +4,7 @@ import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 import 'package:southern_money/widgets/utilities.dart';
 
@@ -139,23 +140,9 @@ class _PostViewerState extends State<PostViewer> {
     }
 
     try {
-      final response = await postService.reportPost(
-        postId: widget.post.id,
-        reason: reason,
+      await apiRequestDialog(
+        postService.reportPost(postId: widget.post.id, reason: reason),
       );
-
-      if (response.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("举报成功"), duration: Duration(seconds: 2)),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message ?? "举报失败"),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

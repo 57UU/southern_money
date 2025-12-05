@@ -13,9 +13,7 @@ ApiResponse<T> _$ApiResponseFromJson<T>(
   success: json['Success'] as bool,
   message: json['Message'] as String?,
   data: _$nullableGenericFromJson(json['Data'], fromJsonT),
-  timestamp: json['Timestamp'] == null
-      ? null
-      : DateTime.parse(json['Timestamp'] as String),
+  timestamp: DateTime.parse(json['Timestamp'] as String),
 );
 
 Map<String, dynamic> _$ApiResponseToJson<T>(
@@ -25,7 +23,7 @@ Map<String, dynamic> _$ApiResponseToJson<T>(
   'Success': instance.success,
   'Message': instance.message,
   'Data': _$nullableGenericToJson(instance.data, toJsonT),
-  'Timestamp': instance.timestamp?.toIso8601String(),
+  'Timestamp': instance.timestamp.toIso8601String(),
 };
 
 T? _$nullableGenericFromJson<T>(

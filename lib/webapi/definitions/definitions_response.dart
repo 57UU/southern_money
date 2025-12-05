@@ -11,15 +11,23 @@ class ApiResponse<T> {
   @JsonKey(name: "Data")
   final T? data;
   @JsonKey(name: "Timestamp")
-  final DateTime? timestamp;
+  final DateTime timestamp;
 
-  ApiResponse({required this.success, this.message, this.data, this.timestamp});
+  ApiResponse({
+    required this.success,
+    this.message,
+    this.data,
+    required this.timestamp,
+  });
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) => _$ApiResponseFromJson(json, fromJsonT);
-  factory ApiResponse.fail({String? message}) =>
-      ApiResponse<T>(success: false, message: message);
+  factory ApiResponse.fail({String? message}) => ApiResponse<T>(
+    success: false,
+    message: message,
+    timestamp: DateTime.now(),
+  );
 }
 
 @JsonSerializable(genericArgumentFactories: true)
