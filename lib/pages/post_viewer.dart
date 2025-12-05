@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/router_utils.dart';
+import 'package:southern_money/widgets/utilities.dart';
 
 class PostViewer extends StatefulWidget {
   final PostPageItemResponse post;
@@ -206,13 +208,12 @@ class _PostViewerState extends State<PostViewer> {
                     CircleAvatar(
                       radius: 20,
                       backgroundImage: widget.post.uploader.avatar != null
-                          ? NetworkImage(
+                          ? CachedNetworkImageProvider(
                               imageService.getImageUrl(
                                 widget.post.uploader.avatar!,
                               ),
                             )
-                          : const AssetImage('assets/images/avatar.png')
-                                as ImageProvider,
+                          : avatarPlaceholder,
                       backgroundColor: colorScheme.surfaceVariant,
                     ),
                     const SizedBox(width: 12),
