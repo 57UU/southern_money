@@ -89,7 +89,11 @@ Future<void> ensureInitialize() async {
   });
   getIt.registerSingletonAsync<ApiImageService>(() async {
     await getIt.isReady<JwtDio>();
-    return ApiImageService(getIt<JwtDio>(), getIt<AppConfigService>());
+    return ApiImageService(
+      getIt<JwtDio>(),
+      getIt<Dio>(),
+      getIt<AppConfigService>(),
+    );
   });
   getIt.registerSingletonAsync<ApiStoreService>(() async {
     await getIt.isReady<JwtDio>();

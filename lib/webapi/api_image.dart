@@ -7,8 +7,9 @@ import 'package:southern_money/webapi/definitions/definitions_response.dart';
 
 class ApiImageService {
   final JwtDio jwtDio;
+  final Dio dio;
   final AppConfigService appConfigService;
-  ApiImageService(this.jwtDio, this.appConfigService);
+  ApiImageService(this.jwtDio, this.dio, this.appConfigService);
 
   /// 上传图片
   Future<ApiResponse<ImageUploadResponse>> uploadImage({
@@ -58,7 +59,7 @@ class ApiImageService {
       // 我们需要将其转换为适合上传的格式
       if (imagePath.startsWith('blob:')) {
         // 如果是blob URL，我们需要先获取图片数据
-        final response = await jwtDio.get(
+        final response = await dio.get(
           imagePath,
           options: Options(responseType: ResponseType.bytes),
         );
