@@ -195,8 +195,8 @@ Future showLoadingDialogWithErrorString({
 
 enum DialogState { conform, loading, success, error }
 
-Future<bool?> apiRequestDialog(
-  Future<ApiResponse> awaitable, {
+Future<bool?> apiRequestDialog<T>(
+  Future<ApiResponse<T>> awaitable, {
   String? confirmMessage,
   void Function()? onSuccess,
 }) {

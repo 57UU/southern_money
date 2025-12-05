@@ -50,13 +50,27 @@ class _ProfilePageState extends State<ProfilePage>
         if (userProfileResponse == null) {
           return const Center(child: CircularProgressIndicator());
         } else if (userProfileResponse!.success == false) {
-          return Center(
-            child: TextButton(
-              onPressed: () {
-                loadUserProfile();
-              },
-              child: Text("Failed:${userProfileResponse!.message}"),
-            ),
+          return Column(
+            spacing: 16,
+            children: [
+              Text(
+                "Failed:${userProfileResponse!.message}",
+                style: TextStyle(color: Colors.red),
+              ),
+              TextButton(
+                onPressed: () {
+                  loadUserProfile();
+                },
+                child: const Text("重新加载"),
+              ),
+              ProfileMenuItem(
+                title: '设置',
+                icon: Icons.settings,
+                onTap: () {
+                  popupOrNavigate(context, const Setting());
+                },
+              ),
+            ],
           );
         } else {
           final data = userProfileResponse!.data!;

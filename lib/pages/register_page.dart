@@ -22,7 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final content = Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,17 +56,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: FloatingActionButton(
-              mini: true,
-              onPressed: _register,
-              child: const Icon(Icons.arrow_forward),
-            ),
-          ),
         ],
       ),
     );
@@ -79,6 +68,11 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
       body: content,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _register,
+        label: const Icon(Icons.arrow_forward),
+        icon: const Text("立即注册"),
+      ),
     );
   }
 

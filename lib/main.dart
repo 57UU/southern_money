@@ -102,12 +102,6 @@ class _MainScreenState extends State<MainScreen> {
       label: '我的',
       page: ProfilePage(),
     ),
-    NavigationItemData(
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
-      label: '设置',
-      page: Setting(),
-    ),
   ];
 
   @override
@@ -126,7 +120,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildMainScreen() {
     scheduleMicrotask(() {
-      if (_currentIndex != _pageController.page?.round()) {
+      if (_pageController.hasClients &&
+          _currentIndex != _pageController.page?.round()) {
         _pageController.jumpToPage(_currentIndex);
       }
     });

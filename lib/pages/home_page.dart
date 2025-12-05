@@ -4,6 +4,7 @@ import 'package:southern_money/pages/jewelry_page.dart';
 import 'package:southern_money/pages/futures_page.dart';
 import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -19,7 +20,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -48,6 +50,7 @@ class Discovery extends StatefulWidget {
   @override
   State<Discovery> createState() => _DiscoveryState();
 }
+
 // get post by hr
 class _DiscoveryState extends State<Discovery> {
   final postService = getIt<ApiPostService>();
@@ -60,51 +63,68 @@ class _DiscoveryState extends State<Discovery> {
     futurePosts = postService.getPostPage(page: 0, pageSize: 3);
   }
 
+  void refreshPosts() {
+    setState(() {
+      futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ApiResponse<PagedResponse<PostPageItemResponse>>>(
-      future: futurePosts,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (!snapshot.hasData || snapshot.data == null) {
-          return const Text("加载失败");
-        }
-
-        final response = snapshot.data!;
-
-        if (!response.success || response.data == null) {
-          return Text("获取帖子失败：${response.message}");
-        }
-
-        final posts = response.data!.items;
-
-        return Column(
-          spacing: 10,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      spacing: 10,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              '发现',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            titleText("发现"),
+            IconButton(
+              onPressed: refreshPosts,
+              icon: const Icon(Icons.refresh),
             ),
-
-            // 🔥 从后端渲染动态帖子（只显示 content + author）
-            for (var p in posts)
-              PostCard(
-                title: p.content, // ← 显示内容
-                author: p.uploader.name, // ← 显示作者
-                timeAgo: "", // ← 你不需要时间，传空字符串
-              ),
           ],
-        );
-      },
+        ),
+        FutureBuilder<ApiResponse<PagedResponse<PostPageItemResponse>>>(
+          future: futurePosts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Text("加载失败");
+            }
+
+            final response = snapshot.data!;
+
+            if (!response.success || response.data == null) {
+              return Text("获取帖子失败：${response.message}");
+            }
+
+            final posts = response.data!.items;
+
+            return posts.isEmpty
+                ? Text("暂无帖子")
+                : Column(
+                    spacing: 10,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var p in posts)
+                        PostCard(
+                          title: p.content, // ← 显示内容
+                          author: p.uploader.name, // ← 显示作者
+                          timeAgo: "", // ← 你不需要时间，传空字符串
+                        ),
+                    ],
+                  );
+          },
+        ),
+      ],
     );
   }
 }
 // get post finish by hr
-
 
 class QuickNavigation extends StatelessWidget {
   const QuickNavigation({super.key});
@@ -140,10 +160,7 @@ class QuickNavigation extends StatelessWidget {
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '快速导航',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        titleText("快速导航"),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [

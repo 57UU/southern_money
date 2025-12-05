@@ -117,13 +117,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           name: nameController.text,
           email: emailController.text,
         ),
-        onSuccess: widget.onUpdateSuccess,
+        onSuccess: () {
+          widget.onUpdateSuccess?.call();
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('信息更新成功')));
+          }
+        },
       );
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('信息更新成功')));
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
