@@ -1,13 +1,14 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
-import 'dart:io';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/webapi/index.dart';
-import 'package:southern_money/widgets/dialog.dart'
-    show DialogState, apiRequestDialog;
+import 'package:southern_money/widgets/dialog.dart' show apiRequestDialog;
 
 class ProfileEditPage extends StatefulWidget {
   final UserProfileResponse userProfileResponse;
@@ -53,6 +54,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (pickedFile != null) {
       setState(() {
+        // 在Web平台上，我们直接使用路径，因为Web上的image_picker返回的是URL
         _avatarPath = pickedFile.path;
         _isAvatarChanged = true;
       });
@@ -70,10 +72,20 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     });
 
     try {
-      await apiRequestDialog(
-        userService.uploadAvatar(_avatarPath!),
-        onSuccess: widget.onUpdateSuccess,
-      );
+      // 在Web平台上，我们使用不同的上传方法
+      if (kIsWeb) {
+        // Web平台的特殊处理
+        await apiRequestDialog(
+          userService.uploadAvatarWeb(_avatarPath!),
+          onSuccess: widget.onUpdateSuccess,
+        );
+      } else {
+        // 移动端平台的上传方法
+        await apiRequestDialog(
+          userService.uploadAvatar(_avatarPath!),
+          onSuccess: widget.onUpdateSuccess,
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -152,8 +164,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             radius: 60,
                             backgroundImage: _avatarPath != null
                                 ? (_isAvatarChanged
-                                      ? FileImage(File(_avatarPath!))
-                                            as ImageProvider
+                                      ? kIsWeb
+                                            ? NetworkImage(_avatarPath!)
+                                                  as ImageProvider
+                                            : FileImage(File(_avatarPath!))
+                                                  as ImageProvider
                                       : CachedNetworkImageProvider(
                                           imageService.getImageUrl(
                                             _avatarPath!,

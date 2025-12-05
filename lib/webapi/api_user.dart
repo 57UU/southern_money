@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:southern_money/webapi/JwtService.dart';
 import 'package:southern_money/webapi/definitions/definitions_request.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 
 class ApiUserService {
   final JwtDio jwtDio;
-  ApiUserService(this.jwtDio);
+  final Dio dio;
+  ApiUserService(this.jwtDio, this.dio);
 
   /// 更新用户信息
   Future<ApiResponse<Map<String, dynamic>>> updateUser({
@@ -114,6 +116,45 @@ class ApiUserService {
       );
     } catch (e) {
       return ApiResponse.fail(message: "上传头像失败: $e");
+    }
+  }
+
+  /// Web平台上传头像
+  Future<ApiResponse<AvatarUploadResponse>> uploadAvatarWeb(
+    String avatarPath,
+  ) async {
+    try {
+      // 在Web平台上，avatarPath是一个blob URL
+      // 我们需要将其转换为适合上传的格式
+      if (avatarPath.startsWith('blob:')) {
+        // 如果是blob URL，我们需要先获取图片数据
+        final response = await dio.get(
+          avatarPath,
+          options: Options(responseType: ResponseType.bytes),
+        );
+
+        final formData = FormData.fromMap({
+          'File': MultipartFile.fromBytes(
+            response.data,
+            filename: 'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          ),
+        });
+
+        final uploadResponse = await jwtDio.post(
+          UserUploadAvatarRequest.route,
+          data: formData,
+        );
+
+        return ApiResponse.fromJson(
+          uploadResponse.data,
+          (dataJson) =>
+              AvatarUploadResponse.fromJson(dataJson as Map<String, dynamic>),
+        );
+      } else {
+        return ApiResponse.fail(message: "不支持的头像路径格式");
+      }
+    } catch (e) {
+      return ApiResponse.fail(message: "Web平台上传头像失败: $e");
     }
   }
 

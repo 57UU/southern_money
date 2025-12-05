@@ -85,7 +85,7 @@ Future<void> ensureInitialize() async {
   });
   getIt.registerSingletonAsync<ApiUserService>(() async {
     await getIt.isReady<JwtDio>();
-    return ApiUserService(getIt<JwtDio>());
+    return ApiUserService(getIt<JwtDio>(), getIt<Dio>());
   });
   getIt.registerSingletonAsync<ApiImageService>(() async {
     await getIt.isReady<JwtDio>();
