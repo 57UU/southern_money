@@ -207,7 +207,7 @@ class ApiPostService {
     try {
       final request = PostMyPostsRequest(page: page, pageSize: pageSize);
 
-      final response = await jwtDio.post(
+      final response = await jwtDio.get(
         PostMyPostsRequest.route,
         queryParameters: {'page': request.page, 'pageSize': request.pageSize},
       );
