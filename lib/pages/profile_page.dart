@@ -228,6 +228,13 @@ class _ProfilePageState extends State<ProfilePage>
                       },
                     ),
                     ProfileMenuItem(
+                      title: '我的自选',
+                      icon: Icons.auto_graph,
+                      onTap: () {
+                        popupOrNavigate(context, const MySelections());
+                      },
+                    ),
+                    ProfileMenuItem(
                       title: '我的收藏',
                       icon: Icons.bookmark_border,
                       onTap: () {

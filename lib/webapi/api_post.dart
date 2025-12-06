@@ -209,7 +209,7 @@ class ApiPostService {
 
       final response = await jwtDio.get(
         PostMyPostsRequest.route,
-        queryParameters: {'page': request.page, 'pageSize': request.pageSize},
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(

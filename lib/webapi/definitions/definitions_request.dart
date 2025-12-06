@@ -170,13 +170,16 @@ class PostEditRequest {
   Map<String, dynamic> toJson() => _$PostEditRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class PostMyPostsRequest {
   static const String route = "/posts/myPosts";
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
   PostMyPostsRequest({required this.page, required this.pageSize});
+  Map<String, dynamic> toJson() => _$PostMyPostsRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -254,28 +257,36 @@ class ProductDeleteRequest {
   Map<String, dynamic> toJson() => _$ProductDeleteRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class ProductDetailRequest {
   static const String route = "/store/detail";
+  @JsonKey(name: "productId")
   final String productId;
 
   ProductDetailRequest({required this.productId});
+  Map<String, dynamic> toJson() => _$ProductDetailRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class ProductRESTDetailRequest {
   static const String route = "/store/products";
+  @JsonKey(name: "id")
   final String id;
 
   ProductRESTDetailRequest({required this.id});
+  Map<String, dynamic> toJson() => _$ProductRESTDetailRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class ProductListRequest {
   static const String route = "/store/products";
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
+  @JsonKey(name: "categoryId")
   final String? categoryId;
+  @JsonKey(name: "search")
   final String? search;
 
   ProductListRequest({
@@ -284,13 +295,17 @@ class ProductListRequest {
     this.categoryId,
     this.search,
   });
+  Map<String, dynamic> toJson() => _$ProductListRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class ProductCategoryListRequest {
   static const String route = "/store/categories";
+  @JsonKey(name: "id")
   final String id;
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
   ProductCategoryListRequest({
@@ -298,13 +313,17 @@ class ProductCategoryListRequest {
     required this.page,
     required this.pageSize,
   });
+  Map<String, dynamic> toJson() => _$ProductCategoryListRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class ProductSearchRequest {
   static const String route = "/store/search";
+  @JsonKey(name: "q")
   final String q;
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
   ProductSearchRequest({
@@ -312,38 +331,47 @@ class ProductSearchRequest {
     required this.page,
     required this.pageSize,
   });
+  Map<String, dynamic> toJson() => _$ProductSearchRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class MyProductsRequest {
   static const String route = "/store/myProducts";
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
   MyProductsRequest({required this.page, required this.pageSize});
+  Map<String, dynamic> toJson() => _$MyProductsRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategoryListRequest {
   static const String route = "/store/categories";
 
   CategoryListRequest();
+  Map<String, dynamic> toJson() => _$CategoryListRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategoryGetRequest {
   static const String route = "/store/categories";
+  @JsonKey(name: "id")
   final String id;
 
   CategoryGetRequest({required this.id});
+  Map<String, dynamic> toJson() => _$CategoryGetRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategorySearchRequest {
   static const String route = "/store/category/search";
+  @JsonKey(name: "name")
   final String name;
 
   CategorySearchRequest({required this.name});
+  Map<String, dynamic> toJson() => _$CategorySearchRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -358,44 +386,52 @@ class CategoryCreateRequest {
   Map<String, dynamic> toJson() => _$CategoryCreateRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategoryFavoriteRequest {
   static const String route = "/store/categories";
+  @JsonKey(name: "categoryId")
   final String categoryId;
 
   CategoryFavoriteRequest({required this.categoryId});
+  Map<String, dynamic> toJson() => _$CategoryFavoriteRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategoryUnfavoriteRequest {
   static const String route = "/store/categories";
+  @JsonKey(name: "categoryId")
   final String categoryId;
 
   CategoryUnfavoriteRequest({required this.categoryId});
+  Map<String, dynamic> toJson() => _$CategoryUnfavoriteRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class FavoriteCategoriesRequest {
   static const String route = "/store/favoriteCategories";
 
   FavoriteCategoriesRequest();
+  Map<String, dynamic> toJson() => _$FavoriteCategoriesRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CheckFavoritedRequest {
   static const String route = "/store/categories";
+  @JsonKey(name: "categoryId")
   final String categoryId;
 
   CheckFavoritedRequest({required this.categoryId});
+  Map<String, dynamic> toJson() => _$CheckFavoritedRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class UserUploadAvatarRequest {
   static const String route = "/user/uploadAvatar";
   // 注意：文件上传使用FormData，不在JSON中序列化
   // final File file;
 
   UserUploadAvatarRequest();
+  Map<String, dynamic> toJson() => _$UserUploadAvatarRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -408,13 +444,16 @@ class TransactionBuyRequest {
   Map<String, dynamic> toJson() => _$TransactionBuyRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class TransactionMyRecordsRequest {
   static const String route = "/transaction/myRecords";
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
   TransactionMyRecordsRequest({required this.page, required this.pageSize});
+  Map<String, dynamic> toJson() => _$TransactionMyRecordsRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -464,12 +503,14 @@ class AdminUsersRequest {
   Map<String, dynamic> toJson() => _$AdminUsersRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class AdminUserDetailRequest {
   static const String route = "/admin/users";
+  @JsonKey(name: "userId")
   final int userId;
 
   AdminUserDetailRequest({required this.userId});
+  Map<String, dynamic> toJson() => _$AdminUserDetailRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -505,21 +546,32 @@ class AdminHandleReportRequest {
   Map<String, dynamic> toJson() => _$AdminHandleReportRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class AdminPostsRequest {
   static const String route = "/admin/posts";
+  @JsonKey(name: "userId")
+  final int userId;
+  @JsonKey(name: "page")
   final int page;
+  @JsonKey(name: "pageSize")
   final int pageSize;
 
-  AdminPostsRequest({required this.page, required this.pageSize});
+  AdminPostsRequest({
+    required this.userId,
+    required this.page,
+    required this.pageSize,
+  });
+  Map<String, dynamic> toJson() => _$AdminPostsRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class CategoryAvgPriceRequest {
-  static const String route = "/store/avgPrice";
+  static const String route = "/store/categories/avgPrice";
+  @JsonKey(name: "categoryId")
   final String categoryId;
 
   CategoryAvgPriceRequest({required this.categoryId});
+  Map<String, dynamic> toJson() => _$CategoryAvgPriceRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -532,4 +584,42 @@ class SetAdminRequest {
 
   SetAdminRequest({required this.userId, required this.isAdmin});
   Map<String, dynamic> toJson() => _$SetAdminRequestToJson(this);
+}
+
+@JsonSerializable()
+class NotificationMyRequest {
+  static const String route = "/notification/my";
+  @JsonKey(name: "page")
+  final int page;
+  @JsonKey(name: "pageSize")
+  final int pageSize;
+
+  NotificationMyRequest({this.page = 1, this.pageSize = 10});
+  Map<String, dynamic> toJson() => _$NotificationMyRequestToJson(this);
+}
+
+@JsonSerializable()
+class NotificationUnreadCountRequest {
+  static const String route = "/notification/unreadCount";
+
+  NotificationUnreadCountRequest();
+  Map<String, dynamic> toJson() => _$NotificationUnreadCountRequestToJson(this);
+}
+
+@JsonSerializable()
+class NotificationMarkReadRequest {
+  static const String route = "/notification/read";
+  @JsonKey(name: "NotificationIds")
+  final List<int> notificationIds;
+
+  NotificationMarkReadRequest({required this.notificationIds});
+  Map<String, dynamic> toJson() => _$NotificationMarkReadRequestToJson(this);
+}
+
+@JsonSerializable()
+class NotificationReadAllRequest {
+  static const String route = "/notification/readAll";
+
+  NotificationReadAllRequest();
+  Map<String, dynamic> toJson() => _$NotificationReadAllRequestToJson(this);
 }

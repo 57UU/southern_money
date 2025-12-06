@@ -548,3 +548,30 @@ class BlockReason {
   factory BlockReason.fromJson(Map<String, dynamic> json) =>
       _$BlockReasonFromJson(json);
 }
+
+@JsonSerializable()
+class NotificationResponse {
+  @JsonKey(name: "Id")
+  final int id;
+  @JsonKey(name: "Title")
+  final String title;
+  @JsonKey(name: "Content")
+  final String content;
+  @JsonKey(name: "IsRead")
+  final bool isRead;
+  @JsonKey(name: "CreateTime")
+  final DateTime createTime;
+  @JsonKey(name: "Type")
+  final String type;
+
+  NotificationResponse({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.isRead,
+    required this.createTime,
+    required this.type,
+  });
+  factory NotificationResponse.fromJson(Map<String, dynamic> json) =>
+      _$NotificationResponseFromJson(json);
+}

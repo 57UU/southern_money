@@ -20,12 +20,12 @@ class ApiStoreService {
         description: description,
         categoryId: categoryId,
       );
-      
+
       final response = await jwtDio.post(
         ProductPublishRequest.route,
         data: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -36,15 +36,17 @@ class ApiStoreService {
   }
 
   /// 删除产品
-  Future<ApiResponse<Map<String, dynamic>>> deleteProduct(String productId) async {
+  Future<ApiResponse<Map<String, dynamic>>> deleteProduct(
+    String productId,
+  ) async {
     try {
       final request = ProductDeleteRequest(productId: productId);
-      
+
       final response = await jwtDio.post(
         ProductDeleteRequest.route,
         data: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -55,18 +57,21 @@ class ApiStoreService {
   }
 
   /// 获取产品详情
-  Future<ApiResponse<ProductDetailResponse>> getProductDetail(String productId) async {
+  Future<ApiResponse<ProductDetailResponse>> getProductDetail(
+    String productId,
+  ) async {
     try {
       final request = ProductDetailRequest(productId: productId);
-      
+
       final response = await jwtDio.get(
         ProductDetailRequest.route,
-        queryParameters: {'id': request.productId},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
-        (dataJson) => ProductDetailResponse.fromJson(dataJson as Map<String, dynamic>),
+        (dataJson) =>
+            ProductDetailResponse.fromJson(dataJson as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse.fail(message: "获取产品详情失败: $e");
@@ -87,30 +92,18 @@ class ApiStoreService {
         categoryId: categoryId,
         search: search,
       );
-      
-      final queryParams = <String, dynamic>{
-        'page': request.page,
-        'pageSize': request.pageSize,
-      };
-      
-      if (request.categoryId != null) {
-        queryParams['categoryId'] = request.categoryId;
-      }
-      
-      if (request.search != null) {
-        queryParams['search'] = request.search;
-      }
-      
+
       final response = await jwtDio.get(
         ProductListRequest.route,
-        queryParameters: queryParams,
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -130,21 +123,18 @@ class ApiStoreService {
         page: page,
         pageSize: pageSize,
       );
-      
+
       final response = await jwtDio.get(
         ProductCategoryListRequest.route,
-        queryParameters: {
-          'id': request.id,
-          'page': request.page,
-          'pageSize': request.pageSize,
-        },
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -164,21 +154,18 @@ class ApiStoreService {
         page: page,
         pageSize: pageSize,
       );
-      
+
       final response = await jwtDio.get(
         ProductSearchRequest.route,
-        queryParameters: {
-          'q': request.q,
-          'page': request.page,
-          'pageSize': request.pageSize,
-        },
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -193,20 +180,18 @@ class ApiStoreService {
   }) async {
     try {
       final request = MyProductsRequest(page: page, pageSize: pageSize);
-      
+
       final response = await jwtDio.get(
         MyProductsRequest.route,
-        queryParameters: {
-          'page': request.page,
-          'pageSize': request.pageSize,
-        },
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) =>
+              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -218,15 +203,15 @@ class ApiStoreService {
   Future<ApiResponse<List<CategoryResponse>>> getCategoryList() async {
     try {
       final request = CategoryListRequest();
-      
-      final response = await jwtDio.get(
-        CategoryListRequest.route,
-      );
-      
+
+      final response = await jwtDio.get(CategoryListRequest.route);
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => (dataJson as List)
-            .map((item) => CategoryResponse.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) => CategoryResponse.fromJson(item as Map<String, dynamic>),
+            )
             .toList(),
       );
     } catch (e) {
@@ -238,15 +223,16 @@ class ApiStoreService {
   Future<ApiResponse<CategoryResponse>> getCategoryDetail(String id) async {
     try {
       final request = CategoryGetRequest(id: id);
-      
+
       final response = await jwtDio.get(
         CategoryGetRequest.route,
-        queryParameters: {'id': request.id},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
-        (dataJson) => CategoryResponse.fromJson(dataJson as Map<String, dynamic>),
+        (dataJson) =>
+            CategoryResponse.fromJson(dataJson as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse.fail(message: "获取分类详情失败: $e");
@@ -254,18 +240,21 @@ class ApiStoreService {
   }
 
   /// 搜索分类
-  Future<ApiResponse<CategorySearchResponse>> searchCategories(String name) async {
+  Future<ApiResponse<CategorySearchResponse>> searchCategories(
+    String name,
+  ) async {
     try {
       final request = CategorySearchRequest(name: name);
-      
+
       final response = await jwtDio.get(
         CategorySearchRequest.route,
-        queryParameters: {'name': request.name},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
-        (dataJson) => CategorySearchResponse.fromJson(dataJson as Map<String, dynamic>),
+        (dataJson) =>
+            CategorySearchResponse.fromJson(dataJson as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse.fail(message: "搜索分类失败: $e");
@@ -278,16 +267,13 @@ class ApiStoreService {
     required String cover,
   }) async {
     try {
-      final request = CategoryCreateRequest(
-        category: category,
-        cover: cover,
-      );
-      
+      final request = CategoryCreateRequest(category: category, cover: cover);
+
       final response = await jwtDio.post(
         CategoryCreateRequest.route,
         data: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -298,15 +284,17 @@ class ApiStoreService {
   }
 
   /// 收藏分类
-  Future<ApiResponse<Map<String, dynamic>>> favoriteCategory(String categoryId) async {
+  Future<ApiResponse<Map<String, dynamic>>> favoriteCategory(
+    String categoryId,
+  ) async {
     try {
       final request = CategoryFavoriteRequest(categoryId: categoryId);
-      
+
       final response = await jwtDio.post(
         CategoryFavoriteRequest.route,
-        queryParameters: {'categoryId': request.categoryId},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -317,15 +305,17 @@ class ApiStoreService {
   }
 
   /// 取消收藏分类
-  Future<ApiResponse<Map<String, dynamic>>> unfavoriteCategory(String categoryId) async {
+  Future<ApiResponse<Map<String, dynamic>>> unfavoriteCategory(
+    String categoryId,
+  ) async {
     try {
       final request = CategoryUnfavoriteRequest(categoryId: categoryId);
-      
-      final response = await jwtDio.delete(
+
+      final response = await jwtDio.post(
         CategoryUnfavoriteRequest.route,
-        queryParameters: {'categoryId': request.categoryId},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -339,15 +329,15 @@ class ApiStoreService {
   Future<ApiResponse<List<CategoryResponse>>> getFavoriteCategories() async {
     try {
       final request = FavoriteCategoriesRequest();
-      
-      final response = await jwtDio.get(
-        FavoriteCategoriesRequest.route,
-      );
-      
+
+      final response = await jwtDio.get(FavoriteCategoriesRequest.route);
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => (dataJson as List)
-            .map((item) => CategoryResponse.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) => CategoryResponse.fromJson(item as Map<String, dynamic>),
+            )
             .toList(),
       );
     } catch (e) {
@@ -356,18 +346,21 @@ class ApiStoreService {
   }
 
   /// 检查是否已收藏分类
-  Future<ApiResponse<CheckFavoritedResponse>> checkFavorited(String categoryId) async {
+  Future<ApiResponse<CheckFavoritedResponse>> checkFavorited(
+    String categoryId,
+  ) async {
     try {
       final request = CheckFavoritedRequest(categoryId: categoryId);
-      
+
       final response = await jwtDio.get(
         CheckFavoritedRequest.route,
-        queryParameters: {'categoryId': request.categoryId},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
-        (dataJson) => CheckFavoritedResponse.fromJson(dataJson as Map<String, dynamic>),
+        (dataJson) =>
+            CheckFavoritedResponse.fromJson(dataJson as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse.fail(message: "检查收藏状态失败: $e");
@@ -375,18 +368,21 @@ class ApiStoreService {
   }
 
   /// 获取分类平均价格
-  Future<ApiResponse<AvgPriceResponse>> getCategoryAvgPrice(String categoryId) async {
+  Future<ApiResponse<AvgPriceResponse>> getCategoryAvgPrice(
+    String categoryId,
+  ) async {
     try {
       final request = CategoryAvgPriceRequest(categoryId: categoryId);
-      
+
       final response = await jwtDio.get(
         CategoryAvgPriceRequest.route,
-        queryParameters: {'categoryId': request.categoryId},
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
-        (dataJson) => AvgPriceResponse.fromJson(dataJson as Map<String, dynamic>),
+        (dataJson) =>
+            AvgPriceResponse.fromJson(dataJson as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse.fail(message: "获取分类平均价格失败: $e");

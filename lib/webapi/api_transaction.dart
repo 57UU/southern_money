@@ -10,12 +10,12 @@ class ApiTransactionService {
   Future<ApiResponse<Map<String, dynamic>>> buyProduct(String productId) async {
     try {
       final request = TransactionBuyRequest(productId: productId);
-      
+
       final response = await jwtDio.post(
         TransactionBuyRequest.route,
         data: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => dataJson as Map<String, dynamic>,
@@ -26,26 +26,26 @@ class ApiTransactionService {
   }
 
   /// 获取我的交易记录
-  Future<ApiResponse<PagedResponse<TransactionRecordResponse>>> getMyTransactionRecords({
-    required int page,
-    required int pageSize,
-  }) async {
+  Future<ApiResponse<PagedResponse<TransactionRecordResponse>>>
+  getMyTransactionRecords({required int page, required int pageSize}) async {
     try {
-      final request = TransactionMyRecordsRequest(page: page, pageSize: pageSize);
-      
+      final request = TransactionMyRecordsRequest(
+        page: page,
+        pageSize: pageSize,
+      );
+
       final response = await jwtDio.get(
         TransactionMyRecordsRequest.route,
-        queryParameters: {
-          'page': request.page,
-          'pageSize': request.pageSize,
-        },
+        queryParameters: request.toJson(),
       );
-      
+
       return ApiResponse.fromJson(
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => TransactionRecordResponse.fromJson(itemJson as Map<String, dynamic>),
+          (itemJson) => TransactionRecordResponse.fromJson(
+            itemJson as Map<String, dynamic>,
+          ),
         ),
       );
     } catch (e) {

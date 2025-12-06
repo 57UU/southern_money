@@ -134,6 +134,15 @@ Map<String, dynamic> _$PostEditRequestToJson(PostEditRequest instance) =>
       'ImageIds': instance.imageIds,
     };
 
+PostMyPostsRequest _$PostMyPostsRequestFromJson(Map<String, dynamic> json) =>
+    PostMyPostsRequest(
+      page: (json['page'] as num).toInt(),
+      pageSize: (json['pageSize'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$PostMyPostsRequestToJson(PostMyPostsRequest instance) =>
+    <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};
+
 UserUpdateRequest _$UserUpdateRequestFromJson(Map<String, dynamic> json) =>
     UserUpdateRequest(
       name: json['Name'] as String,
@@ -189,6 +198,100 @@ Map<String, dynamic> _$ProductDeleteRequestToJson(
   ProductDeleteRequest instance,
 ) => <String, dynamic>{'ProductId': instance.productId};
 
+ProductDetailRequest _$ProductDetailRequestFromJson(
+  Map<String, dynamic> json,
+) => ProductDetailRequest(productId: json['productId'] as String);
+
+Map<String, dynamic> _$ProductDetailRequestToJson(
+  ProductDetailRequest instance,
+) => <String, dynamic>{'productId': instance.productId};
+
+ProductRESTDetailRequest _$ProductRESTDetailRequestFromJson(
+  Map<String, dynamic> json,
+) => ProductRESTDetailRequest(id: json['id'] as String);
+
+Map<String, dynamic> _$ProductRESTDetailRequestToJson(
+  ProductRESTDetailRequest instance,
+) => <String, dynamic>{'id': instance.id};
+
+ProductListRequest _$ProductListRequestFromJson(Map<String, dynamic> json) =>
+    ProductListRequest(
+      page: (json['page'] as num).toInt(),
+      pageSize: (json['pageSize'] as num).toInt(),
+      categoryId: json['categoryId'] as String?,
+      search: json['search'] as String?,
+    );
+
+Map<String, dynamic> _$ProductListRequestToJson(ProductListRequest instance) =>
+    <String, dynamic>{
+      'page': instance.page,
+      'pageSize': instance.pageSize,
+      'categoryId': instance.categoryId,
+      'search': instance.search,
+    };
+
+ProductCategoryListRequest _$ProductCategoryListRequestFromJson(
+  Map<String, dynamic> json,
+) => ProductCategoryListRequest(
+  id: json['id'] as String,
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+);
+
+Map<String, dynamic> _$ProductCategoryListRequestToJson(
+  ProductCategoryListRequest instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'page': instance.page,
+  'pageSize': instance.pageSize,
+};
+
+ProductSearchRequest _$ProductSearchRequestFromJson(
+  Map<String, dynamic> json,
+) => ProductSearchRequest(
+  q: json['q'] as String,
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+);
+
+Map<String, dynamic> _$ProductSearchRequestToJson(
+  ProductSearchRequest instance,
+) => <String, dynamic>{
+  'q': instance.q,
+  'page': instance.page,
+  'pageSize': instance.pageSize,
+};
+
+MyProductsRequest _$MyProductsRequestFromJson(Map<String, dynamic> json) =>
+    MyProductsRequest(
+      page: (json['page'] as num).toInt(),
+      pageSize: (json['pageSize'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$MyProductsRequestToJson(MyProductsRequest instance) =>
+    <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};
+
+CategoryListRequest _$CategoryListRequestFromJson(Map<String, dynamic> json) =>
+    CategoryListRequest();
+
+Map<String, dynamic> _$CategoryListRequestToJson(
+  CategoryListRequest instance,
+) => <String, dynamic>{};
+
+CategoryGetRequest _$CategoryGetRequestFromJson(Map<String, dynamic> json) =>
+    CategoryGetRequest(id: json['id'] as String);
+
+Map<String, dynamic> _$CategoryGetRequestToJson(CategoryGetRequest instance) =>
+    <String, dynamic>{'id': instance.id};
+
+CategorySearchRequest _$CategorySearchRequestFromJson(
+  Map<String, dynamic> json,
+) => CategorySearchRequest(name: json['name'] as String);
+
+Map<String, dynamic> _$CategorySearchRequestToJson(
+  CategorySearchRequest instance,
+) => <String, dynamic>{'name': instance.name};
+
 CategoryCreateRequest _$CategoryCreateRequestFromJson(
   Map<String, dynamic> json,
 ) => CategoryCreateRequest(
@@ -200,6 +303,46 @@ Map<String, dynamic> _$CategoryCreateRequestToJson(
   CategoryCreateRequest instance,
 ) => <String, dynamic>{'Category': instance.category, 'Cover': instance.cover};
 
+CategoryFavoriteRequest _$CategoryFavoriteRequestFromJson(
+  Map<String, dynamic> json,
+) => CategoryFavoriteRequest(categoryId: json['categoryId'] as String);
+
+Map<String, dynamic> _$CategoryFavoriteRequestToJson(
+  CategoryFavoriteRequest instance,
+) => <String, dynamic>{'categoryId': instance.categoryId};
+
+CategoryUnfavoriteRequest _$CategoryUnfavoriteRequestFromJson(
+  Map<String, dynamic> json,
+) => CategoryUnfavoriteRequest(categoryId: json['categoryId'] as String);
+
+Map<String, dynamic> _$CategoryUnfavoriteRequestToJson(
+  CategoryUnfavoriteRequest instance,
+) => <String, dynamic>{'categoryId': instance.categoryId};
+
+FavoriteCategoriesRequest _$FavoriteCategoriesRequestFromJson(
+  Map<String, dynamic> json,
+) => FavoriteCategoriesRequest();
+
+Map<String, dynamic> _$FavoriteCategoriesRequestToJson(
+  FavoriteCategoriesRequest instance,
+) => <String, dynamic>{};
+
+CheckFavoritedRequest _$CheckFavoritedRequestFromJson(
+  Map<String, dynamic> json,
+) => CheckFavoritedRequest(categoryId: json['categoryId'] as String);
+
+Map<String, dynamic> _$CheckFavoritedRequestToJson(
+  CheckFavoritedRequest instance,
+) => <String, dynamic>{'categoryId': instance.categoryId};
+
+UserUploadAvatarRequest _$UserUploadAvatarRequestFromJson(
+  Map<String, dynamic> json,
+) => UserUploadAvatarRequest();
+
+Map<String, dynamic> _$UserUploadAvatarRequestToJson(
+  UserUploadAvatarRequest instance,
+) => <String, dynamic>{};
+
 TransactionBuyRequest _$TransactionBuyRequestFromJson(
   Map<String, dynamic> json,
 ) => TransactionBuyRequest(productId: json['ProductId'] as String);
@@ -207,6 +350,17 @@ TransactionBuyRequest _$TransactionBuyRequestFromJson(
 Map<String, dynamic> _$TransactionBuyRequestToJson(
   TransactionBuyRequest instance,
 ) => <String, dynamic>{'ProductId': instance.productId};
+
+TransactionMyRecordsRequest _$TransactionMyRecordsRequestFromJson(
+  Map<String, dynamic> json,
+) => TransactionMyRecordsRequest(
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+);
+
+Map<String, dynamic> _$TransactionMyRecordsRequestToJson(
+  TransactionMyRecordsRequest instance,
+) => <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};
 
 AdminHandleUserRequest _$AdminHandleUserRequestFromJson(
   Map<String, dynamic> json,
@@ -250,6 +404,14 @@ Map<String, dynamic> _$AdminUsersRequestToJson(AdminUsersRequest instance) =>
       'search': instance.search,
     };
 
+AdminUserDetailRequest _$AdminUserDetailRequestFromJson(
+  Map<String, dynamic> json,
+) => AdminUserDetailRequest(userId: (json['userId'] as num).toInt());
+
+Map<String, dynamic> _$AdminUserDetailRequestToJson(
+  AdminUserDetailRequest instance,
+) => <String, dynamic>{'userId': instance.userId};
+
 AdminReportedPostsRequest _$AdminReportedPostsRequestFromJson(
   Map<String, dynamic> json,
 ) => AdminReportedPostsRequest(
@@ -282,6 +444,28 @@ Map<String, dynamic> _$AdminHandleReportRequestToJson(
   'HandleReason': instance.handleReason,
 };
 
+AdminPostsRequest _$AdminPostsRequestFromJson(Map<String, dynamic> json) =>
+    AdminPostsRequest(
+      userId: (json['userId'] as num).toInt(),
+      page: (json['page'] as num).toInt(),
+      pageSize: (json['pageSize'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$AdminPostsRequestToJson(AdminPostsRequest instance) =>
+    <String, dynamic>{
+      'userId': instance.userId,
+      'page': instance.page,
+      'pageSize': instance.pageSize,
+    };
+
+CategoryAvgPriceRequest _$CategoryAvgPriceRequestFromJson(
+  Map<String, dynamic> json,
+) => CategoryAvgPriceRequest(categoryId: json['categoryId'] as String);
+
+Map<String, dynamic> _$CategoryAvgPriceRequestToJson(
+  CategoryAvgPriceRequest instance,
+) => <String, dynamic>{'categoryId': instance.categoryId};
+
 SetAdminRequest _$SetAdminRequestFromJson(Map<String, dynamic> json) =>
     SetAdminRequest(
       userId: (json['UserId'] as num).toInt(),
@@ -290,3 +474,42 @@ SetAdminRequest _$SetAdminRequestFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SetAdminRequestToJson(SetAdminRequest instance) =>
     <String, dynamic>{'UserId': instance.userId, 'IsAdmin': instance.isAdmin};
+
+NotificationMyRequest _$NotificationMyRequestFromJson(
+  Map<String, dynamic> json,
+) => NotificationMyRequest(
+  page: (json['page'] as num?)?.toInt() ?? 1,
+  pageSize: (json['pageSize'] as num?)?.toInt() ?? 10,
+);
+
+Map<String, dynamic> _$NotificationMyRequestToJson(
+  NotificationMyRequest instance,
+) => <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};
+
+NotificationUnreadCountRequest _$NotificationUnreadCountRequestFromJson(
+  Map<String, dynamic> json,
+) => NotificationUnreadCountRequest();
+
+Map<String, dynamic> _$NotificationUnreadCountRequestToJson(
+  NotificationUnreadCountRequest instance,
+) => <String, dynamic>{};
+
+NotificationMarkReadRequest _$NotificationMarkReadRequestFromJson(
+  Map<String, dynamic> json,
+) => NotificationMarkReadRequest(
+  notificationIds: (json['NotificationIds'] as List<dynamic>)
+      .map((e) => (e as num).toInt())
+      .toList(),
+);
+
+Map<String, dynamic> _$NotificationMarkReadRequestToJson(
+  NotificationMarkReadRequest instance,
+) => <String, dynamic>{'NotificationIds': instance.notificationIds};
+
+NotificationReadAllRequest _$NotificationReadAllRequestFromJson(
+  Map<String, dynamic> json,
+) => NotificationReadAllRequest();
+
+Map<String, dynamic> _$NotificationReadAllRequestToJson(
+  NotificationReadAllRequest instance,
+) => <String, dynamic>{};
