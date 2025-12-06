@@ -22,7 +22,24 @@ Future popupContent(
     barrierDismissible: true,
     useRootNavigator: false,
     builder: (builder) {
-      return Dialog(child: widget);
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Stack(
+          children: [
+            widget,
+            Positioned(
+              top: 5,
+              right: 5,
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context0).pop(),
+              ),
+            ),
+          ],
+        ),
+      );
     },
   );
 }

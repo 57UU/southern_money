@@ -25,7 +25,11 @@ class _PostViewerState extends State<PostViewer> {
   final ApiPostService postService = getIt<ApiPostService>();
 
   // 状态
-  bool isLiked = false;
+  get isLiked => widget.post.isLiked;
+  set isLiked(bool value) {
+    widget.post.isLiked = value;
+  }
+
   int likeCount = 0;
   bool isReporting = false;
 
@@ -33,7 +37,6 @@ class _PostViewerState extends State<PostViewer> {
   void initState() {
     super.initState();
     // 初始化点赞状态
-    isLiked = widget.post.isLiked;
     likeCount = widget.post.likeCount;
   }
 

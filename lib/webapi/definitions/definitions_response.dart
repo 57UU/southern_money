@@ -200,7 +200,7 @@ class PostPageItemResponse {
   @JsonKey(name: "IsBlocked")
   final bool isBlocked;
   @JsonKey(name: "IsLiked")
-  final bool isLiked;
+  bool isLiked;
   @JsonKey(name: "Tags")
   final List<String> tags;
   @JsonKey(name: "ImageIds")
