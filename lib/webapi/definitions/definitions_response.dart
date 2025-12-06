@@ -276,6 +276,8 @@ class UserProfileResponse {
   final DateTime CreateTime;
   @JsonKey(name: "Asset")
   final UserAssetResponse asset;
+  @JsonKey(name: "IsAdmin")
+  final bool isAdmin;
 
   UserProfileResponse({
     required this.id,
@@ -285,6 +287,7 @@ class UserProfileResponse {
     required this.isBlocked,
     required this.CreateTime,
     required this.asset,
+    required this.isAdmin,
   });
   factory UserProfileResponse.fromJson(Map<String, dynamic> json) =>
       _$UserProfileResponseFromJson(json);
@@ -565,4 +568,22 @@ class AvgPriceResponse {
   AvgPriceResponse({required this.avgPrice});
   factory AvgPriceResponse.fromJson(Map<String, dynamic> json) =>
       _$AvgPriceResponseFromJson(json);
+}
+
+@JsonSerializable()
+class BlockReason {
+  @JsonKey(name: "BlockReason")
+  final String reason;
+  @JsonKey(name: "BlockedAt")
+  final DateTime blockedAt;
+  @JsonKey(name: "Operator")
+  final PostUploaderResponse operator;
+
+  BlockReason({
+    required this.reason,
+    required this.blockedAt,
+    required this.operator,
+  });
+  factory BlockReason.fromJson(Map<String, dynamic> json) =>
+      _$BlockReasonFromJson(json);
 }

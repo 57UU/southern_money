@@ -445,7 +445,7 @@ class AdminSetAdminRequest {
   Map<String, dynamic> toJson() => _$AdminSetAdminRequestToJson(this);
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class AdminUsersRequest {
   static const String route = "/admin/users";
   final int page;
@@ -461,6 +461,7 @@ class AdminUsersRequest {
     this.isAdmin,
     this.search,
   });
+  Map<String, dynamic> toJson() => _$AdminUsersRequestToJson(this);
 }
 
 @JsonKey(ignore: true)
@@ -471,13 +472,19 @@ class AdminUserDetailRequest {
   AdminUserDetailRequest({required this.userId});
 }
 
-@JsonKey(ignore: true)
+@JsonSerializable()
 class AdminReportedPostsRequest {
   static const String route = "/admin/reportedPosts";
   final int page;
   final int pageSize;
+  final bool? isBlocked;
 
-  AdminReportedPostsRequest({required this.page, required this.pageSize});
+  AdminReportedPostsRequest({
+    required this.page,
+    required this.pageSize,
+    required this.isBlocked,
+  });
+  Map<String, dynamic> toJson() => _$AdminReportedPostsRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -513,4 +520,16 @@ class CategoryAvgPriceRequest {
   final String categoryId;
 
   CategoryAvgPriceRequest({required this.categoryId});
+}
+
+@JsonSerializable()
+class SetAdminRequest {
+  static const String route = "/admin/setAdmin";
+  @JsonKey(name: "UserId")
+  final int userId;
+  @JsonKey(name: "IsAdmin")
+  final bool isAdmin;
+
+  SetAdminRequest({required this.userId, required this.isAdmin});
+  Map<String, dynamic> toJson() => _$SetAdminRequestToJson(this);
 }

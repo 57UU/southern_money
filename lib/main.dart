@@ -12,21 +12,6 @@ import 'pages/profile_page.dart';
 import 'setting/app_config.dart';
 import 'widgets/common_widget.dart';
 
-// 导航项数据模型
-class NavigationItemData {
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final Widget page;
-
-  const NavigationItemData({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.page,
-  });
-}
-
 void main() async {
   await ensureInitialize();
   runApp(MyApp());

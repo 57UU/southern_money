@@ -8,15 +8,12 @@ class ApiAdminService {
 
   /// 获取所有用户列表
   Future<ApiResponse<PagedResponse<AdminUserResponse>>> getAllUsers({
-    required int page,
-    required int pageSize,
+    required AdminUsersRequest request,
   }) async {
     try {
-      final request = AdminUsersRequest(page: page, pageSize: pageSize);
-
       final response = await jwtDio.get(
         AdminUsersRequest.route,
-        queryParameters: {'page': request.page, 'pageSize': request.pageSize},
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(
@@ -59,17 +56,22 @@ class ApiAdminService {
     }
   }
 
-  /// 获取所有帖子列表
+  /// 获取所有被举报帖子列表
   Future<ApiResponse<PagedResponse<AdminReportedPostResponse>>> getAllPosts({
     required int page,
     required int pageSize,
+    required bool isBlocked,
   }) async {
     try {
-      final request = AdminReportedPostsRequest(page: page, pageSize: pageSize);
+      final request = AdminReportedPostsRequest(
+        page: page,
+        pageSize: pageSize,
+        isBlocked: isBlocked,
+      );
 
       final response = await jwtDio.get(
         AdminReportedPostsRequest.route,
-        queryParameters: {'page': request.page, 'pageSize': request.pageSize},
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(
@@ -110,6 +112,27 @@ class ApiAdminService {
       );
     } catch (e) {
       return ApiResponse.fail(message: "处理举报帖子失败: $e");
+    }
+  }
+
+  Future<ApiResponse> setAdmin({
+    required int userId,
+    required bool isAdmin,
+  }) async {
+    try {
+      final request = SetAdminRequest(userId: userId, isAdmin: isAdmin);
+
+      final response = await jwtDio.post(
+        SetAdminRequest.route,
+        data: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => dataJson as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "设置管理员状态失败: $e");
     }
   }
 }

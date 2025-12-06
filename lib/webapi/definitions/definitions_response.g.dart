@@ -236,6 +236,7 @@ UserProfileResponse _$UserProfileResponseFromJson(Map<String, dynamic> json) =>
       isBlocked: json['IsBlocked'] as bool,
       CreateTime: DateTime.parse(json['CreateTime'] as String),
       asset: UserAssetResponse.fromJson(json['Asset'] as Map<String, dynamic>),
+      isAdmin: json['IsAdmin'] as bool,
     );
 
 Map<String, dynamic> _$UserProfileResponseToJson(
@@ -248,6 +249,7 @@ Map<String, dynamic> _$UserProfileResponseToJson(
   'IsBlocked': instance.isBlocked,
   'CreateTime': instance.CreateTime.toIso8601String(),
   'Asset': instance.asset,
+  'IsAdmin': instance.isAdmin,
 };
 
 ProductResponse _$ProductResponseFromJson(Map<String, dynamic> json) =>
@@ -477,3 +479,18 @@ AvgPriceResponse _$AvgPriceResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$AvgPriceResponseToJson(AvgPriceResponse instance) =>
     <String, dynamic>{'AvgPrice': instance.avgPrice};
+
+BlockReason _$BlockReasonFromJson(Map<String, dynamic> json) => BlockReason(
+  reason: json['BlockReason'] as String,
+  blockedAt: DateTime.parse(json['BlockedAt'] as String),
+  operator: PostUploaderResponse.fromJson(
+    json['Operator'] as Map<String, dynamic>,
+  ),
+);
+
+Map<String, dynamic> _$BlockReasonToJson(BlockReason instance) =>
+    <String, dynamic>{
+      'BlockReason': instance.reason,
+      'BlockedAt': instance.blockedAt.toIso8601String(),
+      'Operator': instance.operator,
+    };

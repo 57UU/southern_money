@@ -232,6 +232,40 @@ Map<String, dynamic> _$AdminSetAdminRequestToJson(
   AdminSetAdminRequest instance,
 ) => <String, dynamic>{'UserId': instance.userId};
 
+AdminUsersRequest _$AdminUsersRequestFromJson(Map<String, dynamic> json) =>
+    AdminUsersRequest(
+      page: (json['page'] as num).toInt(),
+      pageSize: (json['pageSize'] as num).toInt(),
+      isBlocked: json['isBlocked'] as bool?,
+      isAdmin: json['isAdmin'] as bool?,
+      search: json['search'] as String?,
+    );
+
+Map<String, dynamic> _$AdminUsersRequestToJson(AdminUsersRequest instance) =>
+    <String, dynamic>{
+      'page': instance.page,
+      'pageSize': instance.pageSize,
+      'isBlocked': instance.isBlocked,
+      'isAdmin': instance.isAdmin,
+      'search': instance.search,
+    };
+
+AdminReportedPostsRequest _$AdminReportedPostsRequestFromJson(
+  Map<String, dynamic> json,
+) => AdminReportedPostsRequest(
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+  isBlocked: json['isBlocked'] as bool?,
+);
+
+Map<String, dynamic> _$AdminReportedPostsRequestToJson(
+  AdminReportedPostsRequest instance,
+) => <String, dynamic>{
+  'page': instance.page,
+  'pageSize': instance.pageSize,
+  'isBlocked': instance.isBlocked,
+};
+
 AdminHandleReportRequest _$AdminHandleReportRequestFromJson(
   Map<String, dynamic> json,
 ) => AdminHandleReportRequest(
@@ -247,3 +281,12 @@ Map<String, dynamic> _$AdminHandleReportRequestToJson(
   'IsBlocked': instance.isBlocked,
   'HandleReason': instance.handleReason,
 };
+
+SetAdminRequest _$SetAdminRequestFromJson(Map<String, dynamic> json) =>
+    SetAdminRequest(
+      userId: (json['UserId'] as num).toInt(),
+      isAdmin: json['IsAdmin'] as bool,
+    );
+
+Map<String, dynamic> _$SetAdminRequestToJson(SetAdminRequest instance) =>
+    <String, dynamic>{'UserId': instance.userId, 'IsAdmin': instance.isAdmin};

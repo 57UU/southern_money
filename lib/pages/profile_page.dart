@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/admin_page.dart';
 import 'package:southern_money/pages/profile_edit_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_user.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart'
     show ApiResponse, UserProfileResponse;
+import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 import '../widgets/profile_menu_item.dart';
@@ -99,12 +101,18 @@ class _ProfilePageState extends State<ProfilePage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                data.name,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                spacing: 10,
+                                children: [
+                                  Text(
+                                    data.name,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (data.isAdmin) AdminIdentifier(),
+                                ],
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -212,13 +220,6 @@ class _ProfilePageState extends State<ProfilePage>
                 child: Column(
                   children: [
                     ProfileMenuItem(
-                      title: '我的自选',
-                      icon: Icons.star_border,
-                      onTap: () {
-                        popupOrNavigate(context, const MySelections());
-                      },
-                    ),
-                    ProfileMenuItem(
                       title: '交易记录',
                       icon: Icons.history,
                       onTap: () {
@@ -246,6 +247,19 @@ class _ProfilePageState extends State<ProfilePage>
                         popupOrNavigate(context, const Setting());
                       },
                     ),
+                    if (data.isAdmin)
+                      ProfileMenuItem(
+                        title: '管理员中心',
+                        icon: Icons.admin_panel_settings,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => AdminPage(),
+                            ),
+                          );
+                        },
+                      ),
                     ProfileMenuItem(
                       title: '退出登录',
                       icon: Icons.logout,
