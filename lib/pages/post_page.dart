@@ -74,7 +74,7 @@ class _PostPageState extends State<PostPage> {
   }
 
   // 验证表单并发布
-  void _publish() {
+  void _publish() async {
     if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -125,13 +125,10 @@ class _PostPageState extends State<PostPage> {
       );
     }
 
-    apiRequestDialog(
-      post(),
-      onSuccess: () {
-        // 发布成功后返回上一页
-        Navigator.pop(context);
-      },
-    );
+    final success = await apiRequestDialog(post());
+    if (success == true) {
+      Navigator.pop(context);
+    }
   }
 
   @override
