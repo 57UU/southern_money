@@ -6,6 +6,7 @@ import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/post_card.dart';
 import 'package:southern_money/widgets/dialog.dart';
+import 'package:southern_money/widgets/utilities.dart';
 
 class MyPosts extends StatefulWidget {
   const MyPosts({super.key});
@@ -26,22 +27,6 @@ class _MyPostsState extends State<MyPosts> {
   String? _errorMessage;
 
   final ScrollController _scrollController = ScrollController();
-
-  // 将DateTime转换为"多久之前"的格式
-  String _formatTimeAgo(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}天前';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}小时前';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}分钟前';
-    } else {
-      return '刚刚';
-    }
-  }
 
   @override
   void initState() {
@@ -130,7 +115,7 @@ class _MyPostsState extends State<MyPosts> {
     return PostCard(
       title: post.title,
       author: post.uploader.name,
-      timeAgo: _formatTimeAgo(post.createTime),
+      timeAgo: formatTimeAgo(post.createTime),
       onTap: () {
         Navigator.of(context).push(
           CupertinoPageRoute(builder: (context) => PostViewer(post: post)),

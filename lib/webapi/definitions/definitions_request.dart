@@ -610,7 +610,7 @@ class NotificationUnreadCountRequest {
 class NotificationMarkReadRequest {
   static const String route = "/notification/read";
   @JsonKey(name: "NotificationIds")
-  final List<int> notificationIds;
+  final List<String> notificationIds;
 
   NotificationMarkReadRequest({required this.notificationIds});
   Map<String, dynamic> toJson() => _$NotificationMarkReadRequestToJson(this);

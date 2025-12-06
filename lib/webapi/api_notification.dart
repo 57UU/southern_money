@@ -47,7 +47,7 @@ class ApiNotificationService {
 
   /// 标记通知为已读
   Future<ApiResponse<Map<String, dynamic>>> markAsRead({
-    required List<int> notificationIds,
+    required List<String> notificationIds,
   }) async {
     try {
       final request = NotificationMarkReadRequest(

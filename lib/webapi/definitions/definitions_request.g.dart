@@ -498,7 +498,7 @@ NotificationMarkReadRequest _$NotificationMarkReadRequestFromJson(
   Map<String, dynamic> json,
 ) => NotificationMarkReadRequest(
   notificationIds: (json['NotificationIds'] as List<dynamic>)
-      .map((e) => (e as num).toInt())
+      .map((e) => e as String)
       .toList(),
 );
 

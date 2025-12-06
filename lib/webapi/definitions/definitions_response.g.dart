@@ -466,21 +466,21 @@ Map<String, dynamic> _$BlockReasonToJson(BlockReason instance) =>
 NotificationResponse _$NotificationResponseFromJson(
   Map<String, dynamic> json,
 ) => NotificationResponse(
-  id: (json['Id'] as num).toInt(),
-  title: json['Title'] as String,
+  id: json['Id'] as String,
+  userId: (json['UserId'] as num).toInt(),
   content: json['Content'] as String,
+  type: json['Type'] as String,
   isRead: json['IsRead'] as bool,
   createTime: DateTime.parse(json['CreateTime'] as String),
-  type: json['Type'] as String,
 );
 
 Map<String, dynamic> _$NotificationResponseToJson(
   NotificationResponse instance,
 ) => <String, dynamic>{
   'Id': instance.id,
-  'Title': instance.title,
+  'UserId': instance.userId,
   'Content': instance.content,
+  'Type': instance.type,
   'IsRead': instance.isRead,
   'CreateTime': instance.createTime.toIso8601String(),
-  'Type': instance.type,
 };
