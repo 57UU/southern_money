@@ -184,6 +184,9 @@ PostPageItemResponse _$PostPageItemResponseFromJson(
   uploader: PostUploaderResponse.fromJson(
     json['Uploader'] as Map<String, dynamic>,
   ),
+  postBlocks: (json['PostBlocks'] as List<dynamic>)
+      .map((e) => BlockReason.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$PostPageItemResponseToJson(
@@ -201,6 +204,7 @@ Map<String, dynamic> _$PostPageItemResponseToJson(
   'Tags': instance.tags,
   'ImageIds': instance.imageIds,
   'Uploader': instance.uploader,
+  'PostBlocks': instance.postBlocks,
 };
 
 PostLikeResponse _$PostLikeResponseFromJson(Map<String, dynamic> json) =>
@@ -408,44 +412,6 @@ Map<String, dynamic> _$AdminUserResponseToJson(AdminUserResponse instance) =>
       'IsAdmin': instance.isAdmin,
     };
 
-AdminReportedPostResponse _$AdminReportedPostResponseFromJson(
-  Map<String, dynamic> json,
-) => AdminReportedPostResponse(
-  id: json['Id'] as String,
-  title: json['Title'] as String,
-  content: json['Content'] as String,
-  CreateTime: DateTime.parse(json['CreateTime'] as String),
-  reportCount: (json['ReportCount'] as num).toInt(),
-  viewCount: (json['ViewCount'] as num).toInt(),
-  likeCount: (json['LikeCount'] as num).toInt(),
-  isBlocked: json['IsBlocked'] as bool,
-  isLiked: json['IsLiked'] as bool,
-  tags: (json['Tags'] as List<dynamic>).map((e) => e as String).toList(),
-  imageIds: (json['ImageIds'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
-  uploader: PostUploaderResponse.fromJson(
-    json['Uploader'] as Map<String, dynamic>,
-  ),
-);
-
-Map<String, dynamic> _$AdminReportedPostResponseToJson(
-  AdminReportedPostResponse instance,
-) => <String, dynamic>{
-  'Id': instance.id,
-  'Title': instance.title,
-  'Content': instance.content,
-  'CreateTime': instance.CreateTime.toIso8601String(),
-  'ReportCount': instance.reportCount,
-  'ViewCount': instance.viewCount,
-  'LikeCount': instance.likeCount,
-  'IsBlocked': instance.isBlocked,
-  'IsLiked': instance.isLiked,
-  'Tags': instance.tags,
-  'ImageIds': instance.imageIds,
-  'Uploader': instance.uploader,
-};
-
 AvatarUploadResponse _$AvatarUploadResponseFromJson(
   Map<String, dynamic> json,
 ) => AvatarUploadResponse(avatarId: json['AvatarId'] as String);
@@ -481,16 +447,18 @@ Map<String, dynamic> _$AvgPriceResponseToJson(AvgPriceResponse instance) =>
     <String, dynamic>{'AvgPrice': instance.avgPrice};
 
 BlockReason _$BlockReasonFromJson(Map<String, dynamic> json) => BlockReason(
-  reason: json['BlockReason'] as String,
-  blockedAt: DateTime.parse(json['BlockedAt'] as String),
+  reason: json['Reason'] as String,
+  actionTime: DateTime.parse(json['ActionTime'] as String),
   operator: PostUploaderResponse.fromJson(
     json['Operator'] as Map<String, dynamic>,
   ),
+  isBlock: json['IsBlock'] as bool,
 );
 
 Map<String, dynamic> _$BlockReasonToJson(BlockReason instance) =>
     <String, dynamic>{
-      'BlockReason': instance.reason,
-      'BlockedAt': instance.blockedAt.toIso8601String(),
+      'Reason': instance.reason,
+      'ActionTime': instance.actionTime.toIso8601String(),
       'Operator': instance.operator,
+      'IsBlock': instance.isBlock,
     };

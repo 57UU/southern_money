@@ -125,7 +125,13 @@ class _PostPageState extends State<PostPage> {
       );
     }
 
-    apiRequestDialog(post());
+    apiRequestDialog(
+      post(),
+      onSuccess: () {
+        // 发布成功后返回上一页
+        Navigator.pop(context);
+      },
+    );
   }
 
   @override

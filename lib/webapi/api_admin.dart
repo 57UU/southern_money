@@ -57,7 +57,7 @@ class ApiAdminService {
   }
 
   /// 获取所有被举报帖子列表
-  Future<ApiResponse<PagedResponse<AdminReportedPostResponse>>> getAllPosts({
+  Future<ApiResponse<PagedResponse<PostPageItemResponse>>> getAllPosts({
     required int page,
     required int pageSize,
     required bool isBlocked,
@@ -78,9 +78,8 @@ class ApiAdminService {
         response.data,
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
-          (itemJson) => AdminReportedPostResponse.fromJson(
-            itemJson as Map<String, dynamic>,
-          ),
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {

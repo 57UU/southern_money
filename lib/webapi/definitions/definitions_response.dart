@@ -207,6 +207,8 @@ class PostPageItemResponse {
   final List<String> imageIds;
   @JsonKey(name: "Uploader")
   final PostUploaderResponse uploader;
+  @JsonKey(name: "PostBlocks")
+  final List<BlockReason> postBlocks;
 
   PostPageItemResponse({
     required this.id,
@@ -221,6 +223,7 @@ class PostPageItemResponse {
     required this.tags,
     required this.imageIds,
     required this.uploader,
+    required this.postBlocks,
   });
   factory PostPageItemResponse.fromJson(Map<String, dynamic> json) =>
       _$PostPageItemResponseFromJson(json);
@@ -486,51 +489,6 @@ class AdminUserResponse {
 }
 
 @JsonSerializable()
-class AdminReportedPostResponse {
-  @JsonKey(name: "Id")
-  final String id;
-  @JsonKey(name: "Title")
-  final String title;
-  @JsonKey(name: "Content")
-  final String content;
-  @JsonKey(name: "CreateTime")
-  final DateTime CreateTime;
-  @JsonKey(name: "ReportCount")
-  final int reportCount;
-  @JsonKey(name: "ViewCount")
-  final int viewCount;
-  @JsonKey(name: "LikeCount")
-  final int likeCount;
-  @JsonKey(name: "IsBlocked")
-  final bool isBlocked;
-  @JsonKey(name: "IsLiked")
-  final bool isLiked;
-  @JsonKey(name: "Tags")
-  final List<String> tags;
-  @JsonKey(name: "ImageIds")
-  final List<String> imageIds;
-  @JsonKey(name: "Uploader")
-  final PostUploaderResponse uploader;
-
-  AdminReportedPostResponse({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.CreateTime,
-    required this.reportCount,
-    required this.viewCount,
-    required this.likeCount,
-    required this.isBlocked,
-    required this.isLiked,
-    required this.tags,
-    required this.imageIds,
-    required this.uploader,
-  });
-  factory AdminReportedPostResponse.fromJson(Map<String, dynamic> json) =>
-      _$AdminReportedPostResponseFromJson(json);
-}
-
-@JsonSerializable()
 class AvatarUploadResponse {
   @JsonKey(name: "AvatarId")
   final String avatarId;
@@ -572,17 +530,20 @@ class AvgPriceResponse {
 
 @JsonSerializable()
 class BlockReason {
-  @JsonKey(name: "BlockReason")
+  @JsonKey(name: "Reason")
   final String reason;
-  @JsonKey(name: "BlockedAt")
-  final DateTime blockedAt;
+  @JsonKey(name: "ActionTime")
+  final DateTime actionTime;
   @JsonKey(name: "Operator")
   final PostUploaderResponse operator;
+  @JsonKey(name: "IsBlock")
+  final bool isBlock;
 
   BlockReason({
     required this.reason,
-    required this.blockedAt,
+    required this.actionTime,
     required this.operator,
+    required this.isBlock,
   });
   factory BlockReason.fromJson(Map<String, dynamic> json) =>
       _$BlockReasonFromJson(json);

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/admin_page.dart';
+import 'package:southern_money/pages/my_posts.dart';
 import 'package:southern_money/pages/profile_edit_page.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
@@ -238,6 +239,13 @@ class _ProfilePageState extends State<ProfilePage>
                       icon: Icons.notifications_none,
                       onTap: () {
                         popupOrNavigate(context, const MyMessage());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: '我的帖子',
+                      icon: Icons.post_add,
+                      onTap: () {
+                        popupOrNavigate(context, const MyPosts());
                       },
                     ),
                     ProfileMenuItem(

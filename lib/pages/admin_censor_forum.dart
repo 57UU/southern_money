@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/admin_post_block_history.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_admin.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/router_utils.dart';
+import 'package:southern_money/widgets/styled_card.dart';
 
 class AdminCensorForum extends StatefulWidget {
   const AdminCensorForum({super.key});
@@ -17,7 +20,7 @@ class _AdminCensorForumState extends State<AdminCensorForum>
   final adminService = getIt<ApiAdminService>();
 
   // 状态变量
-  List<AdminReportedPostResponse> _posts = [];
+  List<PostPageItemResponse> _posts = [];
   int _currentPage = 1;
   int _pageSize = 10;
   bool _isLoading = false;
@@ -65,10 +68,7 @@ class _AdminCensorForumState extends State<AdminCensorForum>
   }
 
   // 处理帖子（封禁/解封）
-  Future<void> _handlePost(
-    AdminReportedPostResponse post,
-    bool isBlocked,
-  ) async {
+  Future<void> _handlePost(PostPageItemResponse post, bool isBlocked) async {
     final reasonController = TextEditingController();
 
     final result = await showDialog<String>(
@@ -169,7 +169,13 @@ class _AdminCensorForumState extends State<AdminCensorForum>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.refresh)),
+              IconButton(
+                onPressed: () {
+                  _currentPage = 1; // 点击刷新时重置到第一页
+                  _fetchPosts();
+                },
+                icon: Icon(Icons.refresh),
+              ),
               Row(
                 children: [
                   const Text('显示已封禁帖子：'),
@@ -198,8 +204,14 @@ class _AdminCensorForumState extends State<AdminCensorForum>
                     itemCount: _posts.length,
                     itemBuilder: (context, index) {
                       final post = _posts[index];
-                      return Card(
+                      return StyledCard(
                         margin: const EdgeInsets.only(bottom: 16),
+                        onTap: () {
+                          popupOrNavigate(
+                            context,
+                            AdminPostBlockHistory(response: post),
+                          );
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -261,7 +273,7 @@ class _AdminCensorForumState extends State<AdminCensorForum>
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                       Text(
-                                        '发布时间: ${_formatDate(post.CreateTime)}',
+                                        '发布时间: ${_formatDate(post.createTime)}',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],
