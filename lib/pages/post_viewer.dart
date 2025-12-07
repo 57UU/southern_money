@@ -36,12 +36,19 @@ class _PostViewerState extends State<PostViewer> {
 
   int likeCount = 0;
   bool isReporting = false;
+  final TextEditingController _reasonController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     // 初始化点赞状态
     likeCount = widget.post.likeCount;
+  }
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
   }
 
   // 点赞功能
@@ -157,10 +164,60 @@ class _PostViewerState extends State<PostViewer> {
       isReporting = true;
     });
 
-    final isConfirmed =
-        (await showYesNoDialog(title: "举报帖子", content: "确定举报该帖子吗？")) == true;
+    // 清空之前的内容
+    _reasonController.clear();
+    String? reason;
 
-    if (!isConfirmed) {
+    // 显示输入对话框
+    reason = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('举报帖子'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('请输入举报原因'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _reasonController,
+                decoration: const InputDecoration(
+                  hintText: '请详细描述举报原因',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_reasonController.text.trim().isNotEmpty) {
+                  Navigator.of(context).pop(_reasonController.text.trim());
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("请输入举报原因"),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: const Text('举报'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (reason == null || reason.isEmpty) {
       setState(() {
         isReporting = false;
       });
@@ -169,7 +226,7 @@ class _PostViewerState extends State<PostViewer> {
 
     try {
       await apiRequestDialog(
-        postService.reportPost(postId: widget.post.id, reason: ""),
+        postService.reportPost(postId: widget.post.id, reason: reason),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

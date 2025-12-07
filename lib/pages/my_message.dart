@@ -30,7 +30,7 @@ class _MyMessageState extends State<MyMessage> {
   IconData _getNotificationIcon(String type) {
     switch (type.toLowerCase()) {
       case 'system':
-        return Icons.system_update;
+        return Icons.info_outline;
       case 'comment':
         return Icons.comment;
       case 'like':

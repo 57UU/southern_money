@@ -69,16 +69,33 @@ class _AdminCensorForumState extends State<AdminCensorForum>
 
   // 处理帖子（封禁/解封）
   Future<void> _handlePost(PostPageItemResponse post, bool isBlocked) async {
+    // 如果是封禁操作且帖子已经被封禁，显示提示信息
+    if (isBlocked && post.isBlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('该帖子已经被封禁，无需重复操作'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     final reasonController = TextEditingController();
+
+    // 如果是解封操作，添加特殊说明
+    String title = isBlocked ? '封禁帖子' : '解封帖子';
+    String content = isBlocked
+        ? '请输入封禁原因：'
+        : '请输入解封原因：\n(注意：即使帖子未被封禁，解封操作也会清除举报信息)';
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isBlocked ? '封禁帖子' : '解封帖子'),
+        title: Text(title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(isBlocked ? '请输入封禁原因：' : '请输入解封原因：'),
+            Text(content),
             const SizedBox(height: 8),
             TextField(
               controller: reasonController,
@@ -128,7 +145,7 @@ class _AdminCensorForumState extends State<AdminCensorForum>
         if (response.success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isBlocked ? '帖子已封禁' : '帖子已解封'),
+              content: Text(isBlocked ? '帖子已封禁' : '帖子已解封，举报信息已清除'),
               backgroundColor: Colors.green,
             ),
           );
@@ -280,20 +297,34 @@ class _AdminCensorForumState extends State<AdminCensorForum>
                                   ),
                                   Row(
                                     children: [
+                                      // 解封按钮 - 始终可用，用于清除举报信息
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.check_circle_outline,
+                                          color: Colors.green,
+                                        ),
+                                        onPressed: () {
+                                          // 始终允许解封操作，无论帖子当前状态如何
+                                          _handlePost(post, false);
+                                        },
+                                        tooltip: '解封帖子（清除举报信息）',
+                                      ),
+                                      const SizedBox(width: 8),
+                                      // 封禁按钮 - 根据当前状态显示不同样式
                                       IconButton(
                                         icon: Icon(
                                           post.isBlocked
-                                              ? Icons.check_circle_outline
+                                              ? Icons.block
                                               : Icons.cancel_outlined,
                                           color: post.isBlocked
-                                              ? Colors.green
+                                              ? Colors.grey
                                               : Colors.red,
                                         ),
                                         onPressed: () {
-                                          _handlePost(post, !post.isBlocked);
+                                          _handlePost(post, true);
                                         },
                                         tooltip: post.isBlocked
-                                            ? '解封帖子'
+                                            ? '帖子已封禁'
                                             : '封禁帖子',
                                       ),
                                     ],
