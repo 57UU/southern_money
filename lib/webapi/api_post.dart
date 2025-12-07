@@ -84,12 +84,10 @@ class ApiPostService {
 
   /// 搜索帖子
   Future<ApiResponse<PagedResponse<PostPageItemResponse>>> searchPosts(
-    String query,
+    PostSearchRequest request,
   ) async {
     try {
-      final request = PostSearchRequest(query: query);
-
-      final response = await jwtDio.post(
+      final response = await jwtDio.get(
         PostSearchRequest.route,
         data: request.toJson(),
       );
@@ -222,6 +220,37 @@ class ApiPostService {
       );
     } catch (e) {
       return ApiResponse.fail(message: "获取我的帖子失败: $e");
+    }
+  }
+
+  /// 获取用户帖子
+  Future<ApiResponse<PagedResponse<PostPageItemResponse>>> getPostByUserId({
+    required String userId,
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final request = GetPostsByUserIdRequest(
+        userId: userId,
+        page: page,
+        pageSize: pageSize,
+      );
+
+      final response = await jwtDio.get(
+        GetPostsByUserIdRequest.route,
+        queryParameters: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => PagedResponse.fromJson(
+          dataJson as Map<String, dynamic>,
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
+        ),
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "获取用户帖子失败: $e");
     }
   }
 }

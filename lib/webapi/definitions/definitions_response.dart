@@ -1,4 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_image.dart';
 
 part 'definitions_response.g.dart';
 
@@ -124,6 +126,8 @@ class ImageGetResponse {
       _$ImageGetResponseFromJson(json);
 }
 
+ApiImageService? apiImageService;
+
 @JsonSerializable()
 class PostUploaderResponse {
   @JsonKey(name: "Id")
@@ -131,9 +135,18 @@ class PostUploaderResponse {
   @JsonKey(name: "Name")
   final String name;
   @JsonKey(name: "Avatar")
-  final String? avatar;
+  final String avatar;
 
-  PostUploaderResponse({required this.id, required this.name, this.avatar});
+  get avatarUrl {
+    apiImageService ??= getIt<ApiImageService>();
+    return apiImageService!.getImageUrl(avatar);
+  }
+
+  PostUploaderResponse({
+    required this.id,
+    required this.name,
+    required this.avatar,
+  });
   factory PostUploaderResponse.fromJson(Map<String, dynamic> json) =>
       _$PostUploaderResponseFromJson(json);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'common_widget.dart';
+import 'popup_context.dart';
 
 Future popupContent(
   Widget child,
@@ -22,22 +23,25 @@ Future popupContent(
     barrierDismissible: true,
     useRootNavigator: false,
     builder: (builder) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Stack(
-          children: [
-            widget,
-            Positioned(
-              top: 5,
-              right: 5,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () => Navigator.of(context0).pop(),
+      return PopupContext(
+        isInPopup: true,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Stack(
+            children: [
+              widget,
+              Positioned(
+                top: 5,
+                right: 5,
+                child: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () => Navigator.of(context0).pop(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     },
@@ -53,7 +57,7 @@ ScreenSizeType getScreenSizeType(MediaQueryData mediaQuery) {
   if (isLandscape) {
     return ScreenSizeType.landscape;
   }
-  bool isBigScreen = (width > 500 && height > 500);
+  bool isBigScreen = (width > 600 && height > 600);
   if (isBigScreen) {
     return ScreenSizeType.bigPortrait;
   }
@@ -66,10 +70,28 @@ void popupOrNavigate(
   bool adaptiveHeight = false,
   bool useFragment = true,
 }) {
+  // 检查是否已经在弹窗内
+  final popupContext = PopupContext.of(context);
+  final bool isInPopup = popupContext?.isInPopup ?? false;
+
   var mediaQuery = MediaQuery.of(context);
   var width = mediaQuery.size.width;
   final height = mediaQuery.size.height;
   final screenSizeType = getScreenSizeType(mediaQuery);
+
+  // 如果已经在弹窗内，直接导航而不是再弹窗
+  if (isInPopup) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (builder) {
+          return page;
+        },
+      ),
+    );
+    return;
+  }
+
   if (screenSizeType == ScreenSizeType.landscape) {
     popupContent(
       page,

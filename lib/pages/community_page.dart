@@ -162,6 +162,7 @@ class _CommunityPageState extends State<CommunityPage>
       author: post.uploader.name,
       timeAgo: '',
       onTap: () => PostViewer.show(context, post),
+      avaterUrl: post.uploader.avatarUrl,
     );
   }
 

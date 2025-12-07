@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/community_search_page.dart';
+import 'package:southern_money/pages/posts_by_user.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 import 'package:southern_money/widgets/utilities.dart';
@@ -38,24 +42,6 @@ class _PostViewerState extends State<PostViewer> {
     super.initState();
     // 初始化点赞状态
     likeCount = widget.post.likeCount;
-  }
-
-  // 格式化时间
-  String formatTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inMinutes < 1) {
-      return "刚刚";
-    } else if (difference.inMinutes < 60) {
-      return "${difference.inMinutes}分钟前";
-    } else if (difference.inHours < 24) {
-      return "${difference.inHours}小时前";
-    } else if (difference.inDays < 7) {
-      return "${difference.inDays}天前";
-    } else {
-      return "${time.year}-${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')}";
-    }
   }
 
   // 点赞功能
@@ -107,35 +93,10 @@ class _PostViewerState extends State<PostViewer> {
       isReporting = true;
     });
 
-    String reason =
-        await showDialog(
-          context: context,
-          builder: (context) {
-            TextEditingController reasonController = TextEditingController();
-            return AlertDialog(
-              title: const Text("举报帖子"),
-              content: TextField(
-                controller: reasonController,
-                maxLines: 3,
-                decoration: const InputDecoration(hintText: "请输入举报原因"),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, ""),
-                  child: const Text("取消"),
-                ),
-                TextButton(
-                  onPressed: () =>
-                      Navigator.pop(context, reasonController.text),
-                  child: const Text("确定"),
-                ),
-              ],
-            );
-          },
-        ) ??
-        "";
+    final isConfirmed =
+        (await showYesNoDialog(title: "举报帖子", content: "确定举报该帖子吗？")) == true;
 
-    if (reason.trim().isEmpty) {
+    if (!isConfirmed) {
       setState(() {
         isReporting = false;
       });
@@ -144,7 +105,7 @@ class _PostViewerState extends State<PostViewer> {
 
     try {
       await apiRequestDialog(
-        postService.reportPost(postId: widget.post.id, reason: reason),
+        postService.reportPost(postId: widget.post.id, reason: ""),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -192,37 +153,24 @@ class _PostViewerState extends State<PostViewer> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    // 头像
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundImage: widget.post.uploader.avatar != null
-                          ? CachedNetworkImageProvider(
-                              imageService.getImageUrl(
-                                widget.post.uploader.avatar!,
-                              ),
-                            )
-                          : avatarPlaceholder,
-                      backgroundColor: colorScheme.surfaceVariant,
-                    ),
-                    const SizedBox(width: 12),
-                    // 用户名
-                    Text(
-                      widget.post.uploader.name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: colorScheme.onSurface,
+                Uploader(
+                  avatarUrl: widget.post.uploader.avatarUrl,
+                  name: widget.post.uploader.name,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) =>
+                            PostsByUser(user: widget.post.uploader),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
                 // 创建时间和更多按钮
                 Row(
                   children: [
                     Text(
-                      formatTime(widget.post.createTime),
+                      formatTimeAgo(widget.post.createTime),
                       style: TextStyle(
                         fontSize: 14,
                         color: colorScheme.onSurfaceVariant,
@@ -328,22 +276,17 @@ class _PostViewerState extends State<PostViewer> {
                 spacing: 8,
                 runSpacing: 8,
                 children: widget.post.tags.map((tag) {
-                  return Chip(
-                    label: Text(
-                      tag,
-                      style: TextStyle(
-                        color: colorScheme.onSecondaryContainer,
-                        fontSize: 14,
-                      ),
-                    ),
-                    backgroundColor: colorScheme.secondaryContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
+                  return Tag(
+                    tag: tag,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) =>
+                              CommunitySearchPage(initialQuery: "#$tag"),
+                        ),
+                      );
+                    },
                   );
                 }).toList(),
               ),

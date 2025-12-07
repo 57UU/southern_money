@@ -120,7 +120,7 @@ PostUploaderResponse _$PostUploaderResponseFromJson(
 ) => PostUploaderResponse(
   id: (json['Id'] as num).toInt(),
   name: json['Name'] as String,
-  avatar: json['Avatar'] as String?,
+  avatar: json['Avatar'] as String,
 );
 
 Map<String, dynamic> _$PostUploaderResponseToJson(

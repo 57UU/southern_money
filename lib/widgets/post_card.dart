@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/widgets/common_widget.dart';
 import 'styled_card.dart';
 
 class PostCard extends StatelessWidget {
@@ -7,6 +9,7 @@ class PostCard extends StatelessWidget {
   final String timeAgo;
   final VoidCallback? onTap;
   final VoidCallback? onMorePressed;
+  final String avaterUrl;
 
   const PostCard({
     super.key,
@@ -15,6 +18,7 @@ class PostCard extends StatelessWidget {
     required this.timeAgo,
     this.onTap,
     this.onMorePressed,
+    required this.avaterUrl,
   });
 
   @override
@@ -36,16 +40,7 @@ class PostCard extends StatelessWidget {
                   color: colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(
-                  child: Text(
-                    author.isNotEmpty ? author[0] : '',
-                    style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+                child: Center(child: Avater(avatarUrl: avaterUrl)),
               ),
               const SizedBox(width: 12),
               Expanded(

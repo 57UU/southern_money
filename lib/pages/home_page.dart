@@ -117,6 +117,7 @@ class _DiscoveryState extends State<Discovery> {
                           author: p.uploader.name, // ← 显示作者
                           timeAgo: "", // ← 你不需要时间，传空字符串
                           onTap: () => PostViewer.show(context, p),
+                          avaterUrl: p.uploader.avatarUrl,
                         ),
                     ],
                   );

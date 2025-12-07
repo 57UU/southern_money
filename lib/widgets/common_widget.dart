@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 Widget TitleText(String title) {
@@ -53,7 +54,6 @@ class AdminIdentifier extends StatelessWidget {
   }
 }
 
-
 // 导航项数据模型
 class NavigationItemData {
   final IconData icon;
@@ -67,4 +67,91 @@ class NavigationItemData {
     required this.label,
     required this.page,
   });
+}
+
+class Avater extends StatelessWidget {
+  final String avatarUrl;
+  const Avater({super.key, required this.avatarUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: CachedNetworkImage(
+          imageUrl: avatarUrl,
+          fit: BoxFit.cover,
+          width: 40,
+          height: 40,
+          errorWidget: (context, url, error) => Container(
+            width: 40,
+            height: 40,
+            color: colorScheme.surfaceContainerHighest,
+            child: Icon(Icons.person, color: colorScheme.onSurfaceVariant),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Uploader extends StatelessWidget {
+  final String avatarUrl;
+  final String name;
+  final void Function()? onTap;
+  const Uploader({
+    super.key,
+    required this.avatarUrl,
+    required this.name,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          // 头像
+          Avater(avatarUrl: avatarUrl),
+          const SizedBox(width: 12),
+          // 用户名
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Tag extends StatelessWidget {
+  final String tag;
+  final void Function()? onTap;
+  const Tag({super.key, required this.tag, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final body = Chip(
+      label: Text(
+        tag,
+        style: TextStyle(color: colorScheme.onSecondaryContainer, fontSize: 14),
+      ),
+      backgroundColor: colorScheme.secondaryContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    );
+    return GestureDetector(onTap: onTap, child: body);
+  }
 }

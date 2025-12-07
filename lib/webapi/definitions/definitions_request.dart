@@ -108,9 +108,20 @@ class PostPageRequest {
 class PostSearchRequest {
   static const String route = "/posts/search";
   @JsonKey(name: "query")
-  final String query;
+  final String? query;
+  @JsonKey(name: "Tag")
+  final String? tag;
+  @JsonKey(name: "page")
+  final int page;
+  @JsonKey(name: "pageSize")
+  final int pageSize;
 
-  PostSearchRequest({required this.query});
+  PostSearchRequest({
+    required this.query,
+    this.tag,
+    this.page = 1,
+    this.pageSize = 10,
+  });
   Map<String, dynamic> toJson() => _$PostSearchRequestToJson(this);
 }
 
@@ -192,6 +203,24 @@ class UserUpdateRequest {
 
   UserUpdateRequest({required this.name, required this.email});
   Map<String, dynamic> toJson() => _$UserUpdateRequestToJson(this);
+}
+
+@JsonSerializable()
+class GetPostsByUserIdRequest {
+  static const String route = "/posts/user";
+  @JsonKey(name: "userId")
+  final String userId;
+  @JsonKey(name: "page")
+  final int page;
+  @JsonKey(name: "pageSize")
+  final int pageSize;
+
+  GetPostsByUserIdRequest({
+    required this.userId,
+    required this.page,
+    required this.pageSize,
+  });
+  Map<String, dynamic> toJson() => _$GetPostsByUserIdRequestToJson(this);
 }
 
 @JsonSerializable()

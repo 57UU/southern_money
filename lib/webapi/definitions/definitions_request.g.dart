@@ -88,10 +88,20 @@ Map<String, dynamic> _$PostPageRequestToJson(PostPageRequest instance) =>
     <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};
 
 PostSearchRequest _$PostSearchRequestFromJson(Map<String, dynamic> json) =>
-    PostSearchRequest(query: json['query'] as String);
+    PostSearchRequest(
+      query: json['query'] as String?,
+      tag: json['Tag'] as String?,
+      page: (json['page'] as num?)?.toInt() ?? 1,
+      pageSize: (json['pageSize'] as num?)?.toInt() ?? 10,
+    );
 
 Map<String, dynamic> _$PostSearchRequestToJson(PostSearchRequest instance) =>
-    <String, dynamic>{'query': instance.query};
+    <String, dynamic>{
+      'query': instance.query,
+      'Tag': instance.tag,
+      'page': instance.page,
+      'pageSize': instance.pageSize,
+    };
 
 PostReportRequest _$PostReportRequestFromJson(Map<String, dynamic> json) =>
     PostReportRequest(
@@ -151,6 +161,22 @@ UserUpdateRequest _$UserUpdateRequestFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$UserUpdateRequestToJson(UserUpdateRequest instance) =>
     <String, dynamic>{'Name': instance.name, 'Email': instance.email};
+
+GetPostsByUserIdRequest _$GetPostsByUserIdRequestFromJson(
+  Map<String, dynamic> json,
+) => GetPostsByUserIdRequest(
+  userId: json['userId'] as String,
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+);
+
+Map<String, dynamic> _$GetPostsByUserIdRequestToJson(
+  GetPostsByUserIdRequest instance,
+) => <String, dynamic>{
+  'userId': instance.userId,
+  'page': instance.page,
+  'pageSize': instance.pageSize,
+};
 
 UserChangePasswordRequest _$UserChangePasswordRequestFromJson(
   Map<String, dynamic> json,

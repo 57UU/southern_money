@@ -113,6 +113,7 @@ class _MyPostsState extends State<MyPosts> {
 
   Widget _buildPostItem(PostPageItemResponse post) {
     return PostCard(
+      avaterUrl: post.uploader.avatarUrl,
       title: post.title,
       author: post.uploader.name,
       timeAgo: formatTimeAgo(post.createTime),
@@ -142,13 +143,10 @@ class _MyPostsState extends State<MyPosts> {
                 leading: const Icon(Icons.edit),
                 title: const Text('编辑帖子'),
                 onTap: () {
-                  Navigator.pop(context);
-                  // 导航到编辑帖子页面
-                  Navigator.pushNamed(
+                  //need implement
+                  ScaffoldMessenger.of(
                     context,
-                    '/post_create',
-                    arguments: post.id,
-                  );
+                  ).showSnackBar(const SnackBar(content: Text('编辑帖子功能暂未实现')));
                 },
               ),
               ListTile(
@@ -250,18 +248,7 @@ class _MyPostsState extends State<MyPosts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("我的帖子"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/post_create');
-            },
-            tooltip: '发布新帖子',
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text("我的帖子")),
       body: RefreshIndicator(
         onRefresh: _refreshPosts,
         child: Stack(
