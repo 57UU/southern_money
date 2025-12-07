@@ -23,7 +23,7 @@ class JwtInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final sessionToken = tokenService.sessionTokenValue;
-    if (sessionToken != null) {
+    if (sessionToken != null && sessionToken.isNotEmpty) {
       options.headers["Authorization"] = "Bearer $sessionToken";
     }
     super.onRequest(options, handler);
@@ -31,6 +31,11 @@ class JwtInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (tokenService.sessionTokenValue == null ||
+        tokenService.sessionTokenValue!.isEmpty) {
+      // 如果没有token，直接返回错误
+      return super.onError(err, handler);
+    }
     // 处理 token 过期错误
     if (_isTokenExpiredError(err)) {
       // 如果已经在刷新中，将请求加入队列

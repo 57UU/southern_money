@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _guestMode() {
     // 游客模式逻辑
-    appConfigService.tokenService.sessionToken.value = "114514";
+    appConfigService.tokenService.sessionToken.value = "";
   }
 
   @override
