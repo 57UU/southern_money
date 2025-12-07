@@ -203,7 +203,7 @@ class _AdminManageUserState extends State<AdminManageUser>
     if (response.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(isAdmin ? '已取消管理员权限' : '已设置为管理员'),
+          content: Text(isAdmin ? '已设置为管理员' : '已取消管理员权限'),
           backgroundColor: Colors.green,
         ),
       );
