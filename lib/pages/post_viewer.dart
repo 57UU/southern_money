@@ -85,6 +85,70 @@ class _PostViewerState extends State<PostViewer> {
     }
   }
 
+  // 显示封禁原因对话框
+  void _showBlockReasonDialog(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    if (widget.post.postBlocks.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("封禁详情", style: TextStyle(color: colorScheme.onSurface)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: widget.post.postBlocks.map((block) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "封禁原因:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      block.reason,
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "操作人: ${block.operator}",
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "操作时间: ${formatTimeAgo(block.actionTime)}",
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("确定", style: TextStyle(color: colorScheme.primary)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // 举报功能
   Future<void> reportPost() async {
     if (isReporting) return;
@@ -138,6 +202,43 @@ class _PostViewerState extends State<PostViewer> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 封禁警告
+            if (widget.post.isBlocked) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: colorScheme.error),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber, color: colorScheme.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "此帖子已被封禁",
+                        style: TextStyle(
+                          color: colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    if (widget.post.postBlocks.isNotEmpty)
+                      TextButton(
+                        onPressed: () => _showBlockReasonDialog(context),
+                        child: Text(
+                          "查看原因",
+                          style: TextStyle(color: colorScheme.error),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+
             // 帖子标题
             Text(
               widget.post.title,
@@ -188,18 +289,38 @@ class _PostViewerState extends State<PostViewer> {
                           reportPost();
                         }
                       },
-                      itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem<String>(
-                          value: 'report',
-                          child: Row(
-                            children: [
-                              Icon(Icons.report, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('举报'),
-                            ],
-                          ),
-                        ),
-                      ],
+                      itemBuilder: (BuildContext context) {
+                        if (widget.post.isBlocked) {
+                          return [
+                            const PopupMenuItem<String>(
+                              enabled: false,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.block, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    '帖子已被封禁',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ];
+                        } else {
+                          return [
+                            const PopupMenuItem<String>(
+                              value: 'report',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.report, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('举报'),
+                                ],
+                              ),
+                            ),
+                          ];
+                        }
+                      },
                     ),
                   ],
                 ),

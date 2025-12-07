@@ -126,6 +126,59 @@ class _MyPostsState extends State<MyPosts> {
         // 显示更多操作选项
         _showMoreOptionsDialog(post);
       },
+      isBlocked: post.isBlocked,
+      postBlocks: post.postBlocks,
+      onBlockInfoPressed: () => _showBlockReasonDialog(post),
+    );
+  }
+
+  void _showBlockReasonDialog(PostPageItemResponse post) {
+    if (post.postBlocks.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red.shade700),
+              const SizedBox(width: 8),
+              const Text('封禁详情'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: post.postBlocks
+                  .map(
+                    (block) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '封禁原因: ${block.reason}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text('操作人: ${block.operator.name}'),
+                          Text('操作时间: ${formatTimeAgo(block.actionTime)}'),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('确定'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -139,26 +192,37 @@ class _MyPostsState extends State<MyPosts> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('编辑帖子'),
-                onTap: () {
-                  //need implement
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('编辑帖子功能暂未实现')));
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete),
-                title: const Text('删除帖子'),
-                textColor: Colors.red,
-                onTap: () {
-                  Navigator.pop(context);
-                  // 实现删除帖子的逻辑
-                  _deletePost(post.id);
-                },
-              ),
+              if (!post.isBlocked) ...[
+                ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('编辑帖子'),
+                  onTap: () {
+                    //need implement
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('编辑帖子功能暂未实现')));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('删除帖子'),
+                  textColor: Colors.red,
+                  onTap: () {
+                    Navigator.pop(context);
+                    // 实现删除帖子的逻辑
+                    _deletePost(post.id);
+                  },
+                ),
+              ] else ...[
+                ListTile(
+                  leading: Icon(Icons.block, color: Colors.red.shade700),
+                  title: Text(
+                    '帖子已被封禁',
+                    style: TextStyle(color: Colors.red.shade700),
+                  ),
+                  subtitle: const Text('被封禁的帖子无法编辑或删除'),
+                ),
+              ],
             ],
           ),
         );
