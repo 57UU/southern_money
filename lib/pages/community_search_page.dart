@@ -102,14 +102,18 @@ class _CommunitySearchPageState extends State<CommunitySearchPage> {
         });
       }
     } catch (e) {
-      setState(() {
-        hasError = true;
-        errorMessage = '搜索过程中发生错误: $e';
-      });
+      if (context.mounted) {
+        setState(() {
+          hasError = true;
+          errorMessage = '搜索过程中发生错误: $e';
+        });
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (context.mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
