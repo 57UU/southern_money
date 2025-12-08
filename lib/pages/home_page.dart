@@ -113,7 +113,8 @@ class _DiscoveryState extends State<Discovery> {
                     children: [
                       for (var p in posts)
                         PostCard(
-                          title: p.content, // ← 显示内容
+                          content: p.content, // ← 显示内容
+                          title: p.title, // ← 显示标题
                           author: p.uploader.name, // ← 显示作者
                           timeAgo: "", // ← 你不需要时间，传空字符串
                           onTap: () => PostViewer.show(context, p),

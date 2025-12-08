@@ -90,7 +90,7 @@ Map<String, dynamic> _$PostPageRequestToJson(PostPageRequest instance) =>
 PostSearchRequest _$PostSearchRequestFromJson(Map<String, dynamic> json) =>
     PostSearchRequest(
       query: json['query'] as String?,
-      tag: json['Tag'] as String?,
+      tag: json['tag'] as String?,
       page: (json['page'] as num?)?.toInt() ?? 1,
       pageSize: (json['pageSize'] as num?)?.toInt() ?? 10,
     );
@@ -98,7 +98,7 @@ PostSearchRequest _$PostSearchRequestFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$PostSearchRequestToJson(PostSearchRequest instance) =>
     <String, dynamic>{
       'query': instance.query,
-      'Tag': instance.tag,
+      'tag': instance.tag,
       'page': instance.page,
       'pageSize': instance.pageSize,
     };

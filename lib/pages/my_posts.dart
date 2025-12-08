@@ -114,6 +114,7 @@ class _MyPostsState extends State<MyPosts> {
   Widget _buildPostItem(PostPageItemResponse post) {
     return PostCard(
       avaterUrl: post.uploader.avatarUrl,
+      content: post.content,
       title: post.title,
       author: post.uploader.name,
       timeAgo: formatTimeAgo(post.createTime),

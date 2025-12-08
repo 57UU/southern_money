@@ -89,7 +89,7 @@ class ApiPostService {
     try {
       final response = await jwtDio.get(
         PostSearchRequest.route,
-        data: request.toJson(),
+        queryParameters: request.toJson(),
       );
 
       return ApiResponse.fromJson(

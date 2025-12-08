@@ -158,6 +158,7 @@ class _CommunityPageState extends State<CommunityPage>
 
   Widget _buildPostCard(BuildContext context, PostPageItemResponse post) {
     return PostCard(
+      content: post.content,
       title: post.title,
       author: post.uploader.name,
       timeAgo: '',

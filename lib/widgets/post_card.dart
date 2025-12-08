@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'styled_card.dart';
 
 class PostCard extends StatelessWidget {
+  final String content;
   final String title;
   final String author;
   final String timeAgo;
@@ -18,6 +20,7 @@ class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
     required this.title,
+    required this.content,
     required this.author,
     required this.timeAgo,
     this.onTap,
@@ -35,9 +38,15 @@ class PostCard extends StatelessWidget {
 
     return StyledCard(
       onTap: onTap,
-      borderSide: isBlocked 
-        ? BorderSide(color: colorScheme.error.withValues(alpha: 0.5), width: 1.5)
-        : BorderSide(color: colorScheme.outline.withValues(alpha: 0.2), width: 1),
+      borderSide: isBlocked
+          ? BorderSide(
+              color: colorScheme.error.withValues(alpha: 0.5),
+              width: 1.5,
+            )
+          : BorderSide(
+              color: colorScheme.outline.withValues(alpha: 0.2),
+              width: 1,
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -88,8 +97,9 @@ class PostCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          titleText(title),
           Text(
-            title,
+            content,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -127,7 +137,11 @@ class PostCard extends StatelessWidget {
           ),
           if (postBlocks.isNotEmpty)
             IconButton(
-              icon: Icon(Icons.info_outline, size: 20, color: colorScheme.onErrorContainer),
+              icon: Icon(
+                Icons.info_outline,
+                size: 20,
+                color: colorScheme.onErrorContainer,
+              ),
               onPressed: onBlockInfoPressed,
               visualDensity: VisualDensity.compact,
             ),

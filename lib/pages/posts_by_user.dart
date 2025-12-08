@@ -283,6 +283,7 @@ class _PostsByUserState extends State<PostsByUser> {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: PostCard(
+            content: post.content,
             title: post.title,
             author: post.uploader.name,
             timeAgo: formatTimeAgo(post.createTime),

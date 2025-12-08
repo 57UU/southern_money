@@ -109,19 +109,14 @@ class PostSearchRequest {
   static const String route = "/posts/search";
   @JsonKey(name: "query")
   final String? query;
-  @JsonKey(name: "Tag")
+  @JsonKey(name: "tag")
   final String? tag;
   @JsonKey(name: "page")
   final int page;
   @JsonKey(name: "pageSize")
   final int pageSize;
 
-  PostSearchRequest({
-    required this.query,
-    this.tag,
-    this.page = 1,
-    this.pageSize = 10,
-  });
+  PostSearchRequest({this.query, this.tag, this.page = 1, this.pageSize = 10});
   Map<String, dynamic> toJson() => _$PostSearchRequestToJson(this);
 }
 
