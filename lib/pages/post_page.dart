@@ -56,7 +56,7 @@ class _PostPageState extends State<PostPage> {
 
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      imageQuality: 60,
     );
 
     if (pickedFile != null) {

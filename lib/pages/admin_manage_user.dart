@@ -398,18 +398,10 @@ class _AdminManageUserState extends State<AdminManageUser>
                           child: Row(
                             children: [
                               // 头像
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage:
-                                    user.avatar != null &&
-                                        user.avatar!.isNotEmpty
-                                    ? CachedNetworkImageProvider(
-                                        imageService.getImageUrl(user.avatar!),
-                                      )
-                                    : const AssetImage(
-                                            'assets/images/avatar.png',
-                                          )
-                                          as ImageProvider,
+                              Avater(
+                                avatarUrl: imageService.getImageUrl(
+                                  user.avatar!,
+                                ),
                               ),
                               const SizedBox(width: 16),
 

@@ -44,7 +44,10 @@ class ApiImageService {
     }
   }
 
-  String getImageUrl(String imageId) {
+  String getImageUrl(String? imageId) {
+    if (imageId == null || imageId.isEmpty) {
+      return "";
+    }
     return "${appConfigService.baseUrl}${ImageGetRequest.route}?id=$imageId";
   }
 
