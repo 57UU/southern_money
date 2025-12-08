@@ -66,6 +66,13 @@ class PasswordService {
 }
 
 class AppConfigService {
+  bool forumNeedRefresh = false;
+  bool discoveryNeedRefresh = false;
+  void setPostsNeedRefresh() {
+    forumNeedRefresh = true;
+    discoveryNeedRefresh = true;
+  }
+
   ValueNotifier<Map<String, dynamic>> appSetting = ValueNotifier({});
   TokenService tokenService;
   ValueNotifier<String?> apiBaseUrl = ValueNotifier(null);

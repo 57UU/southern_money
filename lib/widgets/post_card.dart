@@ -86,14 +86,15 @@ class PostCard extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.more_horiz,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+              if (onMorePressed != null)
+                IconButton(
+                  icon: Icon(
+                    Icons.more_horiz,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  onPressed: onMorePressed ?? () {},
+                  visualDensity: VisualDensity.compact,
                 ),
-                onPressed: onMorePressed ?? () {},
-                visualDensity: VisualDensity.compact,
-              ),
             ],
           ),
           const SizedBox(height: 12),

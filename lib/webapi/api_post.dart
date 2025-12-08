@@ -253,4 +253,70 @@ class ApiPostService {
       return ApiResponse.fail(message: "获取用户帖子失败: $e");
     }
   }
+
+  /// 收藏帖子
+  Future<ApiResponse<Map<String, dynamic>>> favoritePost(String postId) async {
+    try {
+      final request = PostFavoriteRequest(postId: postId);
+
+      final response = await jwtDio.post(
+        PostFavoriteRequest.route,
+        queryParameters: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => dataJson as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "收藏帖子失败: $e");
+    }
+  }
+
+  /// 取消收藏帖子
+  Future<ApiResponse<Map<String, dynamic>>> unfavoritePost(
+    String postId,
+  ) async {
+    try {
+      final request = PostUnfavoriteRequest(postId: postId);
+
+      final response = await jwtDio.post(
+        PostUnfavoriteRequest.route,
+        queryParameters: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => dataJson as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "取消收藏帖子失败: $e");
+    }
+  }
+
+  /// 获取收藏帖子列表
+  Future<ApiResponse<PagedResponse<PostPageItemResponse>>> getFavoritePosts({
+    required int page,
+    required int pageSize,
+  }) async {
+    try {
+      final request = PostFavoritesRequest(page: page, pageSize: pageSize);
+
+      final response = await jwtDio.get(
+        PostFavoritesRequest.route,
+        queryParameters: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => PagedResponse.fromJson(
+          dataJson as Map<String, dynamic>,
+          (itemJson) =>
+              PostPageItemResponse.fromJson(itemJson as Map<String, dynamic>),
+        ),
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "获取收藏帖子列表失败: $e");
+    }
+  }
 }

@@ -187,6 +187,7 @@ PostPageItemResponse _$PostPageItemResponseFromJson(
   postBlocks: (json['PostBlocks'] as List<dynamic>)
       .map((e) => BlockReason.fromJson(e as Map<String, dynamic>))
       .toList(),
+  isFavorited: json['IsFavorited'] as bool,
 );
 
 Map<String, dynamic> _$PostPageItemResponseToJson(
@@ -201,6 +202,7 @@ Map<String, dynamic> _$PostPageItemResponseToJson(
   'LikeCount': instance.likeCount,
   'IsBlocked': instance.isBlocked,
   'IsLiked': instance.isLiked,
+  'IsFavorited': instance.isFavorited,
   'Tags': instance.tags,
   'ImageIds': instance.imageIds,
   'Uploader': instance.uploader,

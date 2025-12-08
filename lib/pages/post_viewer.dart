@@ -34,6 +34,11 @@ class _PostViewerState extends State<PostViewer> {
     widget.post.isLiked = value;
   }
 
+  get isFavorited => widget.post.isFavorited;
+  set isFavorited(bool value) {
+    widget.post.isFavorited = value;
+  }
+
   int likeCount = 0;
   bool isReporting = false;
   final TextEditingController _reasonController = TextEditingController();
@@ -73,6 +78,48 @@ class _PostViewerState extends State<PostViewer> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("点赞成功"), duration: const Duration(seconds: 2)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message ?? "操作失败"),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("网络错误，请重试"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // 收藏功能
+  Future<void> toggleFavorite() async {
+    try {
+      ApiResponse response;
+
+      if (isFavorited) {
+        // 取消收藏
+        response = await postService.unfavoritePost(widget.post.id);
+      } else {
+        // 收藏
+        response = await postService.favoritePost(widget.post.id);
+      }
+
+      if (response.success) {
+        setState(() {
+          // 切换收藏状态
+          isFavorited = !isFavorited;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isFavorited ? "收藏成功" : "已取消收藏"),
+            duration: const Duration(seconds: 2),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -511,6 +558,25 @@ class _PostViewerState extends State<PostViewer> {
                     ),
                   ],
                 ),
+                const SizedBox(width: 24),
+                // 收藏数
+                Row(
+                  children: [
+                    Icon(
+                      Icons.favorite_border,
+                      size: 18,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "收藏", // 暂时显示"收藏"，因为API没有返回收藏数
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -544,6 +610,35 @@ class _PostViewerState extends State<PostViewer> {
                         color: isLiked
                             ? colorScheme.primary
                             : colorScheme.outline,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // 收藏按钮
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: toggleFavorite,
+                    icon: Icon(
+                      isFavorited ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorited
+                          ? Colors.red
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    label: Text(
+                      isFavorited ? "已收藏" : "收藏",
+                      style: TextStyle(
+                        color: isFavorited
+                            ? Colors.red
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      side: BorderSide(
+                        color: isFavorited ? Colors.red : colorScheme.outline,
                       ),
                     ),
                   ),

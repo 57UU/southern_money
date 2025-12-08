@@ -647,3 +647,35 @@ class NotificationReadAllRequest {
   NotificationReadAllRequest();
   Map<String, dynamic> toJson() => _$NotificationReadAllRequestToJson(this);
 }
+
+@JsonSerializable()
+class PostFavoriteRequest {
+  static const String route = "/posts/favorite";
+  @JsonKey(name: "id")
+  final String postId;
+
+  PostFavoriteRequest({required this.postId});
+  Map<String, dynamic> toJson() => _$PostFavoriteRequestToJson(this);
+}
+
+@JsonSerializable()
+class PostUnfavoriteRequest {
+  static const String route = "/posts/unfavorite";
+  @JsonKey(name: "id")
+  final String postId;
+
+  PostUnfavoriteRequest({required this.postId});
+  Map<String, dynamic> toJson() => _$PostUnfavoriteRequestToJson(this);
+}
+
+@JsonSerializable()
+class PostFavoritesRequest {
+  static const String route = "/posts/favorites";
+  @JsonKey(name: "page")
+  final int page;
+  @JsonKey(name: "pageSize")
+  final int pageSize;
+
+  PostFavoritesRequest({required this.page, required this.pageSize});
+  Map<String, dynamic> toJson() => _$PostFavoritesRequestToJson(this);
+}

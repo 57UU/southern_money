@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/jewelry_page.dart';
@@ -6,6 +8,7 @@ import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
 import 'package:southern_money/pages/post_viewer.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -55,6 +58,7 @@ class Discovery extends StatefulWidget {
 // get post by hr
 class _DiscoveryState extends State<Discovery> {
   final postService = getIt<ApiPostService>();
+  final appConfigService = getIt<AppConfigService>();
 
   late Future<ApiResponse<PagedResponse<PostPageItemResponse>>> futurePosts;
 
@@ -72,6 +76,12 @@ class _DiscoveryState extends State<Discovery> {
 
   @override
   Widget build(BuildContext context) {
+    scheduleMicrotask(() {
+      if (appConfigService.discoveryNeedRefresh) {
+        refreshPosts();
+        appConfigService.discoveryNeedRefresh = false;
+      }
+    });
     return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,

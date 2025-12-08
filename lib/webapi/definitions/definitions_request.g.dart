@@ -539,3 +539,29 @@ NotificationReadAllRequest _$NotificationReadAllRequestFromJson(
 Map<String, dynamic> _$NotificationReadAllRequestToJson(
   NotificationReadAllRequest instance,
 ) => <String, dynamic>{};
+
+PostFavoriteRequest _$PostFavoriteRequestFromJson(Map<String, dynamic> json) =>
+    PostFavoriteRequest(postId: json['id'] as String);
+
+Map<String, dynamic> _$PostFavoriteRequestToJson(
+  PostFavoriteRequest instance,
+) => <String, dynamic>{'id': instance.postId};
+
+PostUnfavoriteRequest _$PostUnfavoriteRequestFromJson(
+  Map<String, dynamic> json,
+) => PostUnfavoriteRequest(postId: json['id'] as String);
+
+Map<String, dynamic> _$PostUnfavoriteRequestToJson(
+  PostUnfavoriteRequest instance,
+) => <String, dynamic>{'id': instance.postId};
+
+PostFavoritesRequest _$PostFavoritesRequestFromJson(
+  Map<String, dynamic> json,
+) => PostFavoritesRequest(
+  page: (json['page'] as num).toInt(),
+  pageSize: (json['pageSize'] as num).toInt(),
+);
+
+Map<String, dynamic> _$PostFavoritesRequestToJson(
+  PostFavoritesRequest instance,
+) => <String, dynamic>{'page': instance.page, 'pageSize': instance.pageSize};

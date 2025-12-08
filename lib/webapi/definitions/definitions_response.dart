@@ -214,6 +214,8 @@ class PostPageItemResponse {
   final bool isBlocked;
   @JsonKey(name: "IsLiked")
   bool isLiked;
+  @JsonKey(name: "IsFavorited")
+  bool isFavorited;
   @JsonKey(name: "Tags")
   final List<String> tags;
   @JsonKey(name: "ImageIds")
@@ -237,6 +239,7 @@ class PostPageItemResponse {
     required this.imageIds,
     required this.uploader,
     required this.postBlocks,
+    required this.isFavorited,
   });
   factory PostPageItemResponse.fromJson(Map<String, dynamic> json) =>
       _$PostPageItemResponseFromJson(json);

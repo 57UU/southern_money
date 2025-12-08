@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'dart:io';
 
 import 'package:southern_money/setting/ensure_initialized.dart';
@@ -128,8 +129,11 @@ class _PostPageState extends State<PostPage> {
     final success = await apiRequestDialog(post());
     if (success == true) {
       Navigator.pop(context);
+      appConfigService.setPostsNeedRefresh();
     }
   }
+
+  final appConfigService = getIt<AppConfigService>();
 
   @override
   Widget build(BuildContext context) {

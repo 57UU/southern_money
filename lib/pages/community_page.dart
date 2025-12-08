@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/community_search_page.dart';
 import 'package:southern_money/pages/post_page.dart';
 import 'package:southern_money/pages/post_viewer.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -81,6 +84,15 @@ class _CommunityPageState extends State<CommunityPage>
     }
   }
 
+  void refresh() {
+    setState(() {
+      _currentPage = 0;
+      _hasMore = true;
+      _posts.clear();
+    });
+    _loadPosts();
+  }
+
   // 加载更多帖子
   void _loadMorePosts() {
     if (!_isLoading && _hasMore) {
@@ -88,9 +100,17 @@ class _CommunityPageState extends State<CommunityPage>
     }
   }
 
+  final appConfigService = getIt<AppConfigService>();
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
+    scheduleMicrotask(() {
+      if (appConfigService.forumNeedRefresh) {
+        refresh();
+        appConfigService.forumNeedRefresh = false;
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text('社区'),
@@ -100,12 +120,7 @@ class _CommunityPageState extends State<CommunityPage>
             icon: const Icon(Icons.refresh),
             onPressed: () {
               // 重置所有状态并重新加载数据
-              setState(() {
-                _currentPage = 0;
-                _hasMore = true;
-                _posts.clear();
-              });
-              _loadPosts();
+              refresh();
             },
           ),
           IconButton(
