@@ -142,7 +142,7 @@ class _MyCollectionState extends State<MyCollection> {
                 content: post.content,
                 author: post.uploader.name,
                 timeAgo: formatTimeAgo(post.createTime),
-                avaterUrl: post.uploader.avatar,
+                avaterUrl: post.uploader.avatarUrl,
                 onTap: () => _navigateToPost(post),
                 isBlocked: post.isBlocked,
                 postBlocks: post.postBlocks,

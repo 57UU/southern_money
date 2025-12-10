@@ -134,4 +134,19 @@ class ApiAdminService {
       return ApiResponse.fail(message: "设置管理员状态失败: $e");
     }
   }
+
+  /// 获取系统统计数据
+  Future<ApiResponse<AdminStatisticsResponse>> getStatistics() async {
+    try {
+      final response = await jwtDio.get(AdminStatisticsRequest.route);
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) =>
+            AdminStatisticsResponse.fromJson(dataJson as Map<String, dynamic>),
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "获取系统统计数据失败: $e");
+    }
+  }
 }
