@@ -5,7 +5,7 @@ import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/post_card.dart';
-import 'package:southern_money/widgets/common_widget.dart';
+// import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/utilities.dart';
 
 class MyCollection extends StatefulWidget {

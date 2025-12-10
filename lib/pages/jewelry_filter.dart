@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'jewelry_page.dart';
 
 class JewelryFilter extends StatefulWidget {
-  final Set<JewelryCategory> selected;
-  final ValueChanged<Set<JewelryCategory>> onChanged;
+  final Set<JewelryCategoryType> selected;
+  final ValueChanged<Set<JewelryCategoryType>> onChanged;
 
   const JewelryFilter({
     super.key,
@@ -16,7 +16,7 @@ class JewelryFilter extends StatefulWidget {
 }
 
 class _JewelryFilterState extends State<JewelryFilter> {
-  late Set<JewelryCategory> selected;
+  late Set<JewelryCategoryType> selected;
 
   @override
   void initState() {
@@ -31,12 +31,12 @@ class _JewelryFilterState extends State<JewelryFilter> {
       alignment: Alignment.center,
       child: SizedBox(
         width: double.infinity,
-        child: SegmentedButton<JewelryCategory>(
+        child: SegmentedButton<JewelryCategoryType>(
           segments: const [
-            ButtonSegment(value: JewelryCategory.rifle, label: Text("步枪")),
-            ButtonSegment(value: JewelryCategory.pistol, label: Text("手枪")),
-            ButtonSegment(value: JewelryCategory.knife, label: Text("刀具")),
-            ButtonSegment(value: JewelryCategory.glove, label: Text("手套")),
+            ButtonSegment(value: JewelryCategoryType.rifle, label: Text("步枪")),
+            ButtonSegment(value: JewelryCategoryType.pistol, label: Text("手枪")),
+            ButtonSegment(value: JewelryCategoryType.knife, label: Text("刀具")),
+            ButtonSegment(value: JewelryCategoryType.glove, label: Text("手套")),
           ],
           selected: selected,
           multiSelectionEnabled: true,

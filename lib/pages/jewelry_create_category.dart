@@ -25,7 +25,7 @@ Future<void> showCreateItemDialog(
   File? pickedImage;
   String? imageId;
 
-  JewelryCategory mainType = JewelryCategory.rifle;
+  JewelryCategoryType mainType = JewelryCategoryType.rifle;
 
   CategoryResponse selectedBackendCategory = categories.firstWhere(
     (c) => c.name.contains("步枪"),
@@ -44,9 +44,9 @@ Future<void> showCreateItemDialog(
           content: SingleChildScrollView(
             child: Column(
               children: [
-                DropdownButtonFormField<JewelryCategory>(
+                DropdownButtonFormField<JewelryCategoryType>(
                   value: mainType,
-                  items: JewelryCategory.values
+                  items: JewelryCategoryType.values
                       .map((e) => DropdownMenuItem(
                             value: e,
                             child: Text(e.label),
