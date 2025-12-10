@@ -102,6 +102,7 @@ class _SettingState extends State<Setting> {
             );
             if (confirm == true) {
               appConfigService.tokenService.clearTokens();
+              popDialog();
             }
           },
         ),

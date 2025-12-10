@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/csgo_category_create.dart';
+import 'package:southern_money/pages/csgo_products_by_category.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/api_image.dart';
@@ -18,7 +20,7 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
   final apiImageService = getIt<ApiImageService>();
   final TextEditingController _searchController = TextEditingController();
   List<CategoryResponse> _categories = [];
-  List<String> _searchResults = [];
+  List<CategoryResponse> _searchResults = [];
   bool _isLoading = false;
   bool _isSearching = false;
 
@@ -89,8 +91,16 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
     try {
       final response = await storeApi.searchCategories(query);
       if (response.success && response.data != null) {
+        // 获取搜索结果中的分类名称
+        final searchNames = response.data!.categories;
+
+        // 根据名称从完整分类列表中找到对应的分类对象
+        final matchedCategories = _categories
+            .where((category) => searchNames.contains(category.name))
+            .toList();
+
         setState(() {
-          _searchResults = response.data!.categories;
+          _searchResults = matchedCategories;
           _isSearching = false;
         });
       } else {
@@ -188,13 +198,13 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
     return ListView.builder(
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
-        final categoryName = _searchResults[index];
+        final category = _searchResults[index];
         return ListTile(
-          title: Text(categoryName),
+          title: Text(category.name),
           leading: const Icon(Icons.category),
           onTap: () {
             // 处理点击搜索结果
-            _handleCategoryTap(categoryName);
+            _handleCategoryTap(category.id, category.name);
           },
         );
       },
@@ -239,7 +249,7 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
             ),
             onTap: () {
               // 处理点击分类
-              _handleCategoryTap(category.name);
+              _handleCategoryTap(category.id, category.name);
             },
           ),
         );
@@ -247,11 +257,15 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
     );
   }
 
-  void _handleCategoryTap(String categoryName) {
-    // 这里可以添加点击分类后的处理逻辑
-    // 例如导航到分类详情页面
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('点击了分类: $categoryName')));
+  void _handleCategoryTap(String categoryId, String categoryName) {
+    // 导航到产品列表页面
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => CsgoProductsByCategory(
+          categoryId: categoryId,
+          categoryName: categoryName,
+        ),
+      ),
+    );
   }
 }

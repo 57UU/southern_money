@@ -202,7 +202,7 @@ ProductPublishRequest _$ProductPublishRequestFromJson(
   Map<String, dynamic> json,
 ) => ProductPublishRequest(
   name: json['Name'] as String,
-  price: (json['Price'] as num).toDouble(),
+  price: const DecimalConverter().fromJson(json['Price'] as String),
   description: json['Description'] as String,
   categoryId: json['CategoryId'] as String,
 );
@@ -211,7 +211,7 @@ Map<String, dynamic> _$ProductPublishRequestToJson(
   ProductPublishRequest instance,
 ) => <String, dynamic>{
   'Name': instance.name,
-  'Price': instance.price,
+  'Price': const DecimalConverter().toJson(instance.price),
   'Description': instance.description,
   'CategoryId': instance.categoryId,
 };
@@ -226,11 +226,11 @@ Map<String, dynamic> _$ProductDeleteRequestToJson(
 
 ProductDetailRequest _$ProductDetailRequestFromJson(
   Map<String, dynamic> json,
-) => ProductDetailRequest(productId: json['productId'] as String);
+) => ProductDetailRequest(id: json['id'] as String);
 
 Map<String, dynamic> _$ProductDetailRequestToJson(
   ProductDetailRequest instance,
-) => <String, dynamic>{'productId': instance.productId};
+) => <String, dynamic>{'id': instance.id};
 
 ProductRESTDetailRequest _$ProductRESTDetailRequestFromJson(
   Map<String, dynamic> json,

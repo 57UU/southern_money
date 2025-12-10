@@ -1,4 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:decimal/decimal.dart';
+import 'decimal_converter.dart';
 
 part 'definitions_request.g.dart';
 
@@ -256,7 +258,8 @@ class ProductPublishRequest {
   @JsonKey(name: "Name")
   final String name;
   @JsonKey(name: "Price")
-  final double price;
+  @DecimalConverter()
+  final Decimal price;
   @JsonKey(name: "Description")
   final String description;
   @JsonKey(name: "CategoryId")
@@ -284,10 +287,10 @@ class ProductDeleteRequest {
 @JsonSerializable()
 class ProductDetailRequest {
   static const String route = "/store/detail";
-  @JsonKey(name: "productId")
-  final String productId;
+  @JsonKey(name: "id")
+  final String id;
 
-  ProductDetailRequest({required this.productId});
+  ProductDetailRequest({required this.id});
   Map<String, dynamic> toJson() => _$ProductDetailRequestToJson(this);
 }
 

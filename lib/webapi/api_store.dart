@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:southern_money/webapi/JwtService.dart';
 import 'package:southern_money/webapi/definitions/definitions_request.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -9,7 +10,7 @@ class ApiStoreService {
   /// 发布产品
   Future<ApiResponse<Map<String, dynamic>>> publishProduct({
     required String name,
-    required double price,
+    required Decimal price,
     required String description,
     required String categoryId,
   }) async {
@@ -61,7 +62,7 @@ class ApiStoreService {
     String productId,
   ) async {
     try {
-      final request = ProductDetailRequest(productId: productId);
+      final request = ProductDetailRequest(id: productId);
 
       final response = await jwtDio.get(
         ProductDetailRequest.route,
