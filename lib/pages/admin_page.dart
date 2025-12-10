@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/admin_censor_forum.dart';
 import 'package:southern_money/pages/admin_manage_user.dart';
+import 'package:southern_money/pages/admin_statistics.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 
 class AdminPage extends StatefulWidget {
@@ -26,6 +27,12 @@ class _AdminPageState extends State<AdminPage> {
       selectedIcon: Icons.manage_accounts,
       label: '管理用户',
       page: AdminManageUser(),
+    ),
+    NavigationItemData(
+      icon: Icons.analytics_outlined,
+      selectedIcon: Icons.analytics,
+      label: '统计分析',
+      page: AdminStatistics(),
     ),
   ];
 

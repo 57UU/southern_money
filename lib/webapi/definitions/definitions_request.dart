@@ -679,3 +679,10 @@ class PostFavoritesRequest {
   PostFavoritesRequest({required this.page, required this.pageSize});
   Map<String, dynamic> toJson() => _$PostFavoritesRequestToJson(this);
 }
+
+@JsonKey(ignore: true)
+class AdminStatisticsRequest {
+  static const String route = "/admin/statistics";
+
+  AdminStatisticsRequest();
+}
