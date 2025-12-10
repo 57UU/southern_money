@@ -1,41 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/setting/app_config.dart';
-
 import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_user.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
-
 import '../widgets/dialog.dart';
-import 'jewelry_category_dialog.dart';
-import 'jewelry_publish_dialog.dart';
+import 'csgo_category_dialog.dart';
+import 'csgo_item_publish_dialog.dart';
 
-enum JewelryCategoryType {
+enum CsgoCategoryType {
   rifle("步枪"),
   pistol("手枪"),
   knife("刀具"),
   glove("手套");
 
   final String label;
-  const JewelryCategoryType(this.label);
+  const CsgoCategoryType(this.label);
 }
 
-class JewelryPage extends StatefulWidget {
-  const JewelryPage({super.key});
+class CsgoItemsPage extends StatefulWidget {
+  const CsgoItemsPage({super.key});
 
   @override
-  State<JewelryPage> createState() => _JewelryPageState();
+  State<CsgoItemsPage> createState() => _CsgoItemsPageState();
 }
 
-class _JewelryPageState extends State<JewelryPage> {
+class _CsgoItemsPageState extends State<CsgoItemsPage> {
   final storeApi = getIt<ApiStoreService>();
   final imageApi = getIt<ApiImageService>();
   final userService = getIt<ApiUserService>();
   final cfg = getIt<AppConfigService>();
 
   bool openFilter = false;
-  Set<JewelryCategoryType> selectedFilter = {};
+  Set<CsgoCategoryType> selectedFilter = {};
 
   List<CategoryResponse> categories = [];
   List<ProductResponse> allProducts = [];
@@ -45,6 +43,7 @@ class _JewelryPageState extends State<JewelryPage> {
   final int pageSize = 20;
   bool loading = false;
   bool hasMore = true;
+  String searchText = '';
 
   @override
   void initState() {
@@ -99,7 +98,6 @@ class _JewelryPageState extends State<JewelryPage> {
         print("获取到 ${categories.length} 个分类");
         
         setState(() => this.categories = categories);
-        // 添加调试信息
         if (categories.isEmpty && mounted) {
           showInfoDialog(
             title: "提示", 
@@ -108,7 +106,6 @@ class _JewelryPageState extends State<JewelryPage> {
         }
       } else {
         print("加载分类失败: ${res.message}");
-        // 添加错误提示
         if (mounted) {
           showInfoDialog(
             title: "加载失败", 
@@ -151,44 +148,34 @@ class _JewelryPageState extends State<JewelryPage> {
       final res = await storeApi.getProductList(page: page, pageSize: pageSize);
       print("商品数据响应: success=${res.success}, data=${res.data}");
 
-    if (res.success && res.data != null) {
-      final data = res.data!;
-      print("获取到 ${data.items.length} 个商品");
-      print("商品详情:");
-      for (var product in data.items) {
-        print("  - ${product.name} (ID: ${product.id}, 分类: ${product.categoryName}, 价格: ${product.price})");
-      }
-      
-      setState(() {
-        if (reset) {
-          allProducts = data.items;
-        } else {
-          allProducts.addAll(data.items);
+      if (res.success && res.data != null) {
+        final data = res.data!;
+        print("获取到 ${data.items.length} 个商品");
+        
+        setState(() {
+          if (reset) {
+            allProducts = data.items;
+          } else {
+            allProducts.addAll(data.items);
+          }
+          hasMore = allProducts.length < (data.totalCount ?? allProducts.length);
+        });
+        
+        if (allProducts.isEmpty && mounted) {
+          showInfoDialog(
+            title: "提示", 
+            content: "当前没有商品数据"
+          );
         }
-
-        hasMore = allProducts.length < (data.totalCount ?? allProducts.length);
-      });
-      
-      print("更新后的商品总数: ${allProducts.length}");
-      
-      // 添加调试信息
-      if (allProducts.isEmpty && mounted) {
-        showInfoDialog(
-          title: "提示", 
-          content: "当前没有商品数据"
-        );
+      } else {
+        print("加载商品失败: ${res.message}");
+        if (mounted) {
+          showInfoDialog(
+            title: "加载失败", 
+            content: res.message ?? "无法加载商品列表"
+          );
+        }
       }
-    } else {
-      print("加载商品失败: ${res.message}");
-      // 添加错误提示
-      if (mounted) {
-        showInfoDialog(
-          title: "加载失败", 
-          content: res.message ?? "无法加载商品列表"
-        );
-      }
-    }
-
     } catch (e, stackTrace) {
       print("商品数据加载异常: $e");
       print("异常堆栈: $stackTrace");
@@ -203,15 +190,27 @@ class _JewelryPageState extends State<JewelryPage> {
     await _loadPage(reset: false);
   }
 
-  // ----------------- 前端过滤 -----------------
   List<ProductResponse> get filteredProducts {
-    if (selectedFilter.isEmpty) return allProducts;
-
-    final labels = selectedFilter.map((e) => e.label).toList();
-
-    return allProducts.where((p) {
-      return labels.any((label) => p.categoryName.contains(label));
-    }).toList();
+    var filtered = allProducts;
+    
+    // 应用分类筛选
+    if (selectedFilter.isNotEmpty) {
+      final labels = selectedFilter.map((e) => e.label).toList();
+      filtered = filtered.where((p) => 
+        labels.any((label) => p.categoryName.contains(label))
+      ).toList();
+    }
+    
+    // 应用搜索筛选
+    if (searchText.isNotEmpty) {
+      final searchLower = searchText.toLowerCase();
+      filtered = filtered.where((p) => 
+        p.name.toLowerCase().contains(searchLower) ||
+        p.categoryName.toLowerCase().contains(searchLower)
+      ).toList();
+    }
+    
+    return filtered;
   }
 
   CategoryResponse? findCategory(ProductResponse p) {
@@ -226,7 +225,6 @@ class _JewelryPageState extends State<JewelryPage> {
     );
   }
 
-  // ---------------- UI --------------------
   @override
   Widget build(BuildContext context) {
     final products = filteredProducts;
@@ -234,7 +232,7 @@ class _JewelryPageState extends State<JewelryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '珠宝首饰',
+          'CSGO饰品',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -320,10 +318,10 @@ class _JewelryPageState extends State<JewelryPage> {
                       borderRadius: BorderRadius.circular(20),
                       onTap: () async {
                         if (categories.isEmpty) {
-                          showInfoDialog(title: "错误", content: "尚未创建主分类");
+                          showInfoDialog(title: "错误", content: "尚未创建分类");
                           return;
                         }
-                        final ok = await JewelryPublishDialog.show(context, categories);
+                        final ok = await CsgoItemPublishDialog.show(context, categories);
                         if (ok == true) _loadFirstPage();
                       },
                       child: Container(
@@ -380,7 +378,7 @@ class _JewelryPageState extends State<JewelryPage> {
                             showInfoDialog(title: "权限不足", content: "只有管理员可以创建分类");
                             return;
                           }
-                          final ok = await JewelryCategoryDialog.show(context);
+                          final ok = await CsgoCategoryDialog.show(context);
                           if (ok == true) _loadCategories();
                         },
                         child: Container(
@@ -508,7 +506,11 @@ class _JewelryPageState extends State<JewelryPage> {
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
-                      onSubmitted: (_) => _loadFirstPage(),
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value;
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -590,7 +592,6 @@ class _JewelryPageState extends State<JewelryPage> {
               height: openFilter ? 70 : 0,
               child: _buildFilter(),
             ),
-          // 调试信息显示
           if (categories.isEmpty)
             Container(
               padding: const EdgeInsets.all(16),
@@ -661,7 +662,6 @@ class _JewelryPageState extends State<JewelryPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
                               onTap: () {
-                                // TODO: 跳转到商品详情页
                                 print("点击商品: ${item.name}");
                               },
                               child: Padding(
@@ -840,16 +840,14 @@ class _JewelryPageState extends State<JewelryPage> {
     );
   }
 
-  // ---------------- Build Filter -----------------
-
   Widget _buildFilter() {
     return Center(
-      child: SegmentedButton<JewelryCategoryType>(
+      child: SegmentedButton<CsgoCategoryType>(
         segments: const [
-          ButtonSegment(value: JewelryCategoryType.rifle, label: Text("步枪")),
-          ButtonSegment(value: JewelryCategoryType.pistol, label: Text("手枪")),
-          ButtonSegment(value: JewelryCategoryType.knife, label: Text("刀具")),
-          ButtonSegment(value: JewelryCategoryType.glove, label: Text("手套")),
+          ButtonSegment(value: CsgoCategoryType.rifle, label: Text("步枪")),
+          ButtonSegment(value: CsgoCategoryType.pistol, label: Text("手枪")),
+          ButtonSegment(value: CsgoCategoryType.knife, label: Text("刀具")),
+          ButtonSegment(value: CsgoCategoryType.glove, label: Text("手套")),
         ],
         multiSelectionEnabled: true,
         emptySelectionAllowed: true,
