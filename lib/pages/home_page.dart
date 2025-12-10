@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/csgo_category_page.dart';
 import 'package:southern_money/pages/futures_page.dart';
 import 'package:southern_money/pages/gold_page.dart';
 import 'package:southern_money/pages/crypto_currency_page.dart';
 import 'package:southern_money/pages/post_viewer.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
-import 'package:southern_money/pages/csgo_items_page.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
@@ -195,7 +195,7 @@ class QuickNavigation extends StatelessWidget {
                 // 处理CSGO饰品点击事件
                 Navigator.push(
                   context,
-                  CupertinoPageRoute(builder: (context) => const CsgoItemsPage()),
+                  CupertinoPageRoute(builder: (context) => CsgoCategoryPage()),
                 );
               },
             ),

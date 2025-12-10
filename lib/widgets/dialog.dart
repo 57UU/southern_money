@@ -341,3 +341,7 @@ Future<bool?> apiRequestDialog<T>(
     },
   );
 }
+
+void popDialog(dynamic result) {
+  Navigator.of(logicRootContext).pop(result);
+}

@@ -64,12 +64,12 @@ ScreenSizeType getScreenSizeType(MediaQueryData mediaQuery) {
   return ScreenSizeType.smallPortrait;
 }
 
-void popupOrNavigate(
+Future<dynamic> popupOrNavigate(
   BuildContext context,
   Widget page, {
   bool adaptiveHeight = false,
   bool useFragment = true,
-}) {
+}) async {
   // 检查是否已经在弹窗内
   final popupContext = PopupContext.of(context);
   final bool isInPopup = popupContext?.isInPopup ?? false;
@@ -93,14 +93,14 @@ void popupOrNavigate(
   }
 
   if (screenSizeType == ScreenSizeType.landscape) {
-    popupContent(
+    return await popupContent(
       page,
       width / 2,
       useFragment: useFragment,
       adaptiveHeight: adaptiveHeight,
     );
   } else if (screenSizeType == ScreenSizeType.bigPortrait) {
-    popupContent(
+    return await popupContent(
       page,
       width * 2 / 3,
       height: height * 2 / 3,
@@ -108,7 +108,7 @@ void popupOrNavigate(
       adaptiveHeight: adaptiveHeight,
     );
   } else {
-    Navigator.push(
+    return await Navigator.push(
       context,
       CupertinoPageRoute(
         builder: (builder) {
