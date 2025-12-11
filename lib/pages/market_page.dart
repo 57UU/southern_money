@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:southern_money/widgets/common_widget.dart';
-import '../widgets/stock_card.dart';
-import '../widgets/index_card.dart';
-import 'market_search_page.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_store.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
 
 class MarketPage extends StatefulWidget {
   const MarketPage({super.key});
@@ -12,148 +11,122 @@ class MarketPage extends StatefulWidget {
   State<MarketPage> createState() => _MarketPageState();
 }
 
-class _MarketPageState extends State<MarketPage>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+class _MarketPageState extends State<MarketPage> {
+  final storeApi = getIt<ApiStoreService>();
+  List<CategoryResponse> _categories = [];
+  Map<String, double> _avgPrices = {};
+  bool _isLoading = false;
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
-    final body = Column(
-      children: [
-        // 市场指数概览
-        Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TitleText('市场指数概览'),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: IndexCard(
-                      name: '黄金指数',
-                      value: '1923.45',
-                      change: '+0.82%',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: IndexCard(
-                      name: '原油指数',
-                      value: '78.32',
-                      change: '-1.25%',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: IndexCard(
-                      name: '比特币指数',
-                      value: '42356.78',
-                      change: '+2.36%',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: IndexCard(
-                      name: '饰品指数',
-                      value: '876.23',
-                      change: '+0.15%',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+  void initState() {
+    super.initState();
+    _loadCategoriesAndAvgPrices();
+  }
 
-        TitleText("商品详情"),
-        // 股票列表
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: List.generate(
-              10,
-              (index) => _buildStockCard(context, index),
+  Future<void> _loadCategoriesAndAvgPrices() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 获取分类列表
+      final categoryResponse = await storeApi.getCategoryList();
+      if (categoryResponse.success && categoryResponse.data != null) {
+        _categories = categoryResponse.data!;
+        
+        // 获取每个分类的均价
+        for (final category in _categories) {
+          final avgPriceResponse = await storeApi.getCategoryAvgPrice(category.id);
+          if (avgPriceResponse.success && avgPriceResponse.data != null) {
+            _avgPrices[category.id] = avgPriceResponse.data!.avgPrice;
+          } else {
+            _avgPrices[category.id] = 0.0;
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('加载行情数据失败: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildMarketBar(CategoryResponse category) {
+    final avgPrice = _avgPrices[category.id] ?? 0.0;
+    
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              category.name,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ),
-      ],
-    );
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('商品行情'),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => const MarketSearchPage(),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '均价: ¥${avgPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.green,
+                  ),
                 ),
-              );
-            },
-          ),
-        ],
+                const Icon(Icons.trending_up),
+              ],
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: avgPrice / 10000, // 假设最大均价为10000，根据实际情况调整
+              backgroundColor: Colors.grey[200],
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ],
+        ),
       ),
-      body: SingleChildScrollView(child: body),
     );
   }
 
-  Widget _buildStockCard(BuildContext context, int index) {
-    final List<String> stockNames = [
-      '黄金',
-      '原油宝',
-      '比特币',
-      'AK-47 | 红线',
-      'AWP | 龙狙',
-      '刀 | 多普勒',
-      '手套 | 骷髅手套',
-      'M4A4 | 咆哮',
-      'USP-S | 杀戮大厦',
-      'Glock-18 | 水灵',
-    ];
-
-    final List<String> stockCodes = [
-      'XAU/USD',
-      'OIL/USD',
-      'BTC/USD',
-      'AK-47 | Redline',
-      'AWP | Dragon Lore',
-      'Karambit | Doppler',
-      'Sport Gloves | Pandora\'s Box',
-      'M4A4 | Howl',
-      'USP-S | Kill Confirmed',
-      'Glock-18 | Water Elemental',
-    ];
-
-    // 模拟随机涨跌
-    final isUp = index % 3 != 0; // 2/3的概率上涨
-    final changePercent = isUp ? (index + 1) * 0.85 : -(index + 1) * 0.42;
-    final price = 100 + index * 10.5;
-    final changeAmount = isUp ? (index + 1) * 0.35 : -(index + 1) * 0.18;
-
-    return StockCard(
-      stockName: stockNames[index % stockNames.length],
-      stockCode: stockCodes[index % stockCodes.length],
-      price: price,
-      changeAmount: changeAmount,
-      changePercent: changePercent,
-      isUp: isUp,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('查看 ${stockNames[index % stockNames.length]} 详情'),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('行情'),
+        actions: [
+          ElevatedButton.icon(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              _loadCategoriesAndAvgPrices();
+            },
+            label: const Text('刷新'),
           ),
-        );
-      },
+          const SizedBox(width: 10),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _categories.isEmpty
+              ? const Center(child: Text('暂无行情数据'))
+              : ListView.builder(
+                  itemCount: _categories.length,
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    return _buildMarketBar(category);
+                  },
+                ),
     );
   }
 }
