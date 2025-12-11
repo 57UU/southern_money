@@ -193,11 +193,7 @@ class QuickNavigation extends StatelessWidget {
               label: 'CSGO饰品',
               color: Colors.purple,
               onTap: () {
-                // 处理CSGO饰品点击事件
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(builder: (context) => CsgoCategoryPage()),
-                );
+                popupOrNavigate(context, CsgoCategoryPage());
               },
             ),
             _buildCardButton(

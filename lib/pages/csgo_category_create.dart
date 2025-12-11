@@ -20,7 +20,6 @@ class _CsgoCategoryCreateState extends State<CsgoCategoryCreate> {
   final _nameController = TextEditingController();
   final storeApi = getIt<ApiStoreService>();
   final imageApi = getIt<ApiImageService>();
-  final ImagePicker _picker = ImagePicker();
 
   File? _imageFile;
   String? _imagePath; // 用于Web平台存储图片路径
@@ -127,8 +126,8 @@ class _CsgoCategoryCreateState extends State<CsgoCategoryCreate> {
         });
       }
 
-      if (result == true) {
-        popDialog(true);
+      if (result == true && mounted) {
+        Navigator.of(context).pop(true);
       }
     }
   }
