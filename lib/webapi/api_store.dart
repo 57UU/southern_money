@@ -385,4 +385,27 @@ class ApiStoreService {
       return ApiResponse.fail(message: "获取分类平均价格失败: $e");
     }
   }
+
+  /// 购买产品
+  Future<ApiResponse<Map<String, dynamic>>> buyProduct({
+    required String productId,
+  }) async {
+    try {
+      final request = TransactionBuyRequest(
+        productId: productId,
+      );
+
+      final response = await jwtDio.post(
+        TransactionBuyRequest.route,
+        data: request.toJson(),
+      );
+
+      return ApiResponse.fromJson(
+        response.data,
+        (dataJson) => dataJson as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return ApiResponse.fail(message: "购买产品失败: $e");
+    }
+  }
 }

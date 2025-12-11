@@ -593,7 +593,7 @@ class AdminPostsRequest {
 
 @JsonSerializable()
 class CategoryAvgPriceRequest {
-  static const String route = "/store/categories/avgPrice";
+  static const String route = "/store/avgPrice";
   @JsonKey(name: "categoryId")
   final String categoryId;
 
