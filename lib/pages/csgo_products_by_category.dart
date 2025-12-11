@@ -207,8 +207,15 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
   Widget _buildProductItem(ProductDetailResponse product) {
     return StyledCard(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      onTap: () => {
-        popupOrNavigate(context, CsgoProductDetailPage(productId: product.id)),
+      onTap: () async {
+        final result = await popupOrNavigate(
+          context,
+          CsgoProductDetailPage(productId: product.id),
+        );
+        if (result == true) {
+          // 购买成功，刷新商品列表
+          _fetchProducts(isRefresh: true);
+        }
       },
       child: ListTile(
         title: Text(

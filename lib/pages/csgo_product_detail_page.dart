@@ -177,6 +177,11 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
           // 上传者信息卡片
           _buildUploaderCard(),
           const SizedBox(height: 16),
+
+          // 购买按钮卡片
+          if (_productDetail != null &&
+              _productDetail!.uploader.id != tokenService.id) _buildBuyCard(),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -455,5 +460,84 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
 
   String _formatDateTime(DateTime dateTime) {
     return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> _buyProduct() async {
+    if (_productDetail == null) return;
+
+    final confirm = await showYesNoDialog(
+      title: "确认购买",
+      content: "确定要以 ¥${_productDetail!.price.toStringAsFixed(2)} 的价格购买产品「${_productDetail!.name}」吗？",
+    );
+
+    if (confirm != true) return;
+
+    final result = await apiRequestDialog(() async {
+      final response = await apiStoreService.buyProduct(
+        productId: _productDetail!.id,
+      );
+      if (!response.success) {
+        throw Exception(response.message ?? "购买失败");
+      }
+      return response;
+    }());
+
+    if (result == true && mounted) {
+      // 购买成功，返回上一页
+      Navigator.pop(context, true);
+    }
+  }
+
+  Widget _buildBuyCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "确认购买",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "您将以 ¥${_productDetail!.price.toStringAsFixed(2)} 的价格购买此产品",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _buyProduct,
+                icon: const Icon(Icons.shopping_cart_checkout),
+                label: const Text(
+                  "立即购买",
+                  style: TextStyle(fontSize: 18),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

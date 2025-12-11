@@ -47,6 +47,16 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 当用户从其他页面返回时，刷新用户资料
+    // 添加一个延迟，确保数据已经在后端更新完成
+    Future.delayed(Duration(milliseconds: 500), () {
+      loadUserProfile();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
     final body = Builder(
