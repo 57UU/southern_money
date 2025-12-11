@@ -9,7 +9,11 @@ import 'package:southern_money/widgets/dialog.dart';
 class CsgoProductDetailPage extends StatefulWidget {
   final String productId;
   final ProductDetailResponse? productDetail;
-  const CsgoProductDetailPage({super.key, required this.productId, this.productDetail});
+  const CsgoProductDetailPage({
+    super.key,
+    required this.productId,
+    this.productDetail,
+  });
 
   @override
   State<CsgoProductDetailPage> createState() => _CsgoProductDetailPageState();
@@ -27,7 +31,7 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
   @override
   void initState() {
     super.initState();
-    if(widget.productDetail != null){
+    if (widget.productDetail != null) {
       _productDetail = widget.productDetail;
       setState(() {
         _isLoading = false;
@@ -204,7 +208,7 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
                     ),
                   ),
                 ),
-                
+
                 if (_productDetail != null &&
                     _productDetail!.uploader.id == tokenService.id)
                   IconButton(
@@ -383,7 +387,7 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _productDetail!.uploader!.name,
+                        _productDetail!.uploader.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -391,7 +395,7 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "ID: ${_productDetail!.uploader!.id}",
+                        "ID: ${_productDetail!.uploader.id}",
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 14,
