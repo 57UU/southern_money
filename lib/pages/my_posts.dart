@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/post_page.dart';
 import 'package:southern_money/pages/post_viewer.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
@@ -239,6 +240,7 @@ class _MyPostsState extends State<MyPosts> {
         setState(() {
           _posts.removeWhere((post) => post.id == postId);
         });
+        getIt<AppConfigService>().setPostsNeedRefresh();
       } else {
         // 显示删除失败的提示
         ScaffoldMessenger.of(
