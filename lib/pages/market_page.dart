@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/csgo_products_by_category.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/router_utils.dart';
 
 class MarketPage extends StatefulWidget {
   const MarketPage({super.key});
@@ -59,44 +62,68 @@ class _MarketPageState extends State<MarketPage> {
 
   Widget _buildMarketBar(CategoryResponse category) {
     final avgPrice = _avgPrices[category.id] ?? 0.0;
-    
+    final canNavigate = _isSpecialCategory(category.id);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              category.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '均价: ¥${avgPrice.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.green,
-                  ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: canNavigate ? () => _handleCategoryTap(category) : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                category.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                const Icon(Icons.trending_up),
-              ],
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: avgPrice / 10000, // 假设最大均价为10000，根据实际情况调整
-              backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-            ),
-          ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '均价: ¥${avgPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.green,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.trending_up),
+                      if (canNavigate) const SizedBox(width: 8),
+                      if (canNavigate) const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              LinearProgressIndicator(
+                value: avgPrice / 10000, // 假设最大均价为10000，根据实际情况调整
+                backgroundColor: Colors.grey[200],
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  bool _isSpecialCategory(String categoryId) {
+    return const {FUTURES_CATEGORY, GOLD_CATEGORY, VIRTUAL_CATEGORY}
+        .contains(categoryId);
+  }
+
+  Future<void> _handleCategoryTap(CategoryResponse category) async {
+    // 与首页“快速导航”保持一致的跳转逻辑
+    await popupOrNavigate(
+      context,
+      CsgoProductsByCategory(category: category),
     );
   }
 

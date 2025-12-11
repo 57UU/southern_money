@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/csgo_category_create.dart';
 import 'package:southern_money/pages/csgo_products_by_category.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/api_image.dart';
@@ -24,6 +25,12 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
   List<CategoryResponse> _searchResults = [];
   bool _isLoading = false;
   bool _isSearching = false;
+  static const _excludedCategoryIds = {
+    FUTURES_CATEGORY,
+    GOLD_CATEGORY,
+    VIRTUAL_CATEGORY,
+  };
+  
 
   @override
   void initState() {
@@ -59,7 +66,9 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
       final response = await storeApi.getCategoryList();
       if (response.success && response.data != null) {
         setState(() {
-          _categories = response.data!;
+          _categories = response.data!
+              .where((category) => !_excludedCategoryIds.contains(category.id))
+              .toList();
           _isLoading = false;
         });
       } else {
