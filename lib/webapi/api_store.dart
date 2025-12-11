@@ -80,7 +80,7 @@ class ApiStoreService {
   }
 
   /// 获取产品列表
-  Future<ApiResponse<PagedResponse<ProductResponse>>> getProductList({
+  Future<ApiResponse<PagedResponse<ProductDetailResponse>>> getProductList({
     required int page,
     required int pageSize,
     String? categoryId,
@@ -104,7 +104,7 @@ class ApiStoreService {
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
           (itemJson) =>
-              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+              ProductDetailResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -113,7 +113,8 @@ class ApiStoreService {
   }
 
   /// 获取分类下的产品列表
-  Future<ApiResponse<PagedResponse<ProductResponse>>> getProductCategoryList({
+  Future<ApiResponse<PagedResponse<ProductDetailResponse>>>
+  getProductCategoryList({
     required String id,
     required int page,
     required int pageSize,
@@ -135,7 +136,7 @@ class ApiStoreService {
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
           (itemJson) =>
-              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+              ProductDetailResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -144,7 +145,7 @@ class ApiStoreService {
   }
 
   /// 搜索产品
-  Future<ApiResponse<PagedResponse<ProductResponse>>> searchProducts({
+  Future<ApiResponse<PagedResponse<ProductDetailResponse>>> searchProducts({
     required String query,
     required int page,
     required int pageSize,
@@ -166,7 +167,7 @@ class ApiStoreService {
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
           (itemJson) =>
-              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+              ProductDetailResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -175,7 +176,7 @@ class ApiStoreService {
   }
 
   /// 获取我的产品
-  Future<ApiResponse<PagedResponse<ProductResponse>>> getMyProducts({
+  Future<ApiResponse<PagedResponse<ProductDetailResponse>>> getMyProducts({
     required int page,
     required int pageSize,
   }) async {
@@ -192,7 +193,7 @@ class ApiStoreService {
         (dataJson) => PagedResponse.fromJson(
           dataJson as Map<String, dynamic>,
           (itemJson) =>
-              ProductResponse.fromJson(itemJson as Map<String, dynamic>),
+              ProductDetailResponse.fromJson(itemJson as Map<String, dynamic>),
         ),
       );
     } catch (e) {
@@ -293,7 +294,7 @@ class ApiStoreService {
 
       final response = await jwtDio.post(
         CategoryFavoriteRequest.route,
-        queryParameters: request.toJson(),
+        data: request.toJson(),
       );
 
       return ApiResponse.fromJson(
@@ -314,7 +315,7 @@ class ApiStoreService {
 
       final response = await jwtDio.post(
         CategoryUnfavoriteRequest.route,
-        queryParameters: request.toJson(),
+        data: request.toJson(),
       );
 
       return ApiResponse.fromJson(

@@ -52,7 +52,7 @@ class JwtInterceptor extends Interceptor {
         if (refreshToken != null) {
           try {
             final newTokens = await apiLoginService.refreshToken(refreshToken);
-            tokenService.updateTokens(newTokens.$1, newTokens.$2);
+            tokenService.updateTokens(newTokens.$1, newTokens.$2,null);
 
             // 重试所有排队的请求
             for (final retry in _retryQueue) {

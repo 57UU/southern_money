@@ -8,14 +8,9 @@ import 'package:southern_money/widgets/router_utils.dart';
 import 'package:southern_money/widgets/styled_card.dart';
 
 class CsgoProductsByCategory extends StatefulWidget {
-  final String categoryId;
-  final String? categoryName;
+  final CategoryResponse category;
 
-  const CsgoProductsByCategory({
-    super.key,
-    required this.categoryId,
-    this.categoryName,
-  });
+  const CsgoProductsByCategory({super.key, required this.category});
 
   @override
   State<CsgoProductsByCategory> createState() => _CsgoProductsByCategoryState();
@@ -26,7 +21,7 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  List<ProductResponse> _products = [];
+  List<ProductDetailResponse> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
   int _currentPage = 1;
@@ -73,7 +68,7 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
       final response = await _apiStoreService.getProductList(
         page: _currentPage,
         pageSize: _pageSize,
-        categoryId: widget.categoryId,
+        categoryId: widget.category.id,
         search: _searchController.text.isNotEmpty
             ? _searchController.text
             : null,
@@ -108,6 +103,19 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
     }
   }
 
+  Widget _buildFavorite() {
+    return Row(
+      children: [
+        Icon(
+          widget.category.isFavorited ? Icons.favorite : Icons.favorite_border,
+          color: widget.category.isFavorited ? Colors.red : Colors.grey,
+        ),
+        SizedBox(width: 4),
+        Text(widget.category.isFavorited ? '已收藏' : '收藏'),
+      ],
+    );
+  }
+
   Future<void> _searchProducts() async {
     _fetchProducts(isRefresh: true);
   }
@@ -116,13 +124,15 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.categoryName ?? '产品列表'),
+        title: Text(widget.category.name),
         actions: [
+          if (widget.category.isFavorited) _buildFavorite(),
+
           ElevatedButton.icon(
-            onPressed: () {
-              final result = popupOrNavigate(
+            onPressed: () async {
+              final result = await popupOrNavigate(
                 context,
-                CsgoProductsCreate(categoryId: widget.categoryId),
+                CsgoProductsCreate(categoryId: widget.category.id),
               );
               if (result == true) {
                 _fetchProducts(isRefresh: true);
@@ -194,7 +204,7 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
     );
   }
 
-  Widget _buildProductItem(ProductResponse product) {
+  Widget _buildProductItem(ProductDetailResponse product) {
     return StyledCard(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       onTap: () => {
@@ -228,7 +238,7 @@ class _CsgoProductsByCategoryState extends State<CsgoProductsByCategory> {
               style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
             ),
             Text(
-              '上传者: ${product.uploaderName}',
+              '上传者: ${product.uploader.name}',
               style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
             ),
           ],

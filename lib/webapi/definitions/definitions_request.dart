@@ -415,7 +415,7 @@ class CategoryCreateRequest {
 
 @JsonSerializable()
 class CategoryFavoriteRequest {
-  static const String route = "/store/categories";
+  static const String route = "/store/categories/favorite";
   @JsonKey(name: "categoryId")
   final String categoryId;
 
@@ -425,8 +425,8 @@ class CategoryFavoriteRequest {
 
 @JsonSerializable()
 class CategoryUnfavoriteRequest {
-  static const String route = "/store/categories";
-  @JsonKey(name: "categoryId")
+  static const String route = "/store/categories/unfavorite";
+  @JsonKey(name: "CategoryId")
   final String categoryId;
 
   CategoryUnfavoriteRequest({required this.categoryId});

@@ -7,6 +7,7 @@ import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
 import 'package:southern_money/widgets/router_utils.dart';
+import 'package:southern_money/widgets/category_card.dart';
 
 class CsgoCategoryPage extends StatefulWidget {
   const CsgoCategoryPage({super.key});
@@ -199,13 +200,10 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final category = _searchResults[index];
-        return ListTile(
-          title: Text(category.name),
-          leading: const Icon(Icons.category),
-          onTap: () {
-            // 处理点击搜索结果
-            _handleCategoryTap(category.id, category.name);
-          },
+        return CategoryCard(
+          category: category,
+          onTap: () => _handleCategoryTap(category),
+          onFavoriteToggle: () => _toggleFavorite(category),
         );
       },
     );
@@ -224,48 +222,74 @@ class _CsgoCategoryPageState extends State<CsgoCategoryPage> {
       itemCount: _categories.length,
       itemBuilder: (context, index) {
         final category = _categories[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16.0),
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                apiImageService.getImageUrl(category.coverImageId),
-              ),
-              onBackgroundImageError: (exception, stackTrace) {
-                // 图片加载失败时的处理
-              },
-              child: category.coverImageId.isEmpty
-                  ? const Icon(Icons.category)
-                  : null,
-            ),
-            title: Text(
-              category.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              '创建时间: ${category.CreateTime.toString().substring(0, 10)}',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            onTap: () {
-              // 处理点击分类
-              _handleCategoryTap(category.id, category.name);
-            },
-          ),
+        return CategoryCard(
+          category: category,
+          onTap: () => _handleCategoryTap(category),
+          onFavoriteToggle: () => _toggleFavorite(category),
         );
       },
     );
   }
 
-  void _handleCategoryTap(String categoryId, String categoryName) {
+  void _handleCategoryTap(CategoryResponse category) {
     // 导航到产品列表页面
     Navigator.of(context).push(
       CupertinoPageRoute(
-        builder: (context) => CsgoProductsByCategory(
-          categoryId: categoryId,
-          categoryName: categoryName,
-        ),
+        builder: (context) => CsgoProductsByCategory(category: category),
       ),
     );
+  }
+
+  Future<void> _toggleFavorite(CategoryResponse category) async {
+    try {
+      // 直接使用 category 对象中的 isFavorited 属性
+      final isCurrentlyFavorited = category.isFavorited;
+
+      if (isCurrentlyFavorited) {
+        // 取消收藏
+        final response = await storeApi.unfavoriteCategory(category.id);
+        if (response.success) {
+          setState(() {
+            category.isFavorited = false;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('已取消收藏')));
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response.message ?? '取消收藏失败')),
+            );
+          }
+        }
+      } else {
+        // 添加收藏
+        final response = await storeApi.favoriteCategory(category.id);
+        if (response.success) {
+          setState(() {
+            category.isFavorited = true;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('收藏成功')));
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(response.message ?? '收藏失败')));
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('操作失败: $e')));
+      }
+    }
   }
 }

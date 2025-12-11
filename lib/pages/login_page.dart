@@ -129,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
           appConfigService.tokenService.updateTokens(
             apiResponse!.data!.token,
             apiResponse!.data!.refreshToken,
+            apiResponse!.data!.id,
           );
           passwordService.updatePassword(
             _usernameController.text,

@@ -8,12 +8,8 @@ import 'package:southern_money/widgets/dialog.dart';
 
 class CsgoProductDetailPage extends StatefulWidget {
   final String productId;
-  final bool showDeleteButton;
-  const CsgoProductDetailPage({
-    super.key,
-    required this.productId,
-    this.showDeleteButton = false,
-  });
+  final ProductDetailResponse? productDetail;
+  const CsgoProductDetailPage({super.key, required this.productId, this.productDetail});
 
   @override
   State<CsgoProductDetailPage> createState() => _CsgoProductDetailPageState();
@@ -22,6 +18,7 @@ class CsgoProductDetailPage extends StatefulWidget {
 class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
   final apiStoreService = getIt<ApiStoreService>();
   final apiImageService = getIt<ApiImageService>();
+  final tokenService = getIt<TokenService>();
 
   ProductDetailResponse? _productDetail;
   bool _isLoading = true;
@@ -30,6 +27,12 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
   @override
   void initState() {
     super.initState();
+    if(widget.productDetail != null){
+      _productDetail = widget.productDetail;
+      setState(() {
+        _isLoading = false;
+      });
+    }
     _loadProductDetail();
   }
 
@@ -71,63 +74,66 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
 
     if (confirm != true) return;
 
-    final result = await showLoadingDialogWithErrorString(
-      title: "删除中",
-      func: () async {
-        final response = await apiStoreService.deleteProduct(
-          _productDetail!.id,
-        );
-        if (!response.success) {
-          throw Exception(response.message ?? "删除失败");
-        }
-        return response;
-      },
-      onErrorMessage: "删除产品失败，请重试",
-    );
+    final result = await apiRequestDialog(() async {
+      final response = await apiStoreService.deleteProduct(_productDetail!.id);
+      if (!response.success) {
+        throw Exception(response.message ?? "删除失败");
+      }
+      return response;
+    }());
 
-    if (result && mounted) {
-      Navigator.of(context).pop(true);
+    if (result == true && mounted) {
+      popDialog(true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_productDetail?.name ?? "产品详情"),
-        actions: [
-          if (_productDetail != null && widget.showDeleteButton)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _deleteProduct,
-            ),
-        ],
-      ),
+      appBar: AppBar(title: Text(_productDetail?.name ?? "产品详情")),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text("加载产品详情中..."),
+          ],
+        ),
+      );
     }
 
     if (_errorMessage != null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.red.shade400),
+              const SizedBox(height: 16),
               Text(
                 _errorMessage!,
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
                 onPressed: _loadProductDetail,
-                child: const Text("重试"),
+                icon: const Icon(Icons.refresh),
+                label: const Text("重试"),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
               ),
             ],
           ),
@@ -136,7 +142,16 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
     }
 
     if (_productDetail == null) {
-      return const Center(child: Text("未找到产品信息"));
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text("未找到产品信息", style: TextStyle(fontSize: 18, color: Colors.grey)),
+          ],
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -144,86 +159,182 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 产品名称
-          Text(
-            _productDetail!.name,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+          // 产品名称卡片
+          _buildProductInfoCard(),
           const SizedBox(height: 16),
 
-          // 产品价格
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
+          // 价格卡片
+          _buildPriceCard(),
+          const SizedBox(height: 16),
+
+          // 产品描述卡片
+          _buildDescriptionCard(),
+
+          // 分类和时间信息卡片
+          _buildCategoryAndTimeCard(),
+          const SizedBox(height: 16),
+
+          // 上传者信息卡片
+          _buildUploaderCard(),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductInfoCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
+                Icon(Icons.inventory_2_outlined, size: 28),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _productDetail!.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                
+                if (_productDetail != null &&
+                    _productDetail!.uploader.id == tokenService.id)
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: _deleteProduct,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPriceCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.attach_money,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "价格",
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
                 Text(
-                  "价格: ¥${_productDetail!.price.toStringAsFixed(2)}",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  "¥${_productDetail!.price.toStringAsFixed(2)}",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 
-          // 产品分类
-          Row(
-            children: [
-              const Icon(Icons.category, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                "分类: ${_productDetail!.categoryName}",
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // 上传者信息
-          if (_productDetail!.uploader != null) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
+  Widget _buildCategoryAndTimeCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // 分类信息
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.category,
+                    color: Colors.blue.shade700,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "分类",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      Text(
+                        _productDetail!.categoryName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // 时间信息
+            if (_productDetail!.CreateTime != null)
+              Row(
                 children: [
-                  // 头像
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundImage: _productDetail!.uploader!.avatar != null
-                        ? NetworkImage(
-                            apiImageService.getImageUrl(
-                              _productDetail!.uploader!.avatar!,
-                            ),
-                          )
-                        : null,
-                    child: _productDetail!.uploader!.avatar == null
-                        ? const Icon(Icons.person)
-                        : null,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.access_time,
+                      color: Colors.green.shade700,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  // 上传者信息
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "上传者: ${_productDetail!.uploader!.name}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
+                        const Text(
+                          "发布时间",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                         Text(
-                          "ID: ${_productDetail!.uploader!.id}",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
+                          _formatDateTime(_productDetail!.CreateTime!),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -231,68 +342,113 @@ class _CsgoProductDetailPageState extends State<CsgoProductDetailPage> {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-          ] else if (_productDetail!.uploaderName != null) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.person, size: 24),
-                  const SizedBox(width: 12),
-                  Text(
-                    "上传者: ${_productDetail!.uploaderName}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
           ],
+        ),
+      ),
+    );
+  }
 
-          // 创建时间
-          if (_productDetail!.CreateTime != null) ...[
+  Widget _buildUploaderCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Row(
               children: [
-                const Icon(Icons.access_time, size: 20),
+                Icon(Icons.person, color: Colors.purple.shade700, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  "发布时间: ${_formatDateTime(_productDetail!.CreateTime!)}",
-                  style: const TextStyle(fontSize: 16),
+                const Text(
+                  "上传者信息",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-          ],
+            const SizedBox(height: 12),
 
-          // 产品描述
-          const Text(
-            "产品描述",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.purple.shade100,
+                  backgroundImage: NetworkImage(_productDetail!.avatarUrl),
+                  child: null,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _productDetail!.uploader!.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "ID: ${_productDetail!.uploader!.id}",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            child: Text(
-              _productDetail!.description.isEmpty
-                  ? "暂无描述"
-                  : _productDetail!.description,
-              style: const TextStyle(fontSize: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDescriptionCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.description,
+                  color: Colors.orange.shade700,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  "产品描述",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Text(
+                _productDetail!.description.isEmpty
+                    ? "暂无描述"
+                    : _productDetail!.description,
+                style: const TextStyle(fontSize: 16, height: 1.5),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

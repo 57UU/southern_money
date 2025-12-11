@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
+import 'package:southern_money/widgets/common_widget.dart';
 
 part 'definitions_response.g.dart';
 
@@ -73,8 +74,14 @@ class LoginByPasswordResponse {
   final String token;
   @JsonKey(name: "RefreshToken")
   final String refreshToken;
+  @JsonKey(name: "Id")
+  final int? id;
 
-  LoginByPasswordResponse({required this.token, required this.refreshToken});
+  LoginByPasswordResponse({
+    required this.token,
+    required this.refreshToken,
+    this.id,
+  });
   factory LoginByPasswordResponse.fromJson(Map<String, dynamic> json) =>
       _$LoginByPasswordResponseFromJson(json);
 }
@@ -85,8 +92,14 @@ class RefreshTokenResponse {
   final String token;
   @JsonKey(name: "RefreshToken")
   final String refreshToken;
+  @JsonKey(name: "Id")
+  final int? id;
 
-  RefreshTokenResponse({required this.token, required this.refreshToken});
+  RefreshTokenResponse({
+    required this.token,
+    required this.refreshToken,
+    this.id,
+  });
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) =>
       _$RefreshTokenResponseFromJson(json);
 }
@@ -312,59 +325,6 @@ class UserProfileResponse {
       _$UserProfileResponseFromJson(json);
 }
 
-@JsonSerializable()
-class ProductResponse {
-  @JsonKey(name: "Id")
-  final String id;
-  @JsonKey(name: "Name")
-  final String name;
-  @JsonKey(name: "Price")
-  final double price;
-  @JsonKey(name: "Description")
-  final String description;
-  @JsonKey(name: "CategoryId")
-  final String categoryId;
-  @JsonKey(name: "CategoryName")
-  final String categoryName;
-  @JsonKey(name: "UploaderUserId")
-  final int uploaderUserId;
-  @JsonKey(name: "UploaderName")
-  final String uploaderName;
-  @JsonKey(name: "CreateTime")
-  final DateTime CreateTime;
-
-  ProductResponse({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.description,
-    required this.categoryId,
-    required this.categoryName,
-    required this.uploaderUserId,
-    required this.uploaderName,
-    required this.CreateTime,
-  });
-  factory ProductResponse.fromJson(Map<String, dynamic> json) =>
-      _$ProductResponseFromJson(json);
-}
-
-@JsonSerializable()
-class ProductDetailUploaderResponse {
-  @JsonKey(name: "Id")
-  final int id;
-  @JsonKey(name: "Name")
-  final String name;
-  @JsonKey(name: "Avatar")
-  final String? avatar;
-
-  ProductDetailUploaderResponse({
-    required this.id,
-    required this.name,
-    this.avatar,
-  });
-  factory ProductDetailUploaderResponse.fromJson(Map<String, dynamic> json) =>
-      _$ProductDetailUploaderResponseFromJson(json);
-}
 
 @JsonSerializable()
 class ProductDetailResponse {
@@ -381,11 +341,7 @@ class ProductDetailResponse {
   @JsonKey(name: "CategoryName")
   final String categoryName;
   @JsonKey(name: "Uploader")
-  final ProductDetailUploaderResponse? uploader;
-  @JsonKey(name: "UploaderUserId")
-  final int? uploaderUserId;
-  @JsonKey(name: "UploaderName")
-  final String? uploaderName;
+  final PostUploaderResponse uploader;
   @JsonKey(name: "CreateTime")
   final DateTime? CreateTime;
 
@@ -396,11 +352,15 @@ class ProductDetailResponse {
     required this.description,
     required this.categoryId,
     required this.categoryName,
-    this.uploader,
-    this.uploaderUserId,
-    this.uploaderName,
+    required this.uploader,
     this.CreateTime,
   });
+  static ApiImageService? apiImageService;
+  String get avatarUrl {
+    apiImageService ??= getIt<ApiImageService>();
+    return apiImageService!.getImageUrl(uploader.avatar);
+  }
+
   factory ProductDetailResponse.fromJson(Map<String, dynamic> json) =>
       _$ProductDetailResponseFromJson(json);
 }
@@ -415,12 +375,15 @@ class CategoryResponse {
   final String coverImageId;
   @JsonKey(name: "CreateTime")
   final DateTime CreateTime;
+  @JsonKey(name: "Favorited")
+  bool isFavorited;
 
   CategoryResponse({
     required this.id,
     required this.name,
     required this.coverImageId,
     required this.CreateTime,
+    required this.isFavorited,
   });
   factory CategoryResponse.fromJson(Map<String, dynamic> json) =>
       _$CategoryResponseFromJson(json);

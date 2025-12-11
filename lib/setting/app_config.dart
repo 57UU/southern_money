@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ---private key-----
 const String _sessionTokenKey = "session_token";
 const String _refreshTokenKey = "refresh_token";
+const String _idKey = "id";
 const String _apiBaseUrl = "api_base_url";
 //-------
 const String theme_color = "theme_color";
@@ -15,25 +16,35 @@ class TokenService {
     //init
     sessionToken = ValueNotifier(preferences.getString(_sessionTokenKey));
     _refreshToken = preferences.getString(_refreshTokenKey);
+    _id = preferences.getInt(_idKey);
     _addSaveCallback();
   }
   late ValueNotifier<String?> sessionToken;
   String? _refreshToken;
-  void updateTokens(String sessionToken, String refreshToken) {
+  void updateTokens(String sessionToken, String refreshToken, int? id) {
     _refreshToken = refreshToken;
+    if (id != null) {
+      _id = id;
+    }
     this.sessionToken.value = sessionToken;
   }
 
+  int? _id = null;
+
   String? get refreshTokenValue => _refreshToken;
   String? get sessionTokenValue => sessionToken.value;
+  int? get id => _id;
+
   void _addSaveCallback() {
     sessionToken.addListener(() {
       if (sessionToken.value != null) {
         preferences.setString(_sessionTokenKey, sessionToken.value!);
         preferences.setString(_refreshTokenKey, _refreshToken!);
+        preferences.setInt(_idKey, _id!);
       } else {
         preferences.remove(_sessionTokenKey);
         preferences.remove(_refreshTokenKey);
+        preferences.remove(_idKey);
       }
     });
   }
@@ -41,6 +52,7 @@ class TokenService {
   void clearTokens() {
     sessionToken.value = null;
     _refreshToken = null;
+    _id = null;
   }
 }
 
