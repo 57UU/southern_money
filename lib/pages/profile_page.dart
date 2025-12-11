@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/admin_page.dart';
@@ -242,6 +243,11 @@ class _ProfilePageState extends State<ProfilePage>
                       },
                     ),
                     ProfileMenuItem(
+                      title: "转入资金",
+                      icon: Icons.account_balance,
+                      onTap: topup,
+                    ),
+                    ProfileMenuItem(
                       title: '消息通知',
                       icon: Icons.notifications_none,
                       onTap: () {
@@ -335,5 +341,70 @@ class _ProfilePageState extends State<ProfilePage>
         ),
       ],
     );
+  }
+
+  Future topup() async {
+    final TextEditingController amountController = TextEditingController();
+
+    final result = await showDialog<double>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('转入资金'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('请输入充值金额'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: '金额',
+                  prefixText: '¥',
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                final amount = double.tryParse(amountController.text);
+                if (amount != null && amount > 0) {
+                  Navigator.of(context).pop(amount);
+                } else {
+                  // 可以添加错误提示
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('请输入有效的金额')));
+                }
+              },
+              child: const Text('确认'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null) {
+      // 用户输入了有效金额，执行充值操作
+      final userService = getIt<ApiUserService>();
+      final isSuccess = await apiRequestDialog(
+        userService.topup(amount: result),
+      );
+
+      if (isSuccess == true) {
+        userProfileResponse = null;
+        loadUserProfile();
+      }
+    }
   }
 }

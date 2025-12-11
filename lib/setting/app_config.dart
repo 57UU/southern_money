@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// static ids
+const String DEFAULT_IMAGE = "00000000-0000-0000-0000-000000000001";
+const String FUTURES_CATEGORY = "00000000-0000-0000-0000-000000000002";
+const String GOLD_CATEGORY = "00000000-0000-0000-0000-000000000003";
+const String VIRTUAL_CATEGORY = "00000000-0000-0000-0000-000000000004";
+
 // ---private key-----
 const String _sessionTokenKey = "session_token";
 const String _refreshTokenKey = "refresh_token";

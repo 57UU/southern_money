@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:southern_money/pages/post_page.dart';
 import 'package:southern_money/pages/post_viewer.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
@@ -300,7 +301,10 @@ class _MyPostsState extends State<MyPosts> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/post_create');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PostPage()),
+              );
             },
             child: const Text('发布第一篇帖子'),
           ),

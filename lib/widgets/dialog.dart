@@ -81,7 +81,7 @@ Future showLoadingDialog({
       Future.wait([func(), Future.delayed(const Duration(milliseconds: 100))])
           .then((v) async {
             if (contextWrapper.context.mounted) {
-              Navigator.pop(contextWrapper.context);
+              Navigator.pop(contextWrapper.context, true);
             }
           })
           .onError((error, stackTrace) {

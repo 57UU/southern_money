@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/csgo_category_page.dart';
-import 'package:southern_money/pages/futures_page.dart';
-import 'package:southern_money/pages/gold_page.dart';
-import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/pages/csgo_products_by_category.dart';
 import 'package:southern_money/pages/post_viewer.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
+import 'package:southern_money/webapi/api_store.dart';
 import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
 import '../widgets/post_card.dart';
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage>
           child: Column(
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [const QuickNavigation(), const Discovery()],
+            children: [QuickNavigation(), const Discovery()],
           ),
         ),
       ),
@@ -141,7 +141,7 @@ class _DiscoveryState extends State<Discovery> {
 // get post finish by hr
 
 class QuickNavigation extends StatelessWidget {
-  const QuickNavigation({super.key});
+  QuickNavigation({super.key});
 
   Widget _buildCardButton({
     required IconData icon,
@@ -168,6 +168,7 @@ class QuickNavigation extends StatelessWidget {
     );
   }
 
+  final storeService = getIt<ApiStoreService>();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -203,32 +204,58 @@ class QuickNavigation extends StatelessWidget {
               icon: Icons.trending_up,
               label: '期货',
               color: Colors.green,
-              onTap: () {
-                // 处理期货点击事件
-                popupOrNavigate(context, const FuturesPage());
+              onTap: () async {
+                final result = await getCategory(FUTURES_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
             _buildCardButton(
               icon: Icons.monetization_on,
               label: '黄金',
               color: Colors.amber,
-              onTap: () {
-                // 处理黄金点击事件
-                popupOrNavigate(context, const GoldPage());
+              onTap: () async {
+                final result = await getCategory(GOLD_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
             _buildCardButton(
               icon: Icons.attach_money,
               label: '虚拟货币',
               color: Colors.orange,
-              onTap: () {
-                // 处理虚拟货币点击事件
-                popupOrNavigate(context, const CryptoCurrencyPage());
+              onTap: () async {
+                final result = await getCategory(VIRTUAL_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
           ],
         ),
       ],
     );
+  }
+
+  Future<CategoryResponse?> getCategory(String categoryId) async {
+    CategoryResponse? categoryResponse;
+    await showLoadingDialog(
+      func: () async {
+        final response = await storeService.getCategoryDetail(categoryId);
+        categoryResponse = response.data;
+      },
+    );
+    return categoryResponse;
   }
 }

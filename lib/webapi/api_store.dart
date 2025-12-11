@@ -224,12 +224,7 @@ class ApiStoreService {
   /// 获取分类详情
   Future<ApiResponse<CategoryResponse>> getCategoryDetail(String id) async {
     try {
-      final request = CategoryGetRequest(id: id);
-
-      final response = await jwtDio.get(
-        CategoryGetRequest.route,
-        queryParameters: request.toJson(),
-      );
+      final response = await jwtDio.get("${CategoryGetRequest.route}/$id");
 
       return ApiResponse.fromJson(
         response.data,
