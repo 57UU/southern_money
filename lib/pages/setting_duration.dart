@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import '../setting/app_config.dart';
 
 class SettingDuration extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SettingDurationState extends State<SettingDuration> {
   void initState() {
     super.initState();
     // 初始化当前动画时长为配置中的值
-    _tempAnimationTime = animationTime;
+    _tempAnimationTime = appConfigService.animationTime;
 
     // 启动预览动画
     _startAnimation();
@@ -57,11 +58,12 @@ class _SettingDurationState extends State<SettingDuration> {
     });
   }
 
+  final appConfigService = getIt<AppConfigService>();
+
   void _confirmChanges() {
     // 只有在确认时才真正更新appSetting中的值
 
-    appSetting.value[animation_time] = _tempAnimationTime;
-    appSetting.notifyListeners();
+    appConfigService.setConfig(animation_time, _tempAnimationTime);
 
     Navigator.pop(context);
     // 显示成功提示

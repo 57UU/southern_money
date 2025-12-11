@@ -1,19 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:southern_money/pages/jewelry_page.dart';
-import 'package:southern_money/pages/futures_page.dart';
-import 'package:southern_money/pages/gold_page.dart';
-import 'package:southern_money/pages/crypto_currency_page.dart';
+import 'package:southern_money/pages/csgo_category_page.dart';
+import 'package:southern_money/pages/csgo_products_by_category.dart';
+import 'package:southern_money/pages/post_viewer.dart';
+import 'package:southern_money/pages/theme_color_page.dart';
+import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_post.dart';
+import 'package:southern_money/webapi/api_store.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
 
 import '../widgets/post_card.dart';
 import 'open_an_account.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
     return Scaffold(
       appBar: AppBar(title: const Text('南方财富'), elevation: 0),
       body: Padding(
@@ -22,7 +40,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [QuickNavigation(), Discovery()],
+            children: [QuickNavigation(), const Discovery()],
           ),
         ),
       ),
@@ -37,32 +55,93 @@ class Discovery extends StatefulWidget {
   State<Discovery> createState() => _DiscoveryState();
 }
 
+// get post by hr
 class _DiscoveryState extends State<Discovery> {
+  final postService = getIt<ApiPostService>();
+  final appConfigService = getIt<AppConfigService>();
+
+  late Future<ApiResponse<PagedResponse<PostPageItemResponse>>> futurePosts;
+
+  @override
+  void initState() {
+    super.initState();
+    futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+  }
+
+  void refreshPosts() {
+    setState(() {
+      futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    scheduleMicrotask(() {
+      if (appConfigService.discoveryNeedRefresh) {
+        refreshPosts();
+        appConfigService.discoveryNeedRefresh = false;
+      }
+    });
+    return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('发现', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        PostCard(
-          title: '重磅利好来袭！国办发文 事关新场景大规模应用',
-          author: '证券时报网',
-          timeAgo: '1小时前',
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            titleText("发现"),
+            IconButton(
+              onPressed: refreshPosts,
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
         ),
-        PostCard(
-          title: 'CSGO饰品市场分析：龙狙价格创历史新高',
-          author: '游戏投资分析师',
-          timeAgo: '2小时前',
+        FutureBuilder<ApiResponse<PagedResponse<PostPageItemResponse>>>(
+          future: futurePosts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Text("加载失败");
+            }
+
+            final response = snapshot.data!;
+
+            if (!response.success || response.data == null) {
+              return Text("获取帖子失败：${response.message}");
+            }
+
+            final posts = response.data!.items;
+
+            return posts.isEmpty
+                ? Text("暂无帖子")
+                : Column(
+                    spacing: 10,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var p in posts)
+                        PostCard(
+                          content: p.content, // ← 显示内容
+                          title: p.title, // ← 显示标题
+                          author: p.uploader.name, // ← 显示作者
+                          timeAgo: "", // ← 你不需要时间，传空字符串
+                          onTap: () => PostViewer.show(context, p),
+                          avaterUrl: p.uploader.avatarUrl,
+                        ),
+                    ],
+                  );
+          },
         ),
-        PostCard(title: '黄金下破3930美元，发生什么事了？', author: "派大星皮皮", timeAgo: '3小时前'),
       ],
     );
   }
 }
+// get post finish by hr
 
 class QuickNavigation extends StatelessWidget {
-  const QuickNavigation({super.key});
+  QuickNavigation({super.key});
 
   Widget _buildCardButton({
     required IconData icon,
@@ -89,16 +168,14 @@ class QuickNavigation extends StatelessWidget {
     );
   }
 
+  final storeService = getIt<ApiStoreService>();
   @override
   Widget build(BuildContext context) {
     return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '快速导航',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        titleText("快速导航"),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -116,43 +193,65 @@ class QuickNavigation extends StatelessWidget {
               label: 'CSGO饰品',
               color: Colors.purple,
               onTap: () {
-                // 处理CSGO饰品点击事件
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(builder: (context) => const JewelryPage()),
-                );
+                popupOrNavigate(context, CsgoCategoryPage());
               },
             ),
             _buildCardButton(
               icon: Icons.trending_up,
               label: '期货',
               color: Colors.green,
-              onTap: () {
-                // 处理期货点击事件
-                popupOrNavigate(context, const FuturesPage());
+              onTap: () async {
+                final result = await getCategory(FUTURES_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
             _buildCardButton(
               icon: Icons.monetization_on,
               label: '黄金',
               color: Colors.amber,
-              onTap: () {
-                // 处理黄金点击事件
-                popupOrNavigate(context, const GoldPage());
+              onTap: () async {
+                final result = await getCategory(GOLD_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
             _buildCardButton(
               icon: Icons.attach_money,
               label: '虚拟货币',
               color: Colors.orange,
-              onTap: () {
-                // 处理虚拟货币点击事件
-                popupOrNavigate(context, const CryptoCurrencyPage());
+              onTap: () async {
+                final result = await getCategory(VIRTUAL_CATEGORY);
+                if (result != null) {
+                  popupOrNavigate(
+                    context,
+                    CsgoProductsByCategory(category: result),
+                  );
+                }
               },
             ),
           ],
         ),
       ],
     );
+  }
+
+  Future<CategoryResponse?> getCategory(String categoryId) async {
+    CategoryResponse? categoryResponse;
+    await showLoadingDialog(
+      func: () async {
+        final response = await storeService.getCategoryDetail(categoryId);
+        categoryResponse = response.data;
+      },
+    );
+    return categoryResponse;
   }
 }

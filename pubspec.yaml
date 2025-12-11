@@ -40,10 +40,19 @@ dependencies:
   flutter_colorpicker: 
   image_picker: 
   async: 
+  cached_network_image:
+  http:
+  json_annotation: ^4.9.0
+  get_it:
+  dio: 
+  intl: 
+  decimal: ^2.3.3 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: 
+  json_serializable: 
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

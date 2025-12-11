@@ -1,9 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/pages/admin_page.dart';
+import 'package:southern_money/pages/my_posts.dart';
+import 'package:southern_money/pages/profile_edit_page.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_image.dart';
+import 'package:southern_money/webapi/api_user.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart'
+    show ApiResponse, UserProfileResponse;
+import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/router_utils.dart';
-import '../widgets/common_widget.dart';
 import '../widgets/profile_menu_item.dart';
 import 'my_collection.dart';
 import 'my_message.dart';
@@ -11,195 +20,318 @@ import 'my_selections.dart';
 import 'my_transaction.dart';
 import 'setting.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  final userService = getIt<ApiUserService>();
+  final imageService = getIt<ApiImageService>();
+  ApiResponse<UserProfileResponse>? userProfileResponse;
+
+  void loadUserProfile() async {
+    userProfileResponse = await userService.getUserProfile();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserProfile();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 当用户从其他页面返回时，刷新用户资料
+    // 添加一个延迟，确保数据已经在后端更新完成
+    Future.delayed(Duration(milliseconds: 500), () {
+      loadUserProfile();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('我的'), elevation: 0, actions: [
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 用户信息卡片
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+    super.build(context); // 必须调用以使 AutomaticKeepAliveClientMixin 生效
+    final body = Builder(
+      builder: (context) {
+        if (userProfileResponse == null) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (userProfileResponse!.success == false) {
+          return Column(
+            spacing: 16,
+            children: [
+              Text(
+                "Failed:${userProfileResponse!.message}",
+                style: TextStyle(color: Colors.red),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 40,
-                        backgroundImage: AssetImage('assets/images/avatar.png'),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '鱼幼薇',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'ID: 114514',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
+              TextButton(
+                onPressed: () {
+                  loadUserProfile();
+                },
+                child: const Text("重新加载"),
+              ),
+              ProfileMenuItem(
+                title: '设置',
+                icon: Icons.settings,
+                onTap: () {
+                  popupOrNavigate(context, const Setting());
+                },
+              ),
+            ],
+          );
+        } else {
+          final data = userProfileResponse!.data!;
+          final imgUrl = imageService.getImageUrl(data.avatar);
+          //ok
+          return Column(
+            children: [
+              // 用户信息卡片
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: CachedNetworkImageProvider(imgUrl),
                         ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                spacing: 10,
+                                children: [
+                                  Text(
+                                    data.name,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (data.isAdmin) AdminIdentifier(),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'ID: ${data.id}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            popupOrNavigate(
+                              context,
+                              ProfileEditPage(
+                                userProfileResponse: data,
+                                onUpdateSuccess: () {
+                                  setState(() {
+                                    loadUserProfile();
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // 资产概览
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Theme.of(context).cardColor,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '资产概览',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('编辑个人资料')),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildAssetItem(
+                            '总资产',
+                            '¥${data.asset.total}',
+                            Colors.blue,
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildAssetItem(
+                            '今日收益',
+                            '+¥${data.asset.todayEarn}',
+                            Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildAssetItem(
+                            '累计收益',
+                            '+¥${data.asset.accumulatedEarn}',
+                            Colors.green,
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildAssetItem(
+                            '收益率',
+                            '+${data.asset.earnRate}%',
+                            Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 功能菜单
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Theme.of(context).cardColor)],
+                ),
+                child: Column(
+                  children: [
+                    ProfileMenuItem(
+                      title: '交易记录',
+                      icon: Icons.history,
+                      onTap: () {
+                        popupOrNavigate(context, const MyTransaction());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: '我的自选',
+                      icon: Icons.auto_graph,
+                      onTap: () {
+                        popupOrNavigate(context, const MySelections());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: '我的收藏',
+                      icon: Icons.bookmark_border,
+                      onTap: () {
+                        popupOrNavigate(context, const MyCollection());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: "转入资金",
+                      icon: Icons.account_balance,
+                      onTap: topup,
+                    ),
+                    ProfileMenuItem(
+                      title: '消息通知',
+                      icon: Icons.notifications_none,
+                      onTap: () {
+                        popupOrNavigate(context, const MyMessage());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: '我的帖子',
+                      icon: Icons.post_add,
+                      onTap: () {
+                        popupOrNavigate(context, const MyPosts());
+                      },
+                    ),
+                    ProfileMenuItem(
+                      title: '设置',
+                      icon: Icons.settings,
+                      onTap: () {
+                        popupOrNavigate(context, const Setting());
+                      },
+                    ),
+                    if (data.isAdmin)
+                      ProfileMenuItem(
+                        title: '管理员中心',
+                        icon: Icons.admin_panel_settings,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => AdminPage(),
+                            ),
                           );
                         },
                       ),
-                    ],
-                  ),
-                ],
+                    ProfileMenuItem(
+                      title: '退出登录',
+                      icon: Icons.logout,
+                      onTap: () async {
+                        final confirm = await showYesNoDialog(
+                          context: context,
+                          title: '确认退出',
+                          content: '您确定要退出登录吗？',
+                        );
+                        if (confirm == true) {
+                          //退出登录
+                          appConfigService.tokenService.clearTokens();
+                        }
+                      },
+                      foreColor: Colors.red.withValues(alpha: 0.7),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // 资产概览
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).cardColor,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '资产概览',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildAssetItem(
-                          '总资产',
-                          '¥128,888.88',
-                          Colors.blue,
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildAssetItem(
-                          '今日收益',
-                          '+¥1,234.56',
-                          Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildAssetItem(
-                          '累计收益',
-                          '+¥12,345.67',
-                          Colors.green,
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildAssetItem('收益率', '+10.58%', Colors.green),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 功能菜单
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Theme.of(context).cardColor)],
-              ),
-              child: Column(
-                children: [
-                  ProfileMenuItem(
-                    title: '我的自选',
-                    icon: Icons.star_border,
-                    onTap: () {
-                      popupOrNavigate(context, const MySelections());
-                    },
-                  ),
-                  ProfileMenuItem(
-                    title: '交易记录',
-                    icon: Icons.history,
-                    onTap: () {
-                      popupOrNavigate(context, const MyTransaction());
-                    },
-                  ),
-                  ProfileMenuItem(
-                    title: '我的收藏',
-                    icon: Icons.bookmark_border,
-                    onTap: () {
-                      popupOrNavigate(context, const MyCollection());
-                    },
-                  ),
-                  ProfileMenuItem(
-                    title: '消息通知',
-                    icon: Icons.notifications_none,
-                    onTap: () {
-                      popupOrNavigate(context, const MyMessage());
-                    },
-                  ),
-                  ProfileMenuItem(
-                    title: '设置',
-                    icon: Icons.settings,
-                    onTap: () {
-                      popupOrNavigate(context, const Setting());
-                    },
-                  ),
-                  ProfileMenuItem(
-                    title: '退出登录',
-                    icon: Icons.logout,
-                    onTap: () async {
-                      final confirm = await showYesNoDialog(
-                        context: context,
-                        title: '确认退出',
-                        content: '您确定要退出登录吗？',
-                      );
-                      if (confirm == true) {
-                        //退出登录
-                        sessionToken.value = null;
-                      }
-                    },
-                    foreColor: Colors.red.withValues(alpha: 0.7),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-          ],
-        ),
+              const SizedBox(height: 20),
+            ],
+          );
+        }
+      },
+    );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('我的'),
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              userProfileResponse = null;
+              loadUserProfile();
+            },
+            icon: Icon(Icons.refresh),
+          ),
+        ],
       ),
+      body: SingleChildScrollView(child: body),
     );
   }
 
@@ -219,5 +351,70 @@ class ProfilePage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future topup() async {
+    final TextEditingController amountController = TextEditingController();
+
+    final result = await showDialog<double>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('转入资金'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('请输入充值金额'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: '金额',
+                  prefixText: '¥',
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                final amount = double.tryParse(amountController.text);
+                if (amount != null && amount > 0) {
+                  Navigator.of(context).pop(amount);
+                } else {
+                  // 可以添加错误提示
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('请输入有效的金额')));
+                }
+              },
+              child: const Text('确认'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null) {
+      // 用户输入了有效金额，执行充值操作
+      final userService = getIt<ApiUserService>();
+      final isSuccess = await apiRequestDialog(
+        userService.topup(amount: result),
+      );
+
+      if (isSuccess == true) {
+        userProfileResponse = null;
+        loadUserProfile();
+      }
+    }
   }
 }

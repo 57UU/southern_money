@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:southern_money/pages/login_page.dart';
+import 'package:southern_money/pages/setting.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'pages/home_page.dart';
 import 'pages/community_page.dart';
@@ -9,31 +12,17 @@ import 'pages/profile_page.dart';
 import 'setting/app_config.dart';
 import 'widgets/common_widget.dart';
 
-// 导航项数据模型
-class NavigationItemData {
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final Widget page;
-
-  const NavigationItemData({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.page,
-  });
-}
-
 void main() async {
   await ensureInitialize();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final appConfigService = getIt<AppConfigService>();
 
   Widget _build() {
-    final colorSeed = appSetting.value[theme_color];
+    final colorSeed = appConfigService.appSetting.value[theme_color];
     return MaterialApp(
       title: '南方财富',
       theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
@@ -51,7 +40,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //app setting
     return ListenableBuilder(
-      listenable: appSetting,
+      listenable: appConfigService.appSetting,
       builder: (context, _) {
         //session key
         return _build();
@@ -69,6 +58,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  final appConfigService = getIt<AppConfigService>();
+  final PageController _pageController = PageController();
 
   // 导航项数据模型
   static final List<NavigationItemData> _navigationItems = [
@@ -102,9 +93,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     logicRootContext = context;
     return ListenableBuilder(
-      listenable: sessionToken,
+      listenable: appConfigService.tokenService.sessionToken,
       builder: (context, _) {
-        if (sessionToken.value == null) {
+        if (appConfigService.tokenService.sessionToken.value == null) {
           return const LoginPage();
         }
         return _buildMainScreen();
@@ -113,6 +104,12 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildMainScreen() {
+    scheduleMicrotask(() {
+      if (_pageController.hasClients &&
+          _currentIndex != _pageController.page?.round()) {
+        _pageController.jumpToPage(_currentIndex);
+      }
+    });
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) {
@@ -125,6 +122,7 @@ class _MainScreenState extends State<MainScreen> {
                   onDestinationSelected: (index) {
                     setState(() {
                       _currentIndex = index;
+                      _pageController.jumpToPage(_currentIndex);
                     });
                   },
                   labelType: NavigationRailLabelType.all,
@@ -139,19 +137,40 @@ class _MainScreenState extends State<MainScreen> {
                       .toList(),
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: _navigationItems[_currentIndex].page),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    children: _navigationItems
+                        .map((item) => item.page)
+                        .toList(),
+                  ),
+                ),
               ],
             ),
           );
         } else {
           // 竖屏模式：使用底部导航栏
           return Scaffold(
-            body: _navigationItems[_currentIndex].page,
+            body: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              children: _navigationItems.map((item) => item.page).toList(),
+            ),
             bottomNavigationBar: NavigationBar(
               selectedIndex: _currentIndex,
               onDestinationSelected: (index) {
                 setState(() {
                   _currentIndex = index;
+                  _pageController.jumpToPage(index);
                 });
               },
               destinations: _navigationItems

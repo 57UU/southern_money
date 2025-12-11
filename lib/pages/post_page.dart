@@ -1,6 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'dart:io';
+
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/definitions/definitions_response.dart';
+import 'package:southern_money/webapi/index.dart';
+import 'package:southern_money/widgets/dialog.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -17,6 +24,10 @@ class _PostPageState extends State<PostPage> {
   final List<XFile> _images = [];
   final ImagePicker _picker = ImagePicker();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  //service
+  var imageService = getIt<ApiImageService>();
+  var postService = getIt<ApiPostService>();
 
   // 添加标签
   void _addTag() {
@@ -46,7 +57,7 @@ class _PostPageState extends State<PostPage> {
 
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      imageQuality: 60,
     );
 
     if (pickedFile != null) {
@@ -64,7 +75,7 @@ class _PostPageState extends State<PostPage> {
   }
 
   // 验证表单并发布
-  void _publish() {
+  void _publish() async {
     if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -84,13 +95,45 @@ class _PostPageState extends State<PostPage> {
       );
       return;
     }
+    Future<ApiResponse> post() async {
+      // 上传图片
+      List<String> imageIds = [];
+      for (var image in _images) {
+        ApiResponse response;
+        if (kIsWeb) {
+          // Web平台上传
+          response = await imageService.uploadImageWeb(imagePath: image.path);
+        } else {
+          // 移动平台上传
+          response = await imageService.uploadImage(
+            imageFile: File(image.path),
+          );
+        }
 
-    // 这里可以添加发布逻辑，但根据需求不需要实现具体发布功能
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('发布成功')));
-    Navigator.pop(context);
+        if (response.success && response.data != null) {
+          imageIds.add(response.data.imageId);
+        } else {
+          return ApiResponse.fail(message: "图片上传失败: ${response.message}");
+        }
+      }
+
+      // 上传帖子
+      return postService.createPost(
+        title: _titleController.text,
+        content: _contentController.text,
+        tags: _tags,
+        imageIds: imageIds,
+      );
+    }
+
+    final success = await apiRequestDialog(post());
+    if (success == true) {
+      Navigator.pop(context);
+      appConfigService.setPostsNeedRefresh();
+    }
   }
+
+  final appConfigService = getIt<AppConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -293,12 +336,19 @@ class _PostPageState extends State<PostPage> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: Image.file(
-                                  File(image.path),
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: kIsWeb
+                                    ? Image.network(
+                                        image.path,
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        File(image.path),
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                             ),
                             Positioned(

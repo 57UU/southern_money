@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
+import 'package:southern_money/webapi/api_user.dart';
 import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 
@@ -139,8 +140,6 @@ class _OpenAnAccountState extends State<OpenAnAccount> {
   }
 }
 
-enum DialogState { conform, loading, success, error }
-
 //the return value is true if the user agreed to open an account
 Future<bool?> openAnAccountDialog() {
   DialogState dialogState = DialogState.conform;
@@ -151,11 +150,13 @@ Future<bool?> openAnAccountDialog() {
     }
   }
 
+  final userService = getIt<ApiUserService>();
+
   String errorMessage = "";
   String successMessage = "开户成功";
   late CancelableOperation myCancelableFuture;
   Future<dynamic> future() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await userService.openAccount();
 
     // 检查操作是否已被取消，如果已取消则不再更新状态
     if (!myCancelableFuture.isCanceled) {
@@ -179,7 +180,7 @@ Future<bool?> openAnAccountDialog() {
           DialogState.error => '开户失败',
         }),
         content: AnimatedSize(
-          duration: Duration(milliseconds: animationTime),
+          duration: Duration(milliseconds: appConfigService.animationTime),
           curve: Curves.easeOutQuart,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),

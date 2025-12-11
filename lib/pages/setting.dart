@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:southern_money/data/local_store.dart';
 import 'package:southern_money/pages/about_us_page.dart';
 import 'package:southern_money/pages/debug_page.dart';
+import 'package:southern_money/pages/set_api_page.dart';
 import 'package:southern_money/setting/app_config.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/setting/version.dart';
-import 'package:southern_money/widgets/common_widget.dart';
 import 'package:southern_money/widgets/dialog.dart';
 import 'package:southern_money/widgets/profile_menu_item.dart';
 
@@ -20,6 +20,9 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  final appConfigService = getIt<AppConfigService>();
+  final versionService = getIt<VersionService>();
+
   @override
   Widget build(BuildContext context) {
     final body = Column(
@@ -45,6 +48,15 @@ class _SettingState extends State<Setting> {
           },
         ),
         ProfileMenuItem(
+          title: 'API地址',
+          icon: Icons.dns,
+          onTap: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(builder: (context) => const SetApiUrlPage()),
+            );
+          },
+        ),
+        ProfileMenuItem(
           title: '关于我们',
           icon: Icons.info_outline,
           onTap: () {
@@ -59,7 +71,7 @@ class _SettingState extends State<Setting> {
           onTap: () {
             Navigator.of(
               context,
-            ).push(CupertinoPageRoute(builder: (context) => const DebugPage()));
+            ).push(CupertinoPageRoute(builder: (context) => DebugPage()));
           },
         ),
         ProfileMenuItem(
@@ -72,20 +84,34 @@ class _SettingState extends State<Setting> {
               content: '您确定要清除全部数据吗？',
             );
             if (confirm == true) {
-              await LocalStore.instance.clearAll();
-              await clearAllData();
+              await appConfigService.clearAllData();
             }
           },
           foreColor: Colors.red.withValues(alpha: 0.7),
         ),
         ProfileMenuItem(
-          title: '当前版本: ${currentVersion}',
+          title: '退出登录',
+          icon: Icons.logout_outlined,
+          onTap: () async {
+            final confirm = await showYesNoDialog(
+              context: context,
+              title: '确认退出登录',
+              content: '您确定要退出登录吗？',
+            );
+            if (confirm == true) {
+              appConfigService.tokenService.clearTokens();
+              popDialog();
+            }
+          },
+        ),
+        ProfileMenuItem(
+          title: '当前版本: ${versionService.currentVersion}',
           icon: Icons.info_outline,
           onTap: () async {
             await showInfoDialog(
               context: context,
               title: '版本信息',
-              content: getVersionInfo(),
+              content: versionService.getVersionInfo(),
             );
           },
         ),

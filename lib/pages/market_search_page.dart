@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:southern_money/setting/ensure_initialized.dart';
 import '../setting/app_config.dart';
 import '../widgets/stock_card.dart';
 
@@ -93,6 +94,8 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
     super.dispose();
   }
 
+  final appConfigService = getIt<AppConfigService>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,7 +145,7 @@ class _MarketSearchPageState extends State<MarketSearchPage> {
         ],
       ),
       body: AnimatedContainer(
-        duration: Duration(milliseconds: animationTime),
+        duration: Duration(milliseconds: appConfigService.animationTime),
         curve: Curves.easeOutQuart,
         child: _isSearching
             ? _filteredStocks.isEmpty
