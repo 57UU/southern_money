@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/community_search_page.dart';
+import 'package:southern_money/pages/post_page.dart';
 import 'package:southern_money/pages/posts_by_user.dart';
+import 'package:southern_money/setting/app_config.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_image.dart';
 import 'package:southern_money/webapi/api_post.dart';
@@ -26,6 +28,8 @@ class _PostViewerState extends State<PostViewer> {
   // 服务
   final ApiImageService imageService = getIt<ApiImageService>();
   final ApiPostService postService = getIt<ApiPostService>();
+  final TokenService tokenService = getIt<TokenService>();
+  late bool isCurrentUser;
 
   // 状态
   get isLiked => widget.post.isLiked;
@@ -47,6 +51,7 @@ class _PostViewerState extends State<PostViewer> {
     super.initState();
     // 初始化点赞状态
     likeCount = widget.post.likeCount;
+    isCurrentUser = tokenService.id == widget.post.uploader.id;
   }
 
   @override
@@ -199,6 +204,14 @@ class _PostViewerState extends State<PostViewer> {
           ),
         ],
       ),
+    );
+  }
+
+  // 编辑帖子功能
+  void editPost() {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(builder: (context) => PostPage(item: widget.post)),
     );
   }
 
@@ -388,7 +401,9 @@ class _PostViewerState extends State<PostViewer> {
                         color: colorScheme.onSurfaceVariant,
                       ),
                       onSelected: (value) {
-                        if (value == 'report') {
+                        if (value == 'edit') {
+                          editPost();
+                        } else if (value == 'report') {
                           reportPost();
                         }
                       },
@@ -410,7 +425,26 @@ class _PostViewerState extends State<PostViewer> {
                             ),
                           ];
                         } else {
-                          return [
+                          List<PopupMenuEntry<String>> items = [];
+
+                          // 如果是当前用户，添加编辑选项
+                          if (isCurrentUser) {
+                            items.add(
+                              const PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit, color: Colors.blue),
+                                    SizedBox(width: 8),
+                                    Text('编辑'),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+
+                          // 添加举报选项
+                          items.add(
                             const PopupMenuItem<String>(
                               value: 'report',
                               child: Row(
@@ -421,7 +455,9 @@ class _PostViewerState extends State<PostViewer> {
                                 ],
                               ),
                             ),
-                          ];
+                          );
+
+                          return items;
                         }
                       },
                     ),

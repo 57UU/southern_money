@@ -139,7 +139,7 @@ class _CommunityPageState extends State<CommunityPage>
             onPressed: () {
               Navigator.push(
                 context,
-                CupertinoPageRoute(builder: (context) => const PostPage()),
+                CupertinoPageRoute(builder: (context) => PostPage()),
               );
             },
           ),

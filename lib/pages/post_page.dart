@@ -10,7 +10,8 @@ import 'package:southern_money/webapi/index.dart';
 import 'package:southern_money/widgets/dialog.dart';
 
 class PostPage extends StatefulWidget {
-  const PostPage({super.key});
+  PostPageItemResponse? item;
+  PostPage({super.key, this.item});
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -22,12 +23,42 @@ class _PostPageState extends State<PostPage> {
   final TextEditingController _tagController = TextEditingController();
   final List<String> _tags = [];
   final List<XFile> _images = [];
+  final List<String> _existingImageIds = []; // 存储现有图片ID
   final ImagePicker _picker = ImagePicker();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   //service
   var imageService = getIt<ApiImageService>();
   var postService = getIt<ApiPostService>();
+
+  // 判断是否为编辑模式
+  bool get _isEditMode => widget.item != null;
+
+  @override
+  void initState() {
+    super.initState();
+    // 如果是编辑模式，填充表单数据
+    if (_isEditMode) {
+      _titleController.text = widget.item!.title;
+      _contentController.text = widget.item!.content;
+      _tags.addAll(widget.item!.tags);
+      // 加载现有图片
+      _loadExistingImages();
+    }
+  }
+
+  // 加载现有图片
+  Future<void> _loadExistingImages() async {
+    if (!_isEditMode || widget.item!.imageIds.isEmpty) return;
+
+    try {
+      // 将现有图片ID添加到列表中
+      _existingImageIds.addAll(widget.item!.imageIds);
+      setState(() {}); // 更新UI以显示现有图片
+    } catch (e) {
+      print('加载图片失败: $e');
+    }
+  }
 
   // 添加标签
   void _addTag() {
@@ -48,7 +79,7 @@ class _PostPageState extends State<PostPage> {
 
   // 选择图片
   Future<void> _pickImage() async {
-    if (_images.length >= 3) {
+    if (_images.length + _existingImageIds.length >= 3) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('最多只能选择3张图片')));
@@ -74,7 +105,7 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  // 验证表单并发布
+  // 验证表单并发布或更新
   void _publish() async {
     if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -117,13 +148,25 @@ class _PostPageState extends State<PostPage> {
         }
       }
 
-      // 上传帖子
-      return postService.createPost(
-        title: _titleController.text,
-        content: _contentController.text,
-        tags: _tags,
-        imageIds: imageIds,
-      );
+      // 根据编辑模式决定是创建新帖子还是更新现有帖子
+      if (_isEditMode) {
+        // 更新帖子
+        return postService.editPost(
+          postId: widget.item!.id,
+          title: _titleController.text,
+          content: _contentController.text,
+          tags: _tags,
+          imageIds: [..._existingImageIds, ...imageIds], // 合并现有图片和新上传的图片
+        );
+      } else {
+        // 创建新帖子
+        return postService.createPost(
+          title: _titleController.text,
+          content: _contentController.text,
+          tags: _tags,
+          imageIds: imageIds,
+        );
+      }
     }
 
     final success = await apiRequestDialog(post());
@@ -142,7 +185,7 @@ class _PostPageState extends State<PostPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('发布新内容'),
+        title: Text(_isEditMode ? '编辑帖子' : '发布新内容'),
         elevation: 0,
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
@@ -158,7 +201,7 @@ class _PostPageState extends State<PostPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text('发布'),
+            child: Text(_isEditMode ? '更新' : '发布'),
           ),
           const SizedBox(width: 12),
         ],
@@ -311,7 +354,7 @@ class _PostPageState extends State<PostPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '添加图片（最多3张）',
+                    '添加图片（最多3张，已添加${_images.length + _existingImageIds.length}张）',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -323,7 +366,55 @@ class _PostPageState extends State<PostPage> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      // 图片预览列表
+                      // 现有图片预览列表（编辑模式）
+                      ..._existingImageIds.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String imageId = entry.value;
+                        return Stack(
+                          children: [
+                            Card(
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  imageService.getImageUrl(imageId),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: -8,
+                              right: -8,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: colorScheme.error,
+                                  shape: const CircleBorder(),
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(28, 28),
+                                  elevation: 2,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _existingImageIds.removeAt(index);
+                                  });
+                                },
+                                tooltip: '删除图片',
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                      // 新选择的图片预览列表
                       ..._images.asMap().entries.map((entry) {
                         int index = entry.key;
                         XFile image = entry.value;
@@ -375,7 +466,7 @@ class _PostPageState extends State<PostPage> {
                         );
                       }).toList(),
                       // 添加图片按钮
-                      if (_images.length < 3)
+                      if (_images.length + _existingImageIds.length < 3)
                         Card(
                           elevation: 1,
                           shape: RoundedRectangleBorder(

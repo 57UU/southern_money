@@ -199,10 +199,12 @@ class _MyPostsState extends State<MyPosts> {
                   leading: const Icon(Icons.edit),
                   title: const Text('编辑帖子'),
                   onTap: () {
-                    //need implement
-                    ScaffoldMessenger.of(
+                    Navigator.push(
                       context,
-                    ).showSnackBar(const SnackBar(content: Text('编辑帖子功能暂未实现')));
+                      CupertinoPageRoute(
+                        builder: (context) => PostPage(item: post),
+                      ),
+                    );
                   },
                 ),
                 ListTile(
@@ -305,7 +307,7 @@ class _MyPostsState extends State<MyPosts> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PostPage()),
+                MaterialPageRoute(builder: (context) => PostPage()),
               );
             },
             child: const Text('发布第一篇帖子'),
