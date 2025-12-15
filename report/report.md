@@ -328,6 +328,11 @@ Southern Money系统采用Material Design 3设计风格，这是Google推出的�
    - 支持手势操作，如滑动、长按、捏合等
 
 6. **界面设计效果图**：
+   - **主题效果**：
+     - 亮色主题：
+       ![亮色主题效果](lightmode.png)
+     - 暗色主题：
+       ![暗色主题效果](darkmode.png)
    - **首页效果图**：
      ```
      +---------------------------------+
@@ -748,7 +753,13 @@ Southern Money系统采用响应式设计，能够根据设备的屏幕尺寸和
    - 使用`GridView.builder`实现自适应网格布局，根据屏幕尺寸调整列数
    - 使用`LayoutBuilder`根据父组件尺寸调整子组件布局
 
-5. **状态保持**：
+5. **登录页面响应式效果**：
+   - 竖屏模式：
+     ![登录页面竖屏效果](login_page_portrait.png)
+   - 横屏模式：
+     ![登录页面横屏效果](login_page_landscape.png)
+
+6. **状态保持**：
    - 使用`AutomaticKeepAliveClientMixin`保持页面状态，避免切换页面时重新加载数据
    - 实现代码：
      ```dart
