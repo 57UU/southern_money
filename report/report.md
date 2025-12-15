@@ -115,6 +115,10 @@ Southern Money系统采用前后端分离的现代化架构设计，具体技术
    - 集成状态管理库实现应用状态的高效管理
    - 实施响应式UI设计，自动适配不同屏幕尺寸和设备类型
 
+  |移动平台(android,iOS)|桌面平台(Windows,macOS,Linux)|Web平台|
+  |:---:|:---:|:---:|
+  |![](devices/android.jpg)|![](devices/windows.png)|![](devices/web.png)|
+
 3. **数据库设计**：
    - 选用SQLite数据库，兼顾开发便捷性与部署灵活性
    - 设计规范化关系型数据模型，优化表结构和关联关系
@@ -893,6 +897,72 @@ flowchart LR
    - 位于`lib/pages`目录下，包含所有页面组件
    - 实现不同功能页面，如首页、社区页、市场页、个人中心等
    - 采用StatefulWidget和StatelessWidget实现页面逻辑和UI
+
+   ```mermaid
+   flowchart LR
+       %% Entry Points
+       A[Login Page] -->|Login Success| B[Main App]
+       C[Register Page] 
+       A <--> C
+       
+       %% Main App Tab Navigation
+       B -->|Tab Switch| D[Home Page]
+       B -->|Tab Switch| E[Community Page]
+       B -->|Tab Switch| F[Market Page]
+       B -->|Tab Switch| G[Profile Page]
+       D <--> E <--> F <--> G <--> D
+       
+       %% Home Page Flow
+       D -->|View Post| H[Post Page]
+       D -->|View Product| I[CSGO Product Detail Page]
+       
+       %% Community Page Flow
+       E -->|View Post| H
+       E -->|Search| J[Community Search Page]
+       J -->|View Post| H
+       H -->|View User| K[Profile Page]
+       H -->|View Author| L[Posts by User]
+       
+       %% Market Page Flow
+       F -->|View Category| M[CSGO Category Page]
+       F -->|Search| N[Market Search Page]
+       M -->|View Products| O[CSGO Products by Category]
+       O -->|View Detail| I
+       N -->|View Detail| I
+       
+       %% Profile Page Flow
+       G -->|Edit Profile| P[Profile Edit Page]
+       G -->|My Posts| Q[My Posts]
+       G -->|My Collection| R[My Collection]
+       G -->|My Message| S[My Message]
+       G -->|My Selections| T[My Selections]
+       G -->|My Transaction| U[My Transaction]
+       G -->|Settings| V[Setting]
+       G -->|Open an Account| W[Open an Account]
+       Q -->|View Post| H
+       
+       %% Settings Flow
+       V -->|Theme Color| X[Theme Color Page]
+       V -->|Duration Setting| Y[Setting Duration]
+       V -->|API Setting| Z[Set API Page]
+       
+       %% Admin Flow
+       G -->|Admin Access| AA[Admin Page]
+       AA -->|Manage Users| AB[Admin Manage User]
+       AA -->|Censor Forum| AC[Admin Censor Forum]
+       AA -->|Post Block History| AD[Admin Post Block History]
+       AA -->|Statistics| AE[Admin Statistics]
+       
+       %% CSGO Management Flow
+       AA -->|Create Category| AF[CSGO Category Create]
+       AA -->|Create Product| AG[CSGO Products Create]
+       
+       %% Debug Flow
+       G -->|Debug| AH[Debug Page]
+       
+       %% About Us
+       V -->|About Us| AI[About Us Page]
+   ```
 
 2. **API服务模块**：
    - 位于`lib/webapi`目录下，封装与后端API的交互
