@@ -864,22 +864,67 @@ flowchart TD
 
 #### 4.1.2 核心技术
 
-1. **状态管理**：
+1. **依赖注入**：
+   - 使用`GetIt`实现依赖注入容器，集中管理应用服务和依赖
+   - 通过`registerSingleton`和`registerSingletonAsync`注册服务实例
+   - 支持异步依赖初始化和服务间依赖关系管理
+   - 实现服务的懒加载和单例模式，提高资源利用率
+
+```mermaid
+graph TD
+       subgraph "核心依赖"
+           SP[SharedPreferences] --> TS[TokenService]
+           SP --> PS[PasswordService]
+           TS --> ACS[AppConfigService]
+           PI[PackageInfo] --> VS[VersionService]
+       end
+       
+       subgraph "HTTP客户端"
+           DIO[Dio]
+           ACS --> JD[JwtDio]
+           ALS[ApiLoginService] --> JD
+       end
+       
+       subgraph "API服务"
+           JD --> APS[ApiPostService]
+           JD --> AUS[ApiUserService]
+           JD --> ANS[ApiNotificationService]
+           JD --> AIS[ApiImageService]
+           JD --> ASS[ApiStoreService]
+           JD --> ATS[ApiTransactionService]
+           JD --> AAdS[ApiAdminService]
+           
+           DIO --> ALS
+           ACS --> ALS
+           
+           DIO --> ATS2[ApiTestService]
+           ACS --> ATS2
+           
+           DIO --> AUS
+           ACS --> AIS
+       end
+       
+       subgraph "应用服务"
+           NS[NavigationService]
+       end
+```
+
+2. **状态管理**：
    - 使用`ListenableBuilder`实现局部状态管理
    - 使用`AutomaticKeepAliveClientMixin`保持页面状态
    - 实现了基于`ChangeNotifier`的全局状态管理
 
-2. **网络请求**：
+3. **网络请求**：
    - 使用Dio库进行HTTP请求处理
    - 实现了JWT令牌自动刷新机制
    - 封装了统一的API响应处理
 
-3. **路由管理**：
+4. **路由管理**：
    - 使用Flutter内置的路由管理
    - 实现了页面跳转和参数传递
    - 支持弹出式页面和全屏页面
 
-4. **数据持久化**：
+5. **数据持久化**：
    - 使用shared_preferences存储用户设置
    - 使用SecureStorage存储敏感数据，如JWT令牌
 
@@ -1084,6 +1129,95 @@ flowchart TD
    - 实现了全局异常处理中间件
    - 统一处理API异常，返回友好的错误信息
    - 记录异常日志，便于排查问题
+5. **依赖注入**:
+   - 采用.NET内置的依赖注入容器实现控制反转(IoC)
+   - 实现了三层架构的依赖注入:控制器层→服务层→数据访问层
+   - 使用Scoped生命周期管理依赖实例，确保每个请求都有独立的实例
+   - 支持依赖注入的类型包括:控制器、服务、仓库、数据库上下文等
+   - 通过构造函数注入实现解耦，提高代码的可测试性和可维护性
+
+   ```mermaid
+   flowchart TD
+       subgraph 控制器层
+           UserController[UserController]
+           PostController[PostController]
+           StoreController[StoreController]
+           ImageBedController[ImageBedController]
+           AdminController[AdminController]
+           NotificationController[NotificationController]
+           TransactionController[TransactionController]
+       end
+
+       subgraph 服务层
+           UserService[UserService]
+           PostService[PostService]
+           ProductService[ProductService]
+           ImageBedService[ImageBedService]
+           AdminService[AdminService]
+           NotificationService[NotificationService]
+           TransactionService[TransactionService]
+           UserAssetService[UserAssetService]
+           ProductCategoryService[ProductCategoryService]
+           UserFavoriteCategoryService[UserFavoriteCategoryService]
+       end
+
+       subgraph 数据访问层
+           UserRepository[UserRepository]
+           PostRepository[PostRepository]
+           ImageRepository[ImageRepository]
+           ProductRepository[ProductRepository]
+           TransactionRepository[TransactionRepository]
+           UserAssetRepository[UserAssetRepository]
+           ProductCategoryRepository[ProductCategoryRepository]
+           UserFavoriteCategoryRepository[UserFavoriteCategoryRepository]
+           NotificationRepository[NotificationRepository]
+       end
+
+       subgraph 基础设施层
+           AppDbContext[AppDbContext]
+           JwtUtils[JwtUtils]
+       end
+
+       %% 控制器依赖服务
+       UserController --> UserService
+       PostController --> PostService
+       StoreController --> ProductService
+       StoreController --> UserAssetService
+       ImageBedController --> ImageBedService
+       AdminController --> AdminService
+       NotificationController --> NotificationService
+       TransactionController --> TransactionService
+
+       %% 服务依赖仓库和其他服务
+       UserService --> UserRepository
+       PostService --> PostRepository
+       PostService --> ImageRepository
+       PostService --> NotificationService
+       PostService --> UserRepository
+       ProductService --> ProductRepository
+       ImageBedService --> ImageRepository
+       TransactionService --> TransactionRepository
+       TransactionService --> UserAssetRepository
+       TransactionService --> ProductRepository
+       UserAssetService --> UserAssetRepository
+       ProductCategoryService --> ProductCategoryRepository
+       UserFavoriteCategoryService --> UserFavoriteCategoryRepository
+       NotificationService --> NotificationRepository
+
+       %% 仓库依赖数据库上下文
+       UserRepository --> AppDbContext
+       PostRepository --> AppDbContext
+       ImageRepository --> AppDbContext
+       ProductRepository --> AppDbContext
+       TransactionRepository --> AppDbContext
+       UserAssetRepository --> AppDbContext
+       ProductCategoryRepository --> AppDbContext
+       UserFavoriteCategoryRepository --> AppDbContext
+       NotificationRepository --> AppDbContext
+
+       %% 服务依赖工具类
+       UserService --> JwtUtils
+   ```
 
 #### 4.2.3 关键功能实现
 
