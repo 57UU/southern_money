@@ -781,7 +781,7 @@ Southern Money系统采用响应式设计，能够根据设备的屏幕尺寸和
 #### 3.4.1 用户注册流程
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[开始] --> B[输入注册信息]
     B --> C[前端验证]
     C --> D{验证通过?}
@@ -799,7 +799,7 @@ flowchart TD
 #### 3.4.2 用户登录流程
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[开始] --> B[输入登录信息]
     B --> C[前端验证]
     C --> D{验证通过?}
@@ -818,7 +818,7 @@ flowchart TD
 #### 3.4.3 产品购买流程
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[开始] --> B[选择产品]
     B --> C[输入购买数量]
     C --> D[前端验证]
@@ -840,7 +840,7 @@ flowchart TD
 #### 3.4.4 帖子发布流程
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[开始] --> B[输入帖子内容]
     B --> C[选择图片（可选）]
     C --> D[输入标签（可选）]
@@ -866,7 +866,7 @@ flowchart TD
 #### 3.4.5 帖子审核流程
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[开始] --> B[管理员查看待审核帖子]
     B --> C[审核帖子内容]
     C --> D{决定通过或封禁?}
@@ -1169,12 +1169,139 @@ graph TD
 2. **数据库操作**：
    - 使用Entity Framework Core进行ORM映射
    - 实现了Code First数据库设计
-   - 支持SQLite数据库
+   - 支持SQLite数据库作为原型迅速完成开发；也支持PostgreSQL数据库用于生产环境
+   - 实现了数据库事务管理，确保数据操作的原子性和一致性
+   - 事务使用场景：金融交易、用户资产变更、多表关联操作等
+   - 使用Entity Framework Core的事务API（如DbContext.Database.BeginTransaction）实现事务控制
+   - 支持事务回滚机制，在操作失败时保证数据完整性
+   - **事务实现示例**：
+     ```csharp
+     public async Task<TransactionRecord> CreateTransactionAsync(Guid productId, int quantity, long buyerId)
+     {
+         // 使用事务包裹所有操作
+         using var transaction = await _context.Database.BeginTransactionAsync();
+         
+         try
+         {
+             // 验证商品是否存在
+             var product = await _productRepository.GetProductByIdAsync(productId);
+             if (product == null)
+             {
+                 throw new Exception("Product not found");
+             }
+             
+             // 计算总价
+             var totalPrice = product.Price * quantity;
+             
+             // 检查购买者余额是否足够
+             var buyerAsset = await _userAssetRepository.GetUserAssetByUserIdAsync(buyerId);
+             if (buyerAsset == null || buyerAsset.Balance < totalPrice)
+             {
+                 throw new Exception("Insufficient balance");
+             }
+             
+             // 检查销售者资产是否存在
+             var sellerAsset = await _userAssetRepository.GetUserAssetByUserIdAsync(product.UploaderUserId);
+             if (sellerAsset == null)
+             {
+                 throw new Exception("Seller asset not found");
+             }
+             
+             // 扣除购买者余额（不自动保存）
+             var subtractResult = await _userAssetRepository.SubtractFromUserBalanceAsync(buyerId, totalPrice, false);
+             if (!subtractResult)
+             {
+                 throw new Exception("Failed to subtract balance from buyer");
+             }
+             
+             // 增加销售者余额（不自动保存）
+             var addResult = await _userAssetRepository.AddToUserBalanceAsync(product.UploaderUserId, totalPrice, false);
+             if (!addResult)
+             {
+                 throw new Exception("Failed to add balance to seller");
+             }
+             
+             // 更新销售者收益（不自动保存）
+             sellerAsset.AccumulatedEarn += totalPrice;
+             sellerAsset.TodayEarn += totalPrice;
+             await _userAssetRepository.UpdateUserAssetAsync(sellerAsset, false);
+             
+             // 将商品标记为已删除（不自动保存）
+             product.IsDeleted = true;
+             await _productRepository.UpdateProductAsync(product, false);
+             
+             // 创建交易记录（不自动保存）
+             var transactionRecord = new TransactionRecord
+             {
+                 Id = Guid.NewGuid(),
+                 ProductId = productId,
+                 BuyerUserId = buyerId,
+                 Quantity = quantity,
+                 Price = product.Price,
+                 TotalPrice = totalPrice,
+                 PurchaseTime = DateTime.UtcNow
+             };
+             await _transactionRepository.AddTransactionAsync(transactionRecord, false);
+             
+             // 一次性保存所有更改
+             await _context.SaveChangesAsync();
+             
+             // 提交事务
+             await transaction.CommitAsync();
+             
+             return transactionRecord;
+         }
+         catch (Exception ex)
+         {
+             // 回滚事务
+             await transaction.RollbackAsync();
+             throw;
+         }
+     }
+     ```
+     
+   - **事务特性**：
+     - 采用`BeginTransactionAsync()`创建异步事务，提高系统性能
+     - 使用`using`语句自动释放事务资源
+     - 所有数据库操作通过`SaveChangesAsync()`一次性提交，减少数据库交互次数
+     - 完整的异常处理机制，确保任何步骤失败都能回滚到初始状态
+     - 支持嵌套事务和分布式事务场景
+   - **事务流程图**：
+     ```mermaid
+     flowchart LR
+         A[开始事务] --> B{验证商品存在?}
+         B -->|是| C{验证购买者不是所有者?}
+         B -->|否| Z[抛出异常]
+         C -->|是| D[计算总价]
+         C -->|否| Z
+         D --> E{检查购买者余额?}
+         E -->|足够| Node{执行}
+         E -->|不足| Z
+         Node --> F[扣除购买者余额]
+         Node --> G[增加销售者余额]
+         Node --> H[更新销售者收益]
+         Node --> I[标记商品为已删除]
+         Node --> J[创建交易记录]
+         F --> L
+         G --> L
+         H --> L
+         I --> L
+         J --> L[保存所有更改]
+         L --> M[提交事务]
+         M --> N[返回交易记录]
+         Z --> O[回滚事务]
+
+         style A fill:#f9f,stroke:#333,stroke-width:2px
+         style L fill:#cfc,stroke:#333,stroke-width:2px
+         style N fill:#fcc,stroke:#333,stroke-width:2px
+     ```
 
 3. **API文档**：
    - 使用Swagger生成API文档
    - 支持API测试和调试
    - 提供了详细的API说明和参数描述
+   - 为swagger集成了javascript脚本，支持JWT认证
+   - ![](swagger_ui.png)
 
 4. **异常处理**：
    - 实现了全局异常处理中间件
