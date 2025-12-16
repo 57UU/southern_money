@@ -364,39 +364,41 @@ public async Task<IActionResult> ModeratePost(Guid postId) { }
 
 ```mermaid
 flowchart TD
+
+    
+    subgraph 后端服务器
+      Router[HTTP路由]
+      subgraph 服务层
+          Router --> |路由| F[用户服务]
+          Router --> |路由| G[产品服务]
+          Router --> |路由| H[交易服务]
+          Router --> |路由| I[社区服务]
+          Router --> |路由| J[通知服务]
+      end
+      
+      subgraph 数据层
+          F --> |数据访问| K[数据库]
+          G --> |数据访问| K
+          H --> |数据访问| K
+          I --> |数据访问| K
+          J --> |数据访问| K
+      end
+      
+      subgraph 中间件层
+          L[身份认证] --> |验证| Router
+          M[异常处理] --> |处理| Router
+          N[日志记录] --> |记录| Router
+          O[跨域支持] --> |支持| Router
+      end
+    end
+    subgraph 数据交互通道
+      E[API网关] --> |路由| Router
+    end
     subgraph 客户端层
-        A[Web端] --> |HTTP请求| E[API网关]
+        A[Web端] --> |HTTP请求| E
         B[Android端] --> |HTTP请求| E
         C[iOS端] --> |HTTP请求| E
         D[桌面端] --> |HTTP请求| E
-    end
-    
-    subgraph 应用层
-        E --> |路由| F[用户服务]
-        E --> |路由| G[产品服务]
-        E --> |路由| H[交易服务]
-        E --> |路由| I[社区服务]
-        E --> |路由| J[通知服务]
-    end
-    
-    subgraph 数据层
-        F --> |数据访问| K[数据库]
-        G --> |数据访问| K
-        H --> |数据访问| K
-        I --> |数据访问| K
-        J --> |数据访问| K
-    end
-    
-    subgraph 中间件层
-        L[身份认证] --> |验证| E
-        M[异常处理] --> |处理| E
-        N[日志记录] --> |记录| E
-        O[跨域支持] --> |支持| E
-    end
-    
-    subgraph 外部服务
-        P[第三方支付] --> |集成| H
-        Q[消息推送] --> |集成| J
     end
     
     style A fill:#f9f,stroke:#333,stroke-width:2px
@@ -414,8 +416,6 @@ flowchart TD
     style M fill:#bbf,stroke:#333,stroke-width:2px
     style N fill:#bbf,stroke:#333,stroke-width:2px
     style O fill:#bbf,stroke:#333,stroke-width:2px
-    style P fill:#f9f,stroke:#333,stroke-width:2px
-    style Q fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ## 2. 概要设计
