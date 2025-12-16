@@ -175,6 +175,10 @@ flowchart TD
       TransactionController --> TransactionService
 
       %% 服务依赖仓库和其他服务
+      AdminService --> UserRepository
+      AdminService --> ImageRepository
+      AdminService --> PostRepository
+      AdminService --> NotificationService
       UserService --> UserRepository
       PostService --> PostRepository
       PostService --> ImageRepository
@@ -356,11 +360,11 @@ graph TD
 
 #### 系统安全
    - 采用密码哈希存储技术，保障用户密码安全
-   - 实施JWT令牌认证机制，确保API访问安全
-   - 设计基于角色的权限管理系统，区分普通用户与管理员权限
+
+   - 
    - 开发异常处理中间件，防止敏感信息泄露，提供友好错误提示
 
-
+实施JWT令牌认证机制，确保API访问安全
    - **认证流程图**：
      ```mermaid
      flowchart LR
