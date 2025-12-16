@@ -1,4 +1,51 @@
 # 报告
+- [报告](#报告)
+  - [1、绪论](#1绪论)
+    - [1.1 系统开发背景（结合现实的可用性）](#11-系统开发背景结合现实的可用性)
+    - [1.2 开发环境](#12-开发环境)
+    - [1.3 技术路线](#13-技术路线)
+      - [后端架构](#后端架构)
+      - [前端架构](#前端架构)
+      - [数据库设计](#数据库设计)
+      - [系统安全](#系统安全)
+  - [2、概要设计](#2概要设计)
+    - [2.1 需求概述（囊括需求清单的内容，按角色分析）](#21-需求概述囊括需求清单的内容按角色分析)
+      - [2.1.1 普通用户需求](#211-普通用户需求)
+      - [2.1.2 管理员需求](#212-管理员需求)
+    - [2.2 系统功能模块图](#22-系统功能模块图)
+  - [3、详细设计](#3详细设计)
+    - [3.1 UI设计](#31-ui设计)
+      - [**整体风格**：](#整体风格)
+      - [**主题实现**：](#主题实现)
+      - [响应式布局](#响应式布局)
+      - [**主要页面设计**：](#主要页面设计)
+    - [3.2 数据库设计](#32-数据库设计)
+      - [3.2.1 ER图设计](#321-er图设计)
+      - [3.2.2 数据库表结构](#322-数据库表结构)
+      - [3.2.3 数据库数据样例](#323-数据库数据样例)
+    - [3.3 功能模块流程图or时序图（对2.2中的系统功能模块图中的子功能展开分析）](#33-功能模块流程图or时序图对22中的系统功能模块图中的子功能展开分析)
+      - [3.3.1 用户注册流程](#331-用户注册流程)
+      - [3.3.2 用户登录流程](#332-用户登录流程)
+      - [3.3.3 产品购买流程](#333-产品购买流程)
+      - [3.3.4 帖子发布流程](#334-帖子发布流程)
+      - [3.3.5 帖子审核流程](#335-帖子审核流程)
+  - [4、系统功能和测试(截图+描述)](#4系统功能和测试截图描述)
+    - [4.1 系统功能](#41-系统功能)
+    - [4.2 系统测试](#42-系统测试)
+    - [4.3 测试截图](#43-测试截图)
+      - [4.3.1 系统主题展示](#431-系统主题展示)
+      - [4.3.2 多平台兼容性展示](#432-多平台兼容性展示)
+      - [4.3.3 登录页面](#433-登录页面)
+      - [4.3.4 开户页面](#434-开户页面)
+      - [4.3.5 社区页面](#435-社区页面)
+      - [4.3.6 市场页面](#436-市场页面)
+      - [4.3.7 用户帖子页面](#437-用户帖子页面)
+      - [4.3.8 API文档界面](#438-api文档界面)
+  - [5、总结与体会](#5总结与体会)
+    - [5.1 总结](#51-总结)
+    - [5.2 体会](#52-体会)
+  - [6、小组分工(写明每位同学承担的工作，按工作量排序，给出占比。例：小A完成需求分析，概要设计和后端编写，（40%）)](#6小组分工写明每位同学承担的工作按工作量排序给出占比例小a完成需求分析概要设计和后端编写40)
+
 
 ## 1、绪论
 
@@ -18,11 +65,12 @@ Southern Money系统融合了现代金融科技与互联网社区理念，通过
 
 | 类别 | 技术/工具 | 版本 |
 |------|-----------|------|
-| 后端开发语言 | C# | 10.0+ |
-| 后端框架 | ASP.NET Core | 6.0+ |
+| 后端开发语言 | C# | 12.0+ |
+| 后端框架 | ASP.NET Core | 10.0+ |
 | 前端开发语言 | Dart | 3.0+ |
 | 前端框架 | Flutter | 3.0+ |
-| 数据库 | SQLite | 3.0+ |
+| 数据库（原型） | SQLite | 3.0+ |
+| 数据库（生产） | PostgreSQL | 17.0+ |
 | ORM框架 | Entity Framework Core | 6.0+ |
 | API文档 | Swagger | 5.0+ |
 | 身份认证 | JWT | - |
@@ -31,31 +79,319 @@ Southern Money系统融合了现代金融科技与互联网社区理念，通过
 
 Southern Money系统采用前后端分离的现代化架构设计，具体技术路线如下：
 
-1. **后端架构**：
+#### 后端架构
    - 基于ASP.NET Core Web API构建高性能RESTful API服务
    - 采用Entity Framework Core实现高效数据库操作和ORM映射
    - 集成JWT身份认证与授权机制，保障API安全访问
    - 实施分层架构设计：Controller层（请求处理）、Service层（业务逻辑）、Repository层（数据访问）
    - 开发中间件组件处理身份验证、异常处理、日志记录等横切关注点
+```mermaid
+graph LR
+    %% 用户层
+    Client[接受HTTP请求]
+    
+    %% Controller层
+    Controller[Controller层<br/>请求处理]
+    
+    %% Service层
+    Service[Service层<br/>业务逻辑]
+    
+    %% Repository层
+    Repository[Repository层<br/>数据访问]
+    
+    %% 数据层
+    Database[(数据库)]
+    
+    %% 连接关系
+    Client --> Controller
+    Controller --> Service
+    Service --> Repository
+    Repository --> Database
+    
+    %% 样式定义
+    classDef controller fill:#e1f5fe
+    classDef service fill:#f3e5f5
+    classDef repository fill:#e8f5e8
+    classDef database fill:#fff3e0
+    classDef client fill:#fce4ec
+    
+    class Controller controller
+    class Service service
+    class Repository repository
+    class Database database
+    class Client client
+```
+系统设计如下
+```mermaid
+flowchart TD
+      subgraph 控制器层
+         UserController[UserController]
+         PostController[PostController]
+         StoreController[StoreController]
+         ImageBedController[ImageBedController]
+         AdminController[AdminController]
+         NotificationController[NotificationController]
+         TransactionController[TransactionController]
+      end
 
-2. **前端架构**：
+      subgraph 服务层
+         UserService[UserService]
+         PostService[PostService]
+         ProductService[ProductService]
+         ImageBedService[ImageBedService]
+         AdminService[AdminService]
+         NotificationService[NotificationService]
+         TransactionService[TransactionService]
+         UserAssetService[UserAssetService]
+         ProductCategoryService[ProductCategoryService]
+         UserFavoriteCategoryService[UserFavoriteCategoryService]
+      end
+
+      subgraph 数据访问层
+         UserRepository[UserRepository]
+         PostRepository[PostRepository]
+         ImageRepository[ImageRepository]
+         ProductRepository[ProductRepository]
+         TransactionRepository[TransactionRepository]
+         UserAssetRepository[UserAssetRepository]
+         ProductCategoryRepository[ProductCategoryRepository]
+         UserFavoriteCategoryRepository[UserFavoriteCategoryRepository]
+         NotificationRepository[NotificationRepository]
+      end
+
+      subgraph 基础设施层
+         AppDbContext[AppDbContext]
+         JwtUtils[JwtUtils]
+      end
+
+      %% 控制器依赖服务
+      UserController --> UserService
+      PostController --> PostService
+      StoreController --> ProductService
+      StoreController --> UserAssetService
+      ImageBedController --> ImageBedService
+      AdminController --> AdminService
+      NotificationController --> NotificationService
+      TransactionController --> TransactionService
+
+      %% 服务依赖仓库和其他服务
+      UserService --> UserRepository
+      PostService --> PostRepository
+      PostService --> ImageRepository
+      PostService --> NotificationService
+      PostService --> UserRepository
+      ProductService --> ProductRepository
+      ImageBedService --> ImageRepository
+      TransactionService --> TransactionRepository
+      TransactionService --> UserAssetRepository
+      TransactionService --> ProductRepository
+      UserAssetService --> UserAssetRepository
+      ProductCategoryService --> ProductCategoryRepository
+      UserFavoriteCategoryService --> UserFavoriteCategoryRepository
+      NotificationService --> NotificationRepository
+
+      %% 仓库依赖数据库上下文
+      UserRepository --> AppDbContext
+      PostRepository --> AppDbContext
+      ImageRepository --> AppDbContext
+      ProductRepository --> AppDbContext
+      TransactionRepository --> AppDbContext
+      UserAssetRepository --> AppDbContext
+      ProductCategoryRepository --> AppDbContext
+      UserFavoriteCategoryRepository --> AppDbContext
+      NotificationRepository --> AppDbContext
+
+      %% 服务依赖工具类
+      UserService --> JwtUtils
+```
+
+#### 前端架构
    - 基于Flutter框架开发跨平台应用，支持Web、Android、iOS、Windows、macOS、Linux六大平台
-   - 采用Dio库实现高效HTTP请求处理和拦截器机制
-   - 实现JWT令牌自动管理与刷新机制，确保持续安全访问
-   - 集成状态管理库实现应用状态的高效管理
-   - 实施响应式UI设计，自动适配不同屏幕尺寸和设备类型
+   - 开发状态管理库实现应用状态的高效管理
 
-3. **数据库设计**：
-   - 选用SQLite数据库，兼顾开发便捷性与部署灵活性
+实施响应式UI设计，自动适配不同屏幕尺寸和设备类型
+||横屏|竖屏|
+|:---:|:---:|:---:|
+|导航栏|左侧|底部|
+|新页面|作为悬浮窗弹出|作为新页面弹出|
+|登陆页面|在左侧显示占位填充|直接显示|
+
+采用HTTP2库实现高效HTTP请求处理和拦截器机制，简化了认证流程，并实现JWT令牌自动管理与刷新机制，确保持续安全访问
+``` mermaid
+graph LR
+    Request[发起HTTP请求]-->Interceptor[拦截器：添加访问令牌]
+    Interceptor-->Remote[远程资源]
+    Remote-->Expire{令牌过期错误？}
+    Expire-->|是|TokenRefresh[刷新令牌]
+    TokenRefresh-->RefreshResult{刷新成功？}
+    RefreshResult-->|成功|Remote
+    RefreshResult-->|失败|ErrorHandler[错误处理]
+    Expire-->|否|Response[正常响应]
+    
+    classDef requestNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef interceptorNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef remoteNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef decisionNode fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef refreshNode fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    classDef responseNode fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class Request requestNode
+    class Interceptor interceptorNode
+    class Remote remoteNode
+    class Expire,RefreshResult decisionNode
+    class TokenRefresh refreshNode
+    class Response responseNode
+    class ErrorHandler errorNode
+    
+    
+```
+设计了这些页面，下图描述了这些页面的切换关系：
+```mermaid
+flowchart LR
+      %% Entry Points
+      A[Login Page] -->|Login Success| B[Main App]
+      C[Register Page] 
+      A <--> C
+      
+      %% Main App Tab Navigation
+      B -->|Tab Switch| D[Home Page]
+      B -->|Tab Switch| E[Community Page]
+      B -->|Tab Switch| F[Market Page]
+      B -->|Tab Switch| G[Profile Page]
+      D <--> E <--> F <--> G <--> D
+      
+      %% Home Page Flow
+      D -->|View Post| H[Post Page]
+      D -->|View Product| I[CSGO Product Detail Page]
+      
+      %% Community Page Flow
+      E -->|View Post| H
+      E -->|Search| J[Community Search Page]
+      J -->|View Post| H
+      H -->|View User| K[Profile Page]
+      H -->|View Author| L[Posts by User]
+      
+      %% Market Page Flow
+      F -->|View Category| M[CSGO Category Page]
+      F -->|Search| N[Market Search Page]
+      M -->|View Products| O[CSGO Products by Category]
+      O -->|View Detail| I
+      N -->|View Detail| I
+      
+      %% Profile Page Flow
+      G -->|Edit Profile| P[Profile Edit Page]
+      G -->|My Posts| Q[My Posts]
+      G -->|My Collection| R[My Collection]
+      G -->|My Message| S[My Message]
+      G -->|My Selections| T[My Selections]
+      G -->|My Transaction| U[My Transaction]
+      G -->|Settings| V[Setting]
+      G -->|Open an Account| W[Open an Account]
+      Q -->|View Post| H
+      
+      %% Settings Flow
+      V -->|Theme Color| X[Theme Color Page]
+      V -->|Duration Setting| Y[Setting Duration]
+      V -->|API Setting| Z[Set API Page]
+      
+      %% Admin Flow
+      G -->|Admin Access| AA[Admin Page]
+      AA -->|Manage Users| AB[Admin Manage User]
+      AA -->|Censor Forum| AC[Admin Censor Forum]
+      AA -->|Post Block History| AD[Admin Post Block History]
+      AA -->|Statistics| AE[Admin Statistics]
+      
+      %% CSGO Management Flow
+      AA -->|Create Category| AF[CSGO Category Create]
+      AA -->|Create Product| AG[CSGO Products Create]
+      
+      %% Debug Flow
+      G -->|Debug| AH[Debug Page]
+      
+      %% About Us
+      V -->|About Us| AI[About Us Page]
+```
+运用依赖注入容器管理应用依赖，实现模块解耦。遵循SOLID原则中的单一职责和依赖倒置，提高系统的可维护性、可测试性和扩展性。
+下图依赖关系：
+```mermaid
+graph TD
+       subgraph "核心依赖"
+           SP[SharedPreferences] --> TS[TokenService]
+           SP --> PS[PasswordService]
+           TS --> ACS[AppConfigService]
+           PI[PackageInfo] --> VS[VersionService]
+       end
+       
+       subgraph "HTTP客户端"
+           DIO[Dio]
+           ACS --> JD[JwtDio]
+           ALS[ApiLoginService] --> JD
+       end
+       
+       subgraph "API服务"
+           JD --> APS[ApiPostService]
+           JD --> AUS[ApiUserService]
+           JD --> ANS[ApiNotificationService]
+           JD --> AIS[ApiImageService]
+           JD --> ASS[ApiStoreService]
+           JD --> ATS[ApiTransactionService]
+           JD --> AAdS[ApiAdminService]
+           
+           DIO --> ALS
+           ACS --> ALS
+           
+           DIO --> ATS2[ApiTestService]
+           ACS --> ATS2
+           
+           DIO --> AUS
+           ACS --> AIS
+       end
+       
+```
+#### 数据库设计
+   - 在开发过程中，采用SQLite数据库进行原型设计和测试；在生产环境中，切换到PostgreSQL数据库以实现高并发和高数据吞吐量。
    - 设计规范化关系型数据模型，优化表结构和关联关系
    - 实现完整的数据完整性约束，确保数据一致性和可靠性
 
-4. **系统安全**：
+#### 系统安全
    - 采用密码哈希存储技术，保障用户密码安全
    - 实施JWT令牌认证机制，确保API访问安全
    - 设计基于角色的权限管理系统，区分普通用户与管理员权限
    - 开发异常处理中间件，防止敏感信息泄露，提供友好错误提示
 
+
+   - **认证流程图**：
+     ```mermaid
+     flowchart LR
+         A[接收API请求] --> D{令牌正确?}
+         D -->|否| E[继续处理请求，但无用户信息]
+         D -->|是| G[提取token]
+         G --> H[验证token有效性]
+         H -->|无效| E
+         H -->|有效| I[获取用户ID和角色信息]
+         I --> J[将用户信息存储在HttpContext中]
+         J --> K[继续处理请求]
+         style A fill:#f9f,stroke:#333,stroke-width:2px
+         style H fill:#fc9,stroke:#333,stroke-width:2px
+         style I fill:#cfc,stroke:#333,stroke-width:2px
+     ```
+   - **授权流程图**：
+     ```mermaid
+     flowchart LR
+         A[控制器方法开始执行] --> B{是否需要授权?}
+         B -->|否| C[继续执行方法逻辑]
+         B -->|是| D{HttpContext中是否包含User信息?}
+         D -->|否| E[返回401 Unauthorized]
+         D -->|是| F{获取用户角色}
+         F --> G{用户是否具有所需角色?}
+         G -->|否| H[返回403 Forbidden]
+         G -->|是| C
+         style A fill:#f9f,stroke:#333,stroke-width:2px
+         style E fill:#fcc,stroke:#333,stroke-width:2px
+         style H fill:#fcc,stroke:#333,stroke-width:2px
+         style C fill:#cfc,stroke:#333,stroke-width:2px
+     ```
 ## 2、概要设计
 
 ### 2.1 需求概述（囊括需求清单的内容，按角色分析）
@@ -154,18 +490,26 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 
 Southern Money系统采用Material Design 3设计风格，这是Google推出的现代化设计语言，主要特点如下：
 
-1. **整体风格**：
+#### **整体风格**：
    - 基于Material Design 3规范，提供现代化的视觉体验
    - 支持亮色和暗色主题，用户可以根据喜好切换
    - 采用动态颜色系统，基于用户选择的颜色种子生成完整的色彩方案
    - 界面简洁、专业，符合金融应用的视觉需求
 
-2. **主题实现**：
+#### **主题实现**：
    - 在`main.dart`中通过`ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true)`实现Material Design 3主题
    - 支持动态切换主题颜色，用户可以在设置中选择不同的主题色
    - 自动适配系统的亮色/暗色模式，同时允许用户手动切换
 
-3. **主要页面设计**：
+#### 响应式布局
+
+|横屏|竖屏|
+|:-:|:-:|
+|![登录页面-横屏](login_page_landscape.png)|![登录页面-竖屏](login_page_portrait.png)|
+
+
+
+#### **主要页面设计**：
    - **首页**：
      - 顶部显示应用标题和导航栏
      - 中部包含快速导航区，提供开户、CSGO饰品、期货、黄金、虚拟货币等快捷入口
@@ -187,12 +531,12 @@ Southern Money系统采用Material Design 3设计风格，这是Google推出的�
      - 中部包含管理菜单，如用户管理、内容审核、系统统计等
      - 底部显示相关操作按钮
 
-4. **组件设计**：
+2. **组件设计**：
    - 采用Material 3组件，如NavigationBar、NavigationRail、AppBar、Card、FloatingActionButton等
    - 自定义组件设计，如PostCard、CategoryCard、StockCard等，保持界面一致性
    - 组件支持响应式布局，适配不同屏幕尺寸
 
-5. **交互设计**：
+3. **交互设计**：
    - 遵循Material Design的交互规范，提供一致的用户体验
    - 流畅的动画效果，如页面切换、按钮点击、下拉刷新等
    - 清晰的导航结构，便于用户快速找到所需功能
@@ -357,25 +701,34 @@ flowchart LR
 ```
 
 #### 3.3.3 产品购买流程
-
+针对产品购买这种涉及多个操作的流程，我们需要考虑事务的一致性和并发性。以下是一个基于Mermaid语法的流程图，展示了产品购买的详细流程：
 ```mermaid
 flowchart LR
-    A[开始] --> B[选择产品]
-    B --> C[输入购买数量]
-    C --> D[前端验证]
-    D --> E{验证通过?}
-    E -->|是| F[调用购买API]
-    E -->|否| C
-    F --> G[后端验证用户资产]
-    G --> H{资产充足?}
-    H -->|是| I[扣减用户余额]
-    H -->|否| J[返回余额不足错误]
-    I --> K[创建交易记录]
-    K --> L[更新产品信息]
-    L --> M[发送通知]
-    M --> N[返回结果]
-    J --> O[结束]
-    N --> O[结束]
+   A[开始事务] --> B{验证商品存在?}
+   B -->|是| C{验证购买者不是所有者?}
+   B -->|否| Z[抛出异常]
+   C -->|是| D[计算总价]
+   C -->|否| Z
+   D --> E{检查购买者余额?}
+   E -->|足够| Node{执行}
+   E -->|不足| Z
+   Node --> F[扣除购买者余额]
+   Node --> G[增加销售者余额]
+   Node --> H[更新销售者收益]
+   Node --> I[标记商品为已删除]
+   Node --> J[创建交易记录]
+   F --> L
+   G --> L
+   H --> L
+   I --> L
+   J --> L[保存所有更改]
+   L --> M[提交事务]
+   M --> N[返回交易记录]
+   Z --> O[回滚事务]
+
+   style A fill:#f9f,stroke:#333,stroke-width:2px
+   style L fill:#cfc,stroke:#333,stroke-width:2px
+   style N fill:#fcc,stroke:#333,stroke-width:2px
 ```
 
 #### 3.3.4 帖子发布流程
@@ -515,18 +868,9 @@ flowchart LR
 
 登录页面支持用户名和密码登录，同时提供注册新用户功能。页面采用响应式设计，能够适配不同屏幕尺寸和方向。
 
-<table>
-  <tr>
-    <td style="text-align: center;">
-      <img src="login_page_portrait.png" alt="登录页面-竖屏" width="300"/>
-      <br>登录页面-竖屏
-    </td>
-    <td style="text-align: center;">
-      <img src="login_page_landscape.png" alt="登录页面-横屏" width="400"/>
-      <br>登录页面-横屏
-    </td>
-  </tr>
-</table>
+|横屏|竖屏|
+|:-:|:-:|
+|![登录页面-横屏](login_page_landscape.png)|![登录页面-竖屏](login_page_portrait.png)|
 
 #### 4.3.4 开户页面
 
