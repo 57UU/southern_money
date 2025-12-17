@@ -902,7 +902,7 @@ flowchart LR
 
 #### 4.3.8 API文档界面
 
-系统提供完整的API文档，基于Swagger UI实现，方便开发者了解和使用系统的API接口。
+系统提供完整的API文档，基于Swagger UI实现。并为swagger集成了javascript脚本，使其支持JWT认证。方便开发者了解和使用系统的API接口。
 
 ![Swagger UI界面](swagger_ui.png)
 
