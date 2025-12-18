@@ -23,7 +23,7 @@ class _CommunityPageState extends State<CommunityPage>
   final postService = getIt<ApiPostService>();
 
   // 分页相关状态
-  int _currentPage = 0;
+  int _currentPage = 1;
   int _pageSize = 10;
   bool _hasMore = true;
   bool _isLoading = false;
@@ -86,7 +86,7 @@ class _CommunityPageState extends State<CommunityPage>
 
   void refresh() {
     setState(() {
-      _currentPage = 0;
+      _currentPage = 1;
       _hasMore = true;
       _posts.clear();
     });

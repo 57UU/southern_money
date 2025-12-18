@@ -66,13 +66,13 @@ class _DiscoveryState extends State<Discovery> {
   @override
   void initState() {
     super.initState();
-    futurePosts = postService.getPostPage(page: 0, pageSize: _defaultPageSize);
+    futurePosts = postService.getPostPage(page: 1, pageSize: _defaultPageSize);
   }
 
   void refreshPosts() {
     setState(() {
       futurePosts = postService.getPostPage(
-        page: 0,
+        page: 1,
         pageSize: _defaultPageSize,
       );
     });
