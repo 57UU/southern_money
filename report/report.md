@@ -589,8 +589,6 @@ erDiagram
          long Id PK
          string Name
          string Email
-         Guid Avatar FK
-         decimal Balance
          bool IsAdmin
          bool HasAccount
          DateTime AccountOpenedAt
@@ -646,7 +644,6 @@ erDiagram
          long BuyerUserId FK
          int Quantity
          decimal Price
-         decimal TotalPrice
          DateTime PurchaseTime
      }
      
