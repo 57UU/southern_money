@@ -695,6 +695,8 @@ erDiagram
      Notification ||--|| User : ""
      PostBlock }o--|| User : "操作管理员"
      PostBlock }o--|| Post : "被封禁帖子"
+
+     User ||--|| Image : "用户头像"
      
      %% 多对多关系（关联表在线上）
      Post ||--o{ Image : "PostImage(帖子包含图片)"
