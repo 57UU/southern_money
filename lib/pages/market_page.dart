@@ -62,13 +62,12 @@ class _MarketPageState extends State<MarketPage> {
 
   Widget _buildMarketBar(CategoryResponse category) {
     final avgPrice = _avgPrices[category.id] ?? 0.0;
-    final canNavigate = _isSpecialCategory(category.id);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: canNavigate ? () => _handleCategoryTap(category) : null,
+        onTap: () => _handleCategoryTap(category),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -95,8 +94,8 @@ class _MarketPageState extends State<MarketPage> {
                   Row(
                     children: [
                       const Icon(Icons.trending_up),
-                      if (canNavigate) const SizedBox(width: 8),
-                      if (canNavigate) const Icon(Icons.chevron_right),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.chevron_right),
                     ],
                   ),
                 ],
@@ -114,10 +113,6 @@ class _MarketPageState extends State<MarketPage> {
     );
   }
 
-  bool _isSpecialCategory(String categoryId) {
-    return const {FUTURES_CATEGORY, GOLD_CATEGORY, VIRTUAL_CATEGORY}
-        .contains(categoryId);
-  }
 
   Future<void> _handleCategoryTap(CategoryResponse category) async {
     // 与首页“快速导航”保持一致的跳转逻辑
