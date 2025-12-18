@@ -12,6 +12,7 @@
     - [2.1 需求概述（囊括需求清单的内容，按角色分析）](#21-需求概述囊括需求清单的内容按角色分析)
       - [2.1.1 普通用户需求](#211-普通用户需求)
       - [2.1.2 管理员需求](#212-管理员需求)
+      - [2.1.3 需求与实现对应关系](#213-需求与实现对应关系)
     - [2.2 系统功能模块图](#22-系统功能模块图)
   - [3、详细设计](#3详细设计)
     - [3.1 UI设计](#31-ui设计)
@@ -31,6 +32,7 @@
       - [3.3.5 帖子审核流程](#335-帖子审核流程)
   - [4、系统功能和测试(截图+描述)](#4系统功能和测试截图描述)
     - [4.1 系统功能](#41-系统功能)
+      - [4.1.1 典型用户使用场景](#411-典型用户使用场景)
     - [4.2 系统测试](#42-系统测试)
     - [4.3 测试截图](#43-测试截图)
       - [4.3.1 系统主题展示](#431-系统主题展示)
@@ -232,6 +234,13 @@ flowchart TD
 #### 前端架构
    - 基于Flutter框架开发跨平台应用，支持Web、Android、iOS、Windows、macOS、Linux六大平台
    - 开发状态管理库实现应用状态的高效管理
+   - 使用`get_it`作为依赖注入容器，集中管理`SharedPreferences`、`TokenService`及各类`ApiService`实例，降低页面之间的耦合度（对应`lib/setting/ensure_initialized.dart`）。
+   - 通过`AppConfigService`统一管理主题颜色、动画时长、后端`BaseUrl`和会话 Token，配合`ValueNotifier`实现轻量级响应式状态管理（对应`lib/setting/app_config.dart`）。
+   - 网络层基于`Dio`与自定义`JwtInterceptor`/`JwtDio`，在拦截器中自动附加`Authorization`头、处理401错误并尝试刷新令牌，简化前端对认证细节的处理（对应`lib/webapi/JwtService.dart`及各`api_xxx.dart`）。
+
+前端页面结构围绕`main.dart`中的`MainScreen`搭建，采用“底部/侧边导航 + 多 Tab 页面”的形式：
+- 四个核心 Tab：`HomePage`（首页）、`CommunityPage`（社区）、`MarketPage`（行情）、`ProfilePage`（个人中心）。
+- 借助`popupOrNavigate`与`Fragment`组件，在横屏时优先使用弹窗展示子页面，在竖屏时使用路由切换新页面，提升大屏设备上的多任务体验（对应`lib/widgets/router_utils.dart`）。
 
 实施响应式UI设计，自动适配不同屏幕尺寸和设备类型
 ||横屏|竖屏|
@@ -377,6 +386,9 @@ graph TD
    - 在开发过程中，采用SQLite数据库进行原型设计和测试；在生产环境中，切换到PostgreSQL数据库以实现高并发和高数据吞吐量。
    - 设计规范化关系型数据模型，优化表结构和关联关系
    - 实现完整的数据完整性约束，确保数据一致性和可靠性
+   - 采用 Entity Framework Core Code First 模式并配合`dotnet ef`迁移命令管理表结构，使得从 SQLite 切换到 PostgreSQL 的过程自动化、可回滚。
+   - 对所有`DateTime`字段统一使用 UTC 存储，并在`AppDbContext`中通过`UtcDateTimeConverter`约束转换，避免跨时区显示误差。
+   - 对`PostFavorite`、`UserFavoriteCategory`等多对多关系表使用复合主键，既防止重复收藏，又提升常用查询性能。
 
 #### 系统安全
    - 采用密码哈希存储技术，保障用户密码安全
@@ -414,6 +426,13 @@ graph TD
          style H fill:#fcc,stroke:#333,stroke-width:2px
          style C fill:#cfc,stroke:#333,stroke-width:2px
      ```
+     
+   - 为所有 Web API 统一封装`ApiResponse<T>`响应格式，前端能够通过`Success`、`Message`、`Data`等字段进行一致性错误处理，避免泄露堆栈等敏感信息。
+   - 在图片上传接口中限制文件大小、校验 MIME 类型，并将图片数据与元信息分表存储，降低任意文件上传、恶意脚本执行等风险。
+   - 通过`ExceptionHandlerMiddleware`拦截未处理异常，在生产环境中隐藏详细错误信息，只返回标准化错误响应，并记录日志便于排查。
+   - 开发环境下关闭 JWT 强制校验，便于前端快速联调；上线时只需调整环境配置即可启用完整认证流程。
+   - 对关键管理操作（封禁用户、处理举报、封禁帖子等）在数据库中持久化操作记录（如`PostBlock`、`Notification`），便于审计和追踪。
+
 ## 2、概要设计
 
 ### 2.1 需求概述（囊括需求清单的内容，按角色分析）
@@ -468,6 +487,22 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 
 4. **系统统计**：
    - 查看系统统计数据
+
+#### 2.1.3 需求与实现对应关系
+
+为便于从需求追踪到具体实现，下面给出关键需求与前后端实现的对应关系示例：
+
+| 角色 | 需求 | 前端页面/模块 | 后端接口/模块 |
+|------|------|---------------|----------------|
+| 普通用户 | 注册、登录、自动登录 | `LoginPage`、`RegisterPage`、`AppConfigService` 中的 Token 管理 | `/login/register`、`/login/loginByPassword`、`/login/refreshToken`（`LoginController`） |
+| 普通用户 | 浏览行情和金融产品 | `MarketPage`、`CsgoCategoryPage`、`CsgoProductsByCategory` | `/store/categories`、`/store/products`、`/store/categoryAvgPrice`（`StoreController`） |
+| 普通用户 | 社区发帖、浏览、点赞、收藏 | `CommunityPage`、`PostViewer`、`MyPosts`、`MySelections` | `/posts/create`、`/posts/page`、`/posts/like`、`/posts/favorite`、`/posts/report` 等（`PostController`） |
+| 普通用户 | 购买产品与查看交易记录 | `CsgoProductDetailPage`、`MyTransaction`、`MyYield` | `/transaction/buy`、`/transaction/myRecords`、用户资产相关接口（`TransactionController`、`UserAssetService`） |
+| 普通用户 | 通知中心与消息提醒 | `MyMessage` 页面、通知角标 | `/notification/my`、`/notification/unread-count`、`/notification/read`（`NotificationController`） |
+| 管理员 | 用户管理与封禁 | 管理员入口、用户管理页面 | `/admin/users`、`/admin/handleUser`、`/admin/setAdmin`（`AdminController`） |
+| 管理员 | 内容审核与系统统计 | 帖子审核页面、统计页面 | `/admin/reportedPosts`、`/admin/handleReport`、`/admin/statistics`（`AdminController`、`PostService`） |
+
+通过上述映射，可以清晰看到从“角色需求 → 前端页面 → 后端接口”的完整链路，便于后续维护与扩展。
 
 ### 2.2 系统功能模块图
 
@@ -893,6 +928,19 @@ flowchart LR
    - 支持用户管理和内容审核
    - 实现了系统统计和监控
 
+#### 4.1.1 典型用户使用场景
+
+下面以“普通用户从注册到完成一笔交易”为例说明系统整体功能协同过程：
+
+1. 用户在登录页选择“注册”，填写昵称和密码，前端调用`/login/register`完成注册。
+2. 完成注册后在登录页输入账号密码，调用`/login/loginByPassword`获取 JWT 与刷新令牌，前端通过`TokenService`持久化保存。
+3. 进入首页后，在“快速导航”中选择“开户”，进入开户页面并完成开户流程，后端更新`User`及`UserAsset`信息。
+4. 用户切换到“行情”栏目浏览各类产品分类，点击某一分类进入产品列表，挑选具体产品并在详情页调用`/transaction/buy`完成购买。
+5. 交易完成后，用户可在“我的交易”“收益”页面查看交易记录和资产变化，这些数据来自`/transaction/myRecords`及用户资产相关接口。
+6. 与此同时，系统会通过`NotificationService`向用户发送交易成功通知，用户可在“我的消息”页面统一查看和管理。
+
+通过这一完整场景展示，可以看出各模块之间在前后端层面的协作关系。
+
 ### 4.2 系统测试
 
 1. **功能测试**：
@@ -914,6 +962,20 @@ flowchart LR
    - 测试了系统的身份认证和授权机制
    - 验证了系统的输入验证和输出编码
    - 测试了系统的敏感信息保护
+
+**代表性测试用例示例**：
+
+- 功能测试用例：  
+  - 正常登录：输入正确用户名和密码，期望返回有效 Token 并跳转到主界面。  
+  - 错误登录：输入错误密码，期望返回错误提示且不下发 Token。  
+  - 购买流程：在已开户且余额充足的前提下完成一次购买，校验交易记录与用户资产是否同步更新。
+- 接口与异常测试用例：  
+  - 未登录访问受保护接口（如`/posts/create`、`/transaction/buy`），期望返回 401。  
+  - 使用过期 Token 调用 API，触发前端刷新流程并成功重试或提示重新登录。  
+  - 后端抛出未处理异常时，前端收到统一格式的错误响应而非堆栈信息。
+- 兼容性测试用例：  
+  - 在 Android 模拟器、Windows 桌面和 Web 浏览器上分别运行应用，检查页面布局是否一致、功能是否完整。  
+  - 在横屏/竖屏、窄屏/宽屏设备上验证导航栏位置、弹窗/页面切换行为是否符合设计。
 
 ### 4.3 测试截图
 
@@ -1145,6 +1207,11 @@ Southern Money系统是一个集金融交易、产品展示、社区交流于一
 - 完整的错误处理和日志记录
 - 良好的可扩展性和维护性
 
+在具体实现过程中，我们还在以下方面进行了工程化权衡：
+- 通过依赖注入（后端的`AddScoped`注册，前端的`get_it`容器）实现模块解耦，使控制器、服务与持久层之间的关系通过接口与容器管理，而不是硬编码依赖。
+- 利用 EF Core 迁移与双数据库支持（SQLite + PostgreSQL），既方便本地快速迭代，又为后续高并发生产环境预留了扩展空间。
+- 前端在导航与布局上针对横竖屏、大屏/小屏做了差异化设计，既保持代码结构统一，又在体验上兼顾手机和平板/桌面端。
+
 ### 5.2 体会
 
 通过开发Southern Money系统，我们学到了以下经验和体会：
@@ -1179,8 +1246,15 @@ Southern Money系统是一个集金融交易、产品展示、社区交流于一
 - 小A：完成需求分析，概要设计和后端编写，（40%）
 - 小B：完成详细设计，前端实现和测试，（40%）
 - 小C：完成数据库设计，系统测试和文档编写，（20%）
+为使分工更清晰，补充说明各成员的代表性工作如下：
+
+| 成员 | 主要负责模块 | 具体工作内容示例 |
+|------|--------------|------------------|
+| 小A  | 后端与系统架构 | 负责 ASP.NET Core 项目的整体架构设计、控制器与服务层编写、认证/授权中间件、数据库迁移脚本及默认数据初始化等工作。 |
+| 小B  | 前端 UI 与业务逻辑 | 负责 Flutter 界面设计与实现、页面导航与响应式布局、与后端接口的对接、主要业务流程（发帖、购买、社区交互等）的前端实现与联调。 |
+| 小C  | 数据模型与测试文档 | 负责数据库表结构与 ER 模型设计、测试用例设计与执行、性能与兼容性测试、项目文档与本报告撰写整理工作。 |
+| 小D  | 其他工作|
 
 通过小组协作，我们成功完成了Southern Money系统的开发。在开发过程中，我们遇到了各种挑战和问题，但通过团队合作和技术学习，我们成功解决了这些问题，提高了系统的质量和性能。
 
 未来，我们将继续优化和扩展系统功能，提高系统的安全性和可靠性，为用户提供更好的服务和体验。
-
