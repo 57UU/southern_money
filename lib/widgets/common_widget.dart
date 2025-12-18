@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 Widget TitleText(String title) {
@@ -82,12 +81,12 @@ class Avater extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: CachedNetworkImage(
-          imageUrl: avatarUrl,
+        child: Image.network(
+          avatarUrl,
           fit: BoxFit.cover,
           width: 40,
           height: 40,
-          errorWidget: (context, url, error) => Container(
+          errorBuilder: (context, url, error) => Container(
             width: 40,
             height: 40,
             color: colorScheme.surfaceContainerHighest,

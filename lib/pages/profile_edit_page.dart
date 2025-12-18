@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -171,7 +170,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                                   as ImageProvider
                                             : FileImage(File(_avatarPath!))
                                                   as ImageProvider
-                                      : CachedNetworkImageProvider(
+                                      : NetworkImage(
                                           imageService.getImageUrl(
                                             _avatarPath!,
                                           ),

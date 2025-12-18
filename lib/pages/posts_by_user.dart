@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/setting/ensure_initialized.dart';
 import 'package:southern_money/webapi/api_post.dart';
@@ -166,12 +165,12 @@ class _PostsByUserState extends State<PostsByUser> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(30),
-                      child: CachedNetworkImage(
-                        imageUrl: widget.user.avatarUrl,
+                      child: Image.network(
+                        widget.user.avatarUrl,
                         fit: BoxFit.cover,
                         width: 60,
                         height: 60,
-                        errorWidget: (context, url, error) => Container(
+                        errorBuilder: (context, url, error) => Container(
                           width: 60,
                           height: 60,
                           color: colorScheme.surfaceContainerHighest,

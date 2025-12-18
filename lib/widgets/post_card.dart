@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/theme_color_page.dart';
 import 'package:southern_money/widgets/common_widget.dart';

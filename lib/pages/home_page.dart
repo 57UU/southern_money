@@ -62,15 +62,19 @@ class _DiscoveryState extends State<Discovery> {
 
   late Future<ApiResponse<PagedResponse<PostPageItemResponse>>> futurePosts;
 
+  final int _defaultPageSize = 4;
   @override
   void initState() {
     super.initState();
-    futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+    futurePosts = postService.getPostPage(page: 0, pageSize: _defaultPageSize);
   }
 
   void refreshPosts() {
     setState(() {
-      futurePosts = postService.getPostPage(page: 0, pageSize: 3);
+      futurePosts = postService.getPostPage(
+        page: 0,
+        pageSize: _defaultPageSize,
+      );
     });
   }
 

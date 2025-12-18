@@ -1,5 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:decimal/decimal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:southern_money/pages/admin_page.dart';
@@ -106,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage>
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          backgroundImage: CachedNetworkImageProvider(imgUrl),
+                          backgroundImage: NetworkImage(imgUrl),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
