@@ -809,14 +809,16 @@ flowchart LR
    G --> L
    H --> L
    I --> L
-   J --> L[保存所有更改]
-   L --> M[提交事务]
-   M --> N[返回交易记录]
-   Z --> O[回滚事务]
+   J --> L[提交事务]
+   L --> M{修改成功？}
+   M --是--> N[成功]
+   M --否--> roll[回滚事务]
+
+   Z --> O[终止]
 
    style A fill:#f9f,stroke:#333,stroke-width:2px
-   style L fill:#cfc,stroke:#333,stroke-width:2px
-   style N fill:#fcc,stroke:#333,stroke-width:2px
+   style N fill:#cfc,stroke:#333,stroke-width:2px
+   style roll fill:#fcc,stroke:#333,stroke-width:2px
 ```
 
 #### 3.3.4 帖子发布流程
