@@ -25,6 +25,11 @@ class MyApp extends StatelessWidget {
     final colorSeed = appConfigService.appSetting.value[theme_color];
     return MaterialApp(
       title: '南方财富',
+      locale: const Locale.fromSubtags(
+        languageCode: 'zh',
+        scriptCode: 'Hans',
+        countryCode: 'CN',
+      ),
       theme: ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true),
       darkTheme: ThemeData(
         colorSchemeSeed: colorSeed,
