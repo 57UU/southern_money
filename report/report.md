@@ -15,10 +15,10 @@
     - [2.2 系统功能模块图](#22-系统功能模块图)
   - [3、详细设计](#3详细设计)
     - [3.1 UI设计](#31-ui设计)
-      - [3.1.1整体风格：](#311-整体风格)
-      - [3.1.2 主题实现：](#312-主题实现)
-      - [3.1.3 响应式布局](#313-响应式布局)
-      - [3.1.4 主要页面设计](#314-主要页面设计)
+      - [**整体风格**：](#整体风格)
+      - [**主题实现**：](#主题实现)
+      - [响应式布局](#响应式布局)
+      - [**主要页面设计**：](#主要页面设计)
     - [3.2 数据库设计](#32-数据库设计)
       - [3.2.1 ER图设计](#321-er图设计)
       - [3.2.2 数据库表结构](#322-数据库表结构)
@@ -584,54 +584,122 @@ Southern Money系统采用Material Design 3设计风格，这是Google推出的�
 
 ```mermaid
 erDiagram
-    User ||--o{ Post : "发布"
-    User ||--o{ Product : "上传"
-    User ||--o{ TransactionRecord : "购买"
-    User ||--o{ Notification : "接收"
-    User ||--|| UserAsset : "拥有"
-    User ||--o{ UserFavoriteCategory : "收藏"
-    User ||--o{ PostLike : "点赞"
-    User ||--o{ PostFavorite : "收藏"
-    User ||--o{ Image : "上传"
-    User ||--o{ PostBlock : "管理"
-    
-    Post ||--o{ PostImage : "包含"
-    Post ||--o{ PostTags : "标记"
-    Post ||--o{ PostLike : "被点赞"
-    Post ||--o{ PostFavorite : "被收藏"
-    Post ||--o{ PostBlock : "被管理"
-    
-    Product ||--o{ TransactionRecord : "交易"
-    Product ||--|| ProductCategory : "属于"
-    
-    ProductCategory ||--o{ Product : "包含"
-    ProductCategory ||--o{ UserFavoriteCategory : "被收藏"
-    
-    Image ||--o{ PostImage : "关联"
-    
-    UserFavoriteCategory }|--|| User : "属于"
-    UserFavoriteCategory }|--|| ProductCategory : "收藏"
-    
-    PostImage }|--|| Post : "属于"
-    PostImage }|--|| Image : "关联"
-    
-    PostTags }|--|| Post : "属于"
-    
-    PostLike }|--|| Post : "点赞"
-    PostLike }|--|| User : "点赞"
-    
-    PostFavorite }|--|| Post : "收藏"
-    PostFavorite }|--|| User : "收藏"
-    
-    PostBlock }|--|| Post : "管理"
-    PostBlock }|--|| User : "被管理"
-    
-    TransactionRecord }|--|| Product : "交易"
-    TransactionRecord }|--|| User : "购买"
-    
-    Notification }|--|| User : "接收"
-    
-    UserAsset }|--|| User : "拥有"
+     %% 基础实体
+     User {
+         long Id PK
+         string Name
+         string Email
+         Guid Avatar FK
+         decimal Balance
+         bool IsAdmin
+         bool HasAccount
+         DateTime AccountOpenedAt
+         bool IsBlocked
+         string BlockReason
+         DateTime BlockedAt
+         DateTime CreateTime
+         bool IsDeleted
+     }
+     
+     Post {
+         Guid Id PK
+         long UploaderUserId FK
+         string Title
+         string Content
+         DateTime CreateTime
+         int ReportCount
+         int ViewCount
+         int LikeCount
+         bool IsBlocked
+     }
+     
+     Image {
+         Guid Id PK
+         long UploaderUserId FK
+         string Description
+         string ImageType
+         byte[] Data
+         DateTime CreateTime
+     }
+     
+     Product {
+         Guid Id PK
+         string Name
+         decimal Price
+         string Description
+         Guid CategoryId FK
+         long UploaderUserId FK
+         DateTime CreateTime
+         bool IsDeleted
+     }
+     
+     ProductCategory {
+         Guid Id PK
+         string Name
+         Guid CoverImageId FK
+         DateTime CreateTime
+     }
+     
+     TransactionRecord {
+         Guid Id PK
+         Guid ProductId FK
+         long BuyerUserId FK
+         int Quantity
+         decimal Price
+         decimal TotalPrice
+         DateTime PurchaseTime
+     }
+     
+     UserAsset {
+         long UserId PK
+         decimal Total
+         decimal TodayEarn
+         decimal AccumulatedEarn
+         decimal EarnRate
+         decimal Balance
+         DateTime UpdatedAt
+     }
+     
+     Notification {
+         Guid Id PK
+         long UserId FK
+         long SubjectUserId FK
+         string Content
+         string Type
+         bool IsRead
+         DateTime CreateTime
+     }
+     
+     PostBlock {
+         Guid Id PK
+         Guid PostId FK
+         long AdminUserId FK
+         bool IsBlock
+         string Reason
+         DateTime ActionTime
+     }
+     PostTag{
+         string Tag
+     }
+     
+     %% 外键关系
+     Post }o--|| User : "发布者"
+     Post }o--|| User : "PostFavorite(收藏帖子)"
+     Image }o--|| User : "上传者"
+     Product }o--|| User : "上传者"
+     Product }o--|| ProductCategory : "分类"
+     ProductCategory }o--|| Image : "封面图片"
+     TransactionRecord }o--|| User : "购买者"
+     TransactionRecord |o--|| Product : "产品"
+     UserAsset |o--|| User : ""
+     Notification ||--|| User : ""
+     PostBlock }o--|| User : "操作管理员"
+     PostBlock }o--|| Post : "被封禁帖子"
+     
+     %% 多对多关系（关联表在线上）
+     Post ||--o{ Image : "PostImage(帖子包含图片)"
+     Post }o--o{ PostTag : ""
+     User ||--o{ ProductCategory : "UserFavoriteCategory(用户收藏种类)"
 ```
 
 #### 3.2.2 数据库表结构

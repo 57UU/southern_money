@@ -97,7 +97,7 @@ class AppConfigService {
   void Function(String newUrl)? onBaseUrlChange;
 
   int get animationTime => appSetting.value[animation_time]!;
-  String get baseUrl => apiBaseUrl.value ?? "http://localhost:5062";
+  String get baseUrl => apiBaseUrl.value ?? "https://server.57u.tech:48404";
   String? get sessionTokenValue => tokenService.sessionToken.value;
 
   SharedPreferences preferences;
