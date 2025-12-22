@@ -13,10 +13,7 @@
   [摘要 <_zh_abstract_>]
 
 
-  set text(font: (
-    (name: "Times New Roman", covers: "latin-in-cjk"),
-    "Kaiti SC"
-  ))
+  set text(font: kaiti)
 
   align(center)[
     #text(size: 14pt, tracking: -1pt, font: songti)[

@@ -39,6 +39,7 @@
   major_en: "",
   abstract_en: [],
   keywords_en: (),
+  users:""
 ) = {
   /* 全局整体设置 */
 
@@ -66,7 +67,7 @@
 
   /* 目录与摘要 */
   // 整体页眉
-  show: _set_paper_page_header.with(anonymous: anonymous, title: title)
+  show: _set_paper_page_header.with(anonymous: anonymous, title: title, users: users)
   // 整体段落与页面设置
   show: _set_paper_page_par
 

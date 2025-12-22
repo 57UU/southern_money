@@ -22,16 +22,14 @@
 }
 
 // 页眉
-#let _set_paper_page_header(anonymous: false, title: "",  body) = {
+#let _set_paper_page_header(anonymous: false, title: "", users: "", body) = {
     set page(
         header: {
             set par(spacing: 12pt)
             set text(font: songti, 10pt, baseline: 8pt)
             [课程名称：数据库系统原理]; 
             h(1fr); 
-            [学生姓名：114514]
-            h(1fr)
-            [学生学号：1919810]
+            [学生姓名：#users]
             line(length: 100%, stroke: 0.7pt)
         },
         header-ascent: 1cm
