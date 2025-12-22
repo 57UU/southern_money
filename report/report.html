@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>report.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E6%8A%A5%E5%91%8A">报告</h1>
+<ul>
+<li><a href="#%E6%8A%A5%E5%91%8A">报告</a>
+<ul>
+<li><a href="#1%E7%BB%AA%E8%AE%BA">1、绪论</a>
+<ul>
+<li><a href="#11-%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E8%83%8C%E6%99%AF%E7%BB%93%E5%90%88%E7%8E%B0%E5%AE%9E%E7%9A%84%E5%8F%AF%E7%94%A8%E6%80%A7">1.1 系统开发背景（结合现实的可用性）</a></li>
+<li><a href="#12-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83">1.2 开发环境</a></li>
+<li><a href="#13-%E6%8A%80%E6%9C%AF%E8%B7%AF%E7%BA%BF">1.3 技术路线</a>
+<ul>
+<li><a href="#%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84">后端架构</a></li>
+<li><a href="#%E5%89%8D%E7%AB%AF%E6%9E%B6%E6%9E%84">前端架构</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1">数据库设计</a></li>
+<li><a href="#%E7%B3%BB%E7%BB%9F%E5%AE%89%E5%85%A8">系统安全</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#2%E6%A6%82%E8%A6%81%E8%AE%BE%E8%AE%A1">2、概要设计</a>
+<ul>
+<li><a href="#21-%E9%9C%80%E6%B1%82%E6%A6%82%E8%BF%B0%E5%9B%8A%E6%8B%AC%E9%9C%80%E6%B1%82%E6%B8%85%E5%8D%95%E7%9A%84%E5%86%85%E5%AE%B9%E6%8C%89%E8%A7%92%E8%89%B2%E5%88%86%E6%9E%90">2.1 需求概述（囊括需求清单的内容，按角色分析）</a>
+<ul>
+<li><a href="#211-%E6%99%AE%E9%80%9A%E7%94%A8%E6%88%B7%E9%9C%80%E6%B1%82">2.1.1 普通用户需求</a></li>
+<li><a href="#212-%E7%AE%A1%E7%90%86%E5%91%98%E9%9C%80%E6%B1%82">2.1.2 管理员需求</a></li>
+</ul>
+</li>
+<li><a href="#22-%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%9B%BE">2.2 系统功能模块图</a></li>
+</ul>
+</li>
+<li><a href="#3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1">3、详细设计</a>
+<ul>
+<li><a href="#31-ui%E8%AE%BE%E8%AE%A1">3.1 UI设计</a>
+<ul>
+<li><a href="#%E6%95%B4%E4%BD%93%E9%A3%8E%E6%A0%BC"><strong>整体风格</strong>：</a></li>
+<li><a href="#%E4%B8%BB%E9%A2%98%E5%AE%9E%E7%8E%B0"><strong>主题实现</strong>：</a></li>
+<li><a href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E5%B8%83%E5%B1%80">响应式布局</a></li>
+<li><a href="#%E4%B8%BB%E8%A6%81%E9%A1%B5%E9%9D%A2%E8%AE%BE%E8%AE%A1"><strong>主要页面设计</strong>：</a></li>
+</ul>
+</li>
+<li><a href="#32-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1">3.2 数据库设计</a>
+<ul>
+<li><a href="#321-er%E5%9B%BE%E8%AE%BE%E8%AE%A1">3.2.1 ER图设计</a></li>
+<li><a href="#322-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E7%BB%93%E6%9E%84">3.2.2 数据库表结构</a></li>
+<li><a href="#323-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%95%B0%E6%8D%AE%E6%A0%B7%E4%BE%8B">3.2.3 数据库数据样例</a></li>
+</ul>
+</li>
+<li><a href="#33-%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E6%B5%81%E7%A8%8B%E5%9B%BEor%E6%97%B6%E5%BA%8F%E5%9B%BE%E5%AF%B922%E4%B8%AD%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%9B%BE%E4%B8%AD%E7%9A%84%E5%AD%90%E5%8A%9F%E8%83%BD%E5%B1%95%E5%BC%80%E5%88%86%E6%9E%90">3.3 功能模块流程图or时序图（对2.2中的系统功能模块图中的子功能展开分析）</a>
+<ul>
+<li><a href="#331-%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B">3.3.1 用户注册流程</a></li>
+<li><a href="#332-%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B">3.3.2 用户登录流程</a></li>
+<li><a href="#333-%E4%BA%A7%E5%93%81%E8%B4%AD%E4%B9%B0%E6%B5%81%E7%A8%8B">3.3.3 产品购买流程</a></li>
+<li><a href="#334-%E5%B8%96%E5%AD%90%E5%8F%91%E5%B8%83%E6%B5%81%E7%A8%8B">3.3.4 帖子发布流程</a></li>
+<li><a href="#335-%E5%B8%96%E5%AD%90%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B">3.3.5 帖子审核流程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#4%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%92%8C%E6%B5%8B%E8%AF%95%E6%88%AA%E5%9B%BE%E6%8F%8F%E8%BF%B0">4、系统功能和测试(截图+描述)</a>
+<ul>
+<li><a href="#41-%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD">4.1 系统功能</a></li>
+<li><a href="#42-%E7%B3%BB%E7%BB%9F%E6%B5%8B%E8%AF%95">4.2 系统测试</a></li>
+<li><a href="#43-%E6%B5%8B%E8%AF%95%E6%88%AA%E5%9B%BE">4.3 测试截图</a>
+<ul>
+<li><a href="#431-%E7%B3%BB%E7%BB%9F%E4%B8%BB%E9%A2%98%E5%B1%95%E7%A4%BA">4.3.1 系统主题展示</a></li>
+<li><a href="#432-%E5%A4%9A%E5%B9%B3%E5%8F%B0%E5%85%BC%E5%AE%B9%E6%80%A7%E5%B1%95%E7%A4%BA">4.3.2 多平台兼容性展示</a></li>
+<li><a href="#433-%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2">4.3.3 登录页面</a></li>
+<li><a href="#434-%E5%BC%80%E6%88%B7%E9%A1%B5%E9%9D%A2">4.3.4 开户页面</a></li>
+<li><a href="#435-%E6%9C%AA%E5%BC%80%E6%88%B7%E7%8A%B6%E6%80%81%E9%A1%B5%E9%9D%A2">4.3.5 未开户状态页面</a></li>
+<li><a href="#436-%E9%A6%96%E9%A1%B5">4.3.6 首页</a></li>
+<li><a href="#437-%E5%B8%82%E5%9C%BA%E9%A1%B5%E9%9D%A2">4.3.7 市场页面</a></li>
+<li><a href="#438-csgo%E5%B8%82%E5%9C%BA%E9%A1%B5%E9%9D%A2">4.3.8 CSGO市场页面</a></li>
+<li><a href="#439-%E8%99%9A%E6%8B%9F%E8%B4%A7%E5%B8%81%E9%A1%B5%E9%9D%A2">4.3.9 虚拟货币页面</a></li>
+<li><a href="#4310-%E8%B4%AD%E4%B9%B0%E9%A1%B5%E9%9D%A2">4.3.10 购买页面</a></li>
+<li><a href="#4311-%E5%85%85%E5%80%BC%E9%A1%B5%E9%9D%A2">4.3.11 充值页面</a></li>
+<li><a href="#4312-%E6%94%B6%E7%9B%8A%E9%A1%B5%E9%9D%A2">4.3.12 收益页面</a></li>
+<li><a href="#4313-%E6%88%91%E6%94%B6%E8%97%8F%E7%9A%84%E4%BA%A7%E5%93%81%E9%A1%B5%E9%9D%A2">4.3.13 我收藏的产品页面</a></li>
+<li><a href="#4314-%E6%88%91%E7%9A%84%E4%BA%A4%E6%98%93%E9%A1%B5%E9%9D%A2">4.3.14 我的交易页面</a></li>
+<li><a href="#4315-%E7%A4%BE%E5%8C%BA%E9%A1%B5%E9%9D%A2">4.3.15 社区页面</a></li>
+<li><a href="#4316-%E5%B8%96%E5%AD%90%E8%AF%A6%E6%83%85%E9%A1%B5%E9%9D%A2">4.3.16 帖子详情页面</a></li>
+<li><a href="#4317-%E6%88%91%E7%9A%84%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.17 我的帖子页面</a></li>
+<li><a href="#4318-%E7%94%A8%E6%88%B7%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.18 用户帖子页面</a></li>
+<li><a href="#4319-%E6%88%91%E6%94%B6%E8%97%8F%E7%9A%84%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.19 我收藏的帖子页面</a></li>
+<li><a href="#4320-%E6%88%91%E7%9A%84%E6%B6%88%E6%81%AF%E9%A1%B5%E9%9D%A2">4.3.20 我的消息页面</a></li>
+<li><a href="#4321-%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83%E9%A1%B5%E9%9D%A2">4.3.21 个人中心页面</a></li>
+<li><a href="#4322-%E8%AE%BE%E7%BD%AE%E9%A1%B5%E9%9D%A2">4.3.22 设置页面</a></li>
+<li><a href="#4323-%E5%88%9B%E5%BB%BA%E5%88%86%E7%B1%BB%E9%A1%B5%E9%9D%A2">4.3.23 创建分类页面</a></li>
+<li><a href="#4324-%E7%AE%A1%E7%90%86%E5%91%98%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86">4.3.24 管理员用户管理</a></li>
+<li><a href="#4325-%E7%AE%A1%E7%90%86%E5%91%98%E5%86%85%E5%AE%B9%E5%AE%A1%E6%A0%B8">4.3.25 管理员内容审核</a></li>
+<li><a href="#4326-%E7%A4%BE%E5%8C%BA%E5%B8%96%E5%AD%90%E4%B8%BE%E6%8A%A5">4.3.26 社区帖子举报</a></li>
+<li><a href="#4327-%E7%AE%A1%E7%90%86%E5%91%98%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90">4.3.27 管理员统计分析</a></li>
+<li><a href="#4328-api%E6%96%87%E6%A1%A3%E7%95%8C%E9%9D%A2">4.3.28 API文档界面</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#5%E6%80%BB%E7%BB%93%E4%B8%8E%E4%BD%93%E4%BC%9A">5、总结与体会</a>
+<ul>
+<li><a href="#51-%E6%80%BB%E7%BB%93">5.1 总结</a></li>
+<li><a href="#52-%E4%BD%93%E4%BC%9A">5.2 体会</a></li>
+</ul>
+</li>
+<li><a href="#6%E5%B0%8F%E7%BB%84%E5%88%86%E5%B7%A5%E5%86%99%E6%98%8E%E6%AF%8F%E4%BD%8D%E5%90%8C%E5%AD%A6%E6%89%BF%E6%8B%85%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%8C%89%E5%B7%A5%E4%BD%9C%E9%87%8F%E6%8E%92%E5%BA%8F%E7%BB%99%E5%87%BA%E5%8D%A0%E6%AF%94%E4%BE%8B%E5%B0%8Fa%E5%AE%8C%E6%88%90%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90%E6%A6%82%E8%A6%81%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%90%8E%E7%AB%AF%E7%BC%96%E5%86%9940">6、小组分工(写明每位同学承担的工作，按工作量排序，给出占比。例：小A完成需求分析，概要设计和后端编写，（40%）)</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="1%E7%BB%AA%E8%AE%BA">1、绪论</h2>
+<h3 id="11-%E7%B3%BB%E7%BB%9F%E5%BC%80%E5%8F%91%E8%83%8C%E6%99%AF%E7%BB%93%E5%90%88%E7%8E%B0%E5%AE%9E%E7%9A%84%E5%8F%AF%E7%94%A8%E6%80%A7">1.1 系统开发背景（结合现实的可用性）</h3>
+<p>在互联网金融蓬勃发展的背景下，用户对金融服务的需求呈现出多样化、个性化和社区化的趋势。传统金融机构的服务模式在便捷性、个性化推荐和用户互动等方面已难以完全满足现代用户的需求。在此背景下，Southern Money系统应运而生，旨在构建一个集金融交易、产品展示、社区交流于一体的综合性金融服务平台。</p>
+<p>系统主要解决以下核心问题：</p>
+<ul>
+<li>金融产品信息碎片化，用户难以高效获取和比较各类金融产品</li>
+<li>缺乏基于用户行为和偏好的个性化金融产品推荐机制</li>
+<li>缺少专业的金融知识交流和分享社区，用户间互动不足</li>
+<li>金融交易记录管理分散，用户难以全面追踪和分析个人财务状况</li>
+</ul>
+<p>Southern Money系统融合了现代金融科技与互联网社区理念，通过技术创新为用户提供安全、便捷、个性化的金融服务体验，助力提升用户金融素养和投资决策能力。</p>
+<h3 id="12-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83">1.2 开发环境</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>技术/工具</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>后端开发语言</td>
+<td>C#</td>
+<td>12.0+</td>
+</tr>
+<tr>
+<td>后端框架</td>
+<td>ASP.NET Core</td>
+<td>10.0+</td>
+</tr>
+<tr>
+<td>前端开发语言</td>
+<td>Dart</td>
+<td>3.0+</td>
+</tr>
+<tr>
+<td>前端框架</td>
+<td>Flutter</td>
+<td>3.0+</td>
+</tr>
+<tr>
+<td>数据库（原型）</td>
+<td>SQLite</td>
+<td>3.0+</td>
+</tr>
+<tr>
+<td>数据库（生产）</td>
+<td>PostgreSQL</td>
+<td>17.0+</td>
+</tr>
+<tr>
+<td>ORM框架</td>
+<td>Entity Framework Core</td>
+<td>6.0+</td>
+</tr>
+<tr>
+<td>API文档</td>
+<td>Swagger</td>
+<td>5.0+</td>
+</tr>
+<tr>
+<td>身份认证</td>
+<td>JWT</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13-%E6%8A%80%E6%9C%AF%E8%B7%AF%E7%BA%BF">1.3 技术路线</h3>
+<p>Southern Money系统采用前后端分离的现代化架构设计，具体技术路线如下：</p>
+<h4 id="%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84">后端架构</h4>
+<ul>
+<li>基于ASP.NET Core Web API构建高性能RESTful API服务</li>
+<li>采用Entity Framework Core实现高效数据库操作和ORM映射</li>
+<li>集成JWT身份认证与授权机制，保障API安全访问</li>
+<li>实施分层架构设计：Controller层（请求处理）、Service层（业务逻辑）、Repository层（数据访问）</li>
+<li>开发中间件组件处理身份验证、异常处理、日志记录等横切关注点</li>
+</ul>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    %% 用户层
+    Client[接受HTTP请求]
+    
+    %% Controller层
+    Controller[Controller层<br/>请求处理]
+    
+    %% Service层
+    Service[Service层<br/>业务逻辑]
+    
+    %% Repository层
+    Repository[Repository层<br/>数据访问]
+    
+    %% 数据层
+    Database[(数据库)]
+    
+    %% 连接关系
+    Client --> Controller
+    Controller --> Service
+    Service --> Repository
+    Repository --> Database
+    
+    %% 样式定义
+    classDef controller fill:#e1f5fe
+    classDef service fill:#f3e5f5
+    classDef repository fill:#e8f5e8
+    classDef database fill:#fff3e0
+    classDef client fill:#fce4ec
+    
+    class Controller controller
+    class Service service
+    class Repository repository
+    class Database database
+    class Client client
+</div></code></pre>
+<p>系统设计如下</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart TD
+      subgraph 控制器层
+         UserController[UserController]
+         PostController[PostController]
+         StoreController[StoreController]
+         ImageBedController[ImageBedController]
+         AdminController[AdminController]
+         NotificationController[NotificationController]
+         TransactionController[TransactionController]
+      end
+
+      subgraph 服务层
+         UserService[UserService]
+         PostService[PostService]
+         ProductService[ProductService]
+         ImageBedService[ImageBedService]
+         AdminService[AdminService]
+         NotificationService[NotificationService]
+         TransactionService[TransactionService]
+         UserAssetService[UserAssetService]
+         ProductCategoryService[ProductCategoryService]
+         UserFavoriteCategoryService[UserFavoriteCategoryService]
+      end
+
+      subgraph 数据访问层
+         UserRepository[UserRepository]
+         PostRepository[PostRepository]
+         ImageRepository[ImageRepository]
+         ProductRepository[ProductRepository]
+         TransactionRepository[TransactionRepository]
+         UserAssetRepository[UserAssetRepository]
+         ProductCategoryRepository[ProductCategoryRepository]
+         UserFavoriteCategoryRepository[UserFavoriteCategoryRepository]
+         NotificationRepository[NotificationRepository]
+      end
+
+      subgraph 基础设施层
+         AppDbContext[AppDbContext]
+         JwtUtils[JwtUtils]
+      end
+
+      %% 控制器依赖服务
+      UserController --> UserService
+      PostController --> PostService
+      StoreController --> ProductService
+      StoreController --> UserAssetService
+      ImageBedController --> ImageBedService
+      AdminController --> AdminService
+      NotificationController --> NotificationService
+      TransactionController --> TransactionService
+
+      %% 服务依赖仓库和其他服务
+      AdminService --> UserRepository
+      AdminService --> ImageRepository
+      AdminService --> PostRepository
+      AdminService --> NotificationService
+      UserService --> UserRepository
+      PostService --> PostRepository
+      PostService --> ImageRepository
+      PostService --> NotificationService
+      PostService --> UserRepository
+      ProductService --> ProductRepository
+      ImageBedService --> ImageRepository
+      TransactionService --> TransactionRepository
+      TransactionService --> UserAssetRepository
+      TransactionService --> ProductRepository
+      UserAssetService --> UserAssetRepository
+      ProductCategoryService --> ProductCategoryRepository
+      UserFavoriteCategoryService --> UserFavoriteCategoryRepository
+      NotificationService --> NotificationRepository
+
+      %% 仓库依赖数据库上下文
+      UserRepository --> AppDbContext
+      PostRepository --> AppDbContext
+      ImageRepository --> AppDbContext
+      ProductRepository --> AppDbContext
+      TransactionRepository --> AppDbContext
+      UserAssetRepository --> AppDbContext
+      ProductCategoryRepository --> AppDbContext
+      UserFavoriteCategoryRepository --> AppDbContext
+      NotificationRepository --> AppDbContext
+
+      %% 服务依赖工具类
+      UserService --> JwtUtils
+</div></code></pre>
+<h4 id="%E5%89%8D%E7%AB%AF%E6%9E%B6%E6%9E%84">前端架构</h4>
+<ul>
+<li>基于Flutter框架开发跨平台应用，支持Web、Android、iOS、Windows、macOS、Linux六大平台</li>
+<li>开发状态管理库实现应用状态的高效管理</li>
+</ul>
+<p>实施响应式UI设计，自动适配不同屏幕尺寸和设备类型</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">横屏</th>
+<th style="text-align:center">竖屏</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">导航栏</td>
+<td style="text-align:center">左侧</td>
+<td style="text-align:center">底部</td>
+</tr>
+<tr>
+<td style="text-align:center">新页面</td>
+<td style="text-align:center">作为悬浮窗弹出</td>
+<td style="text-align:center">作为新页面弹出</td>
+</tr>
+<tr>
+<td style="text-align:center">登陆页面</td>
+<td style="text-align:center">在左侧显示占位填充</td>
+<td style="text-align:center">直接显示</td>
+</tr>
+</tbody>
+</table>
+<p>采用HTTP2库实现高效HTTP请求处理和拦截器机制，简化了认证流程，并实现JWT令牌自动管理与刷新机制，确保持续安全访问</p>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    Request[发起HTTP请求]-->Interceptor[拦截器：添加访问令牌]
+    Interceptor-->Remote[远程资源]
+    Remote-->Expire{令牌过期错误？}
+    Expire-->|是|TokenRefresh[刷新令牌]
+    TokenRefresh-->RefreshResult{刷新成功？}
+    RefreshResult-->|成功|Remote
+    RefreshResult-->|失败|ErrorHandler[错误处理]
+    Expire-->|否|Response[正常响应]
+    
+    classDef requestNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef interceptorNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef remoteNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef decisionNode fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef refreshNode fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    classDef responseNode fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class Request requestNode
+    class Interceptor interceptorNode
+    class Remote remoteNode
+    class Expire,RefreshResult decisionNode
+    class TokenRefresh refreshNode
+    class Response responseNode
+    class ErrorHandler errorNode
+    
+    
+</div></code></pre>
+<p>设计了这些页面，下图描述了这些页面的切换关系：</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+      %% Entry Points
+      A[Login Page] -->|Login Success| B[Main App]
+      C[Register Page] 
+      A <--> C
+      
+      %% Main App Tab Navigation
+      B -->|Tab Switch| D[Home Page]
+      B -->|Tab Switch| E[Community Page]
+      B -->|Tab Switch| F[Market Page]
+      B -->|Tab Switch| G[Profile Page]
+      D <--> E <--> F <--> G <--> D
+      
+      %% Home Page Flow
+      D -->|View Post| H[Post Page]
+      D -->|View Product| I[CSGO Product Detail Page]
+      
+      %% Community Page Flow
+      E -->|View Post| H
+      E -->|Search| J[Community Search Page]
+      J -->|View Post| H
+      H -->|View User| K[Profile Page]
+      H -->|View Author| L[Posts by User]
+      
+      %% Market Page Flow
+      F -->|View Category| M[CSGO Category Page]
+      F -->|Search| N[Market Search Page]
+      M -->|View Products| O[CSGO Products by Category]
+      O -->|View Detail| I
+      N -->|View Detail| I
+      
+      %% Profile Page Flow
+      G -->|Edit Profile| P[Profile Edit Page]
+      G -->|My Posts| Q[My Posts]
+      G -->|My Collection| R[My Collection]
+      G -->|My Message| S[My Message]
+      G -->|My Selections| T[My Selections]
+      G -->|My Transaction| U[My Transaction]
+      G -->|Settings| V[Setting]
+      G -->|Open an Account| W[Open an Account]
+      Q -->|View Post| H
+      
+      %% Settings Flow
+      V -->|Theme Color| X[Theme Color Page]
+      V -->|Duration Setting| Y[Setting Duration]
+      V -->|API Setting| Z[Set API Page]
+      
+      %% Admin Flow
+      G -->|Admin Access| AA[Admin Page]
+      AA -->|Manage Users| AB[Admin Manage User]
+      AA -->|Censor Forum| AC[Admin Censor Forum]
+      AA -->|Post Block History| AD[Admin Post Block History]
+      AA -->|Statistics| AE[Admin Statistics]
+      
+      %% CSGO Management Flow
+      AA -->|Create Category| AF[CSGO Category Create]
+      AA -->|Create Product| AG[CSGO Products Create]
+      
+      %% Debug Flow
+      G -->|Debug| AH[Debug Page]
+      
+      %% About Us
+      V -->|About Us| AI[About Us Page]
+</div></code></pre>
+<p>运用依赖注入容器管理应用依赖，实现模块解耦。遵循SOLID原则中的单一职责和依赖倒置，提高系统的可维护性、可测试性和扩展性。
+下图依赖关系：</p>
+<pre><code class="language-mermaid"><div class="mermaid">graph TD
+       subgraph "核心依赖"
+           SP[SharedPreferences] --> TS[TokenService]
+           SP --> PS[PasswordService]
+           TS --> ACS[AppConfigService]
+           PI[PackageInfo] --> VS[VersionService]
+       end
+       
+       subgraph "HTTP客户端"
+           DIO[Dio]
+           ACS --> JD[JwtDio]
+           ALS[ApiLoginService] --> JD
+       end
+       
+       subgraph "API服务"
+           JD --> APS[ApiPostService]
+           JD --> AUS[ApiUserService]
+           JD --> ANS[ApiNotificationService]
+           JD --> AIS[ApiImageService]
+           JD --> ASS[ApiStoreService]
+           JD --> ATS[ApiTransactionService]
+           JD --> AAdS[ApiAdminService]
+           
+           DIO --> ALS
+           ACS --> ALS
+           
+           DIO --> ATS2[ApiTestService]
+           ACS --> ATS2
+           
+           DIO --> AUS
+           ACS --> AIS
+       end
+       
+</div></code></pre>
+<h4 id="%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1">数据库设计</h4>
+<ul>
+<li>在开发过程中，采用SQLite数据库进行原型设计和测试；在生产环境中，切换到PostgreSQL数据库以实现高并发和高数据吞吐量。</li>
+<li>设计规范化关系型数据模型，优化表结构和关联关系</li>
+<li>实现完整的数据完整性约束，确保数据一致性和可靠性</li>
+</ul>
+<h4 id="%E7%B3%BB%E7%BB%9F%E5%AE%89%E5%85%A8">系统安全</h4>
+<ul>
+<li>采用密码哈希存储技术，保障用户密码安全</li>
+<li>开发异常处理中间件，防止敏感信息泄露，提供友好错误提示</li>
+</ul>
+<p>实施JWT令牌认证机制，确保API访问安全</p>
+<ul>
+<li><strong>认证流程图</strong>：<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[接收API请求] --> D{令牌正确?}
+    D -->|否| E[继续处理请求，但无用户信息]
+    D -->|是| G[提取token]
+    G --> H[验证token有效性]
+    H -->|无效| E
+    H -->|有效| I[获取用户ID和角色信息]
+    I --> J[将用户信息存储在HttpContext中]
+    J --> K[继续处理请求]
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style H fill:#fc9,stroke:#333,stroke-width:2px
+    style I fill:#cfc,stroke:#333,stroke-width:2px
+</div></code></pre>
+</li>
+<li><strong>授权流程图</strong>：<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[控制器方法开始执行] --> B{是否需要授权?}
+    B -->|否| C[继续执行方法逻辑]
+    B -->|是| D{HttpContext中是否包含User信息?}
+    D -->|否| E[返回401 Unauthorized]
+    D -->|是| F{获取用户角色}
+    F --> G{用户是否具有所需角色?}
+    G -->|否| H[返回403 Forbidden]
+    G -->|是| C
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#fcc,stroke:#333,stroke-width:2px
+    style H fill:#fcc,stroke:#333,stroke-width:2px
+    style C fill:#cfc,stroke:#333,stroke-width:2px
+</div></code></pre>
+</li>
+</ul>
+<h2 id="2%E6%A6%82%E8%A6%81%E8%AE%BE%E8%AE%A1">2、概要设计</h2>
+<h3 id="21-%E9%9C%80%E6%B1%82%E6%A6%82%E8%BF%B0%E5%9B%8A%E6%8B%AC%E9%9C%80%E6%B1%82%E6%B8%85%E5%8D%95%E7%9A%84%E5%86%85%E5%AE%B9%E6%8C%89%E8%A7%92%E8%89%B2%E5%88%86%E6%9E%90">2.1 需求概述（囊括需求清单的内容，按角色分析）</h3>
+<p>Southern Money系统面向两类主要用户：普通用户和管理员。系统需求根据用户角色进行分析如下：</p>
+<h4 id="211-%E6%99%AE%E9%80%9A%E7%94%A8%E6%88%B7%E9%9C%80%E6%B1%82">2.1.1 普通用户需求</h4>
+<ol>
+<li>
+<p><strong>用户管理</strong>：</p>
+<ul>
+<li>用户注册、登录、密码修改</li>
+<li>个人信息编辑（头像、昵称等）</li>
+<li>开户功能</li>
+<li>查看个人资产和交易记录</li>
+</ul>
+</li>
+<li>
+<p><strong>金融产品</strong>：</p>
+<ul>
+<li>浏览金融产品列表</li>
+<li>按分类查看金融产品</li>
+<li>搜索金融产品</li>
+<li>收藏感兴趣的产品分类</li>
+<li>购买金融产品</li>
+<li>查看交易记录</li>
+</ul>
+</li>
+<li>
+<p><strong>社区交流</strong>：</p>
+<ul>
+<li>浏览社区帖子</li>
+<li>发布帖子（支持文字、图片）</li>
+<li>点赞、收藏帖子</li>
+<li>评论帖子</li>
+<li>搜索帖子</li>
+<li>查看个人发布的帖子</li>
+<li>查看个人收藏的帖子</li>
+</ul>
+</li>
+<li>
+<p><strong>通知中心</strong>：</p>
+<ul>
+<li>查看系统通知</li>
+<li>查看活动通知</li>
+<li>标记通知为已读</li>
+</ul>
+</li>
+</ol>
+<h4 id="212-%E7%AE%A1%E7%90%86%E5%91%98%E9%9C%80%E6%B1%82">2.1.2 管理员需求</h4>
+<ol>
+<li>
+<p><strong>用户管理</strong>：</p>
+<ul>
+<li>查看用户列表</li>
+<li>封禁/解封用户</li>
+<li>查看用户详情</li>
+</ul>
+</li>
+<li>
+<p><strong>内容管理</strong>：</p>
+<ul>
+<li>审核社区帖子</li>
+<li>封禁/解封帖子</li>
+<li>查看帖子封禁历史</li>
+</ul>
+</li>
+<li>
+<p><strong>产品管理</strong>：</p>
+<ul>
+<li>查看产品列表</li>
+<li>查看产品分类</li>
+</ul>
+</li>
+<li>
+<p><strong>系统统计</strong>：</p>
+<ul>
+<li>查看系统统计数据</li>
+</ul>
+</li>
+</ol>
+<h3 id="22-%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%9B%BE">2.2 系统功能模块图</h3>
+<pre><code class="language-mermaid"><div class="mermaid">    graph LR
+        A[Southern Money系统] --> B[用户管理模块]
+        A --> C[金融产品模块]
+        A --> D[交易管理模块]
+        A --> E[社区论坛模块]
+        A --> F[通知中心模块]
+        A --> G[管理员模块]
+        
+        B --> B1[用户注册/登录]
+        B --> B2[个人信息管理]
+        B --> B3[开户管理]
+        B --> B4[资产查询]
+        
+        C --> C1[产品分类管理]
+        C --> C2[产品列表展示]
+        C --> C3[产品搜索]
+        C --> C4[产品收藏]
+        
+        D --> D1[产品购买]
+        D --> D2[交易记录查询]
+        
+        E --> E1[帖子发布/浏览]
+        E --> E2[帖子点赞/收藏]
+        E --> E3[帖子搜索]
+        E --> E4[帖子审核]
+        
+        F --> F1[通知发送]
+        F --> F2[通知管理]
+        
+        G --> G1[用户管理]
+        G --> G2[内容审核]
+        G --> G3[系统统计]
+</div></code></pre>
+<h2 id="3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1">3、详细设计</h2>
+<h3 id="31-ui%E8%AE%BE%E8%AE%A1">3.1 UI设计</h3>
+<p>Southern Money系统采用Material Design 3设计风格，这是Google推出的现代化设计语言，主要特点如下：</p>
+<h4 id="%E6%95%B4%E4%BD%93%E9%A3%8E%E6%A0%BC"><strong>整体风格</strong>：</h4>
+<ul>
+<li>基于Material Design 3规范，提供现代化的视觉体验</li>
+<li>支持亮色和暗色主题，用户可以根据喜好切换</li>
+<li>采用动态颜色系统，基于用户选择的颜色种子生成完整的色彩方案</li>
+<li>界面简洁、专业，符合金融应用的视觉需求</li>
+</ul>
+<h4 id="%E4%B8%BB%E9%A2%98%E5%AE%9E%E7%8E%B0"><strong>主题实现</strong>：</h4>
+<ul>
+<li>在<code>main.dart</code>中通过<code>ThemeData(colorSchemeSeed: colorSeed, useMaterial3: true)</code>实现Material Design 3主题</li>
+<li>支持动态切换主题颜色，用户可以在设置中选择不同的主题色</li>
+<li>自动适配系统的亮色/暗色模式，同时允许用户手动切换</li>
+</ul>
+<h4 id="%E5%93%8D%E5%BA%94%E5%BC%8F%E5%B8%83%E5%B1%80">响应式布局</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">横屏</th>
+<th style="text-align:center">竖屏</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="login_page_landscape.png" alt="登录页面-横屏"></td>
+<td style="text-align:center"><img src="login_page_portrait.png" alt="登录页面-竖屏"></td>
+</tr>
+</tbody>
+</table>
+<h4 id="%E4%B8%BB%E8%A6%81%E9%A1%B5%E9%9D%A2%E8%AE%BE%E8%AE%A1"><strong>主要页面设计</strong>：</h4>
+<ul>
+<li><strong>首页</strong>：
+<ul>
+<li>顶部显示应用标题和导航栏</li>
+<li>中部包含快速导航区，提供开户、CSGO饰品、期货、黄金、虚拟货币等快捷入口</li>
+<li>底部显示热门社区帖子，支持下拉刷新</li>
+</ul>
+</li>
+<li><strong>社区页</strong>：
+<ul>
+<li>顶部显示社区标题和操作按钮（刷新、搜索、发布）</li>
+<li>中部显示帖子列表，支持分页加载和下拉刷新</li>
+<li>帖子卡片包含标题、内容摘要、作者、头像等信息</li>
+</ul>
+</li>
+<li><strong>市场页</strong>：
+<ul>
+<li>顶部显示行情标题和刷新按钮</li>
+<li>中部显示各个分类的行情卡片，包含分类名称、均价和趋势图</li>
+<li>支持点击分类进入产品列表</li>
+</ul>
+</li>
+<li><strong>个人中心</strong>：
+<ul>
+<li>顶部显示用户头像、昵称和账号状态</li>
+<li>中部包含个人菜单，如我的收藏、我的帖子、我的消息、我的交易等</li>
+<li>底部显示设置和关于我们等链接</li>
+</ul>
+</li>
+<li><strong>管理员页</strong>：
+<ul>
+<li>顶部显示管理员标题</li>
+<li>中部包含管理菜单，如用户管理、内容审核、系统统计等</li>
+<li>底部显示相关操作按钮</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>
+<p><strong>组件设计</strong>：</p>
+<ul>
+<li>采用Material 3组件，如NavigationBar、NavigationRail、AppBar、Card、FloatingActionButton等</li>
+<li>自定义组件设计，如PostCard、CategoryCard、StockCard等，保持界面一致性</li>
+<li>组件支持响应式布局，适配不同屏幕尺寸</li>
+</ul>
+</li>
+<li>
+<p><strong>交互设计</strong>：</p>
+<ul>
+<li>遵循Material Design的交互规范，提供一致的用户体验</li>
+<li>流畅的动画效果，如页面切换、按钮点击、下拉刷新等</li>
+<li>清晰的导航结构，便于用户快速找到所需功能</li>
+<li>友好的错误提示，帮助用户解决问题</li>
+<li>支持手势操作，如滑动、长按、捏合等</li>
+</ul>
+</li>
+</ol>
+<h3 id="32-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1">3.2 数据库设计</h3>
+<h4 id="321-er%E5%9B%BE%E8%AE%BE%E8%AE%A1">3.2.1 ER图设计</h4>
+<p>系统的主要实体及其关系如下：</p>
+<ul>
+<li><strong>用户（User）</strong>：与帖子（Post）、产品（Product）、交易记录（TransactionRecord）、通知（Notification）、用户资产（UserAsset）、用户收藏分类（UserFavoriteCategory）等实体存在关联</li>
+<li><strong>帖子（Post）</strong>：与用户（User）、帖子图片（PostImage）、帖子标签（PostTags）、帖子点赞（PostLike）、帖子收藏（PostFavorite）、帖子封禁（PostBlock）等实体存在关联</li>
+<li><strong>产品（Product）</strong>：与产品分类（ProductCategory）、用户（User）、交易记录（TransactionRecord）等实体存在关联</li>
+<li><strong>产品分类（ProductCategory）</strong>：与产品（Product）、用户收藏分类（UserFavoriteCategory）等实体存在关联</li>
+<li><strong>交易记录（TransactionRecord）</strong>：与用户（User）、产品（Product）等实体存在关联</li>
+<li><strong>通知（Notification）</strong>：与用户（User）等实体存在关联</li>
+<li><strong>图片（Image）</strong>：与用户（User）、帖子图片（PostImage）等实体存在关联</li>
+<li><strong>用户资产（UserAsset）</strong>：与用户（User）等实体存在关联</li>
+<li><strong>用户收藏分类（UserFavoriteCategory）</strong>：与用户（User）、产品分类（ProductCategory）等实体存在关联</li>
+<li><strong>帖子图片（PostImage）</strong>：与帖子（Post）、图片（Image）等实体存在关联</li>
+<li><strong>帖子标签（PostTags）</strong>：与帖子（Post）等实体存在关联</li>
+<li><strong>帖子点赞（PostLike）</strong>：与帖子（Post）、用户（User）等实体存在关联</li>
+<li><strong>帖子收藏（PostFavorite）</strong>：与帖子（Post）、用户（User）等实体存在关联</li>
+<li><strong>帖子封禁（PostBlock）</strong>：与帖子（Post）、用户（User）等实体存在关联</li>
+</ul>
+<pre><code class="language-mermaid"><div class="mermaid">erDiagram
+     %% 基础实体
+     User {
+         long Id PK
+         string Name
+         string Email
+         bool IsAdmin
+         bool HasAccount
+         DateTime AccountOpenedAt
+         bool IsBlocked
+         string BlockReason
+         DateTime BlockedAt
+         DateTime CreateTime
+         bool IsDeleted
+     }
+     
+     Post {
+         Guid Id PK
+         long UploaderUserId FK
+         string Title
+         string Content
+         DateTime CreateTime
+         int ReportCount
+         int ViewCount
+         int LikeCount
+         bool IsBlocked
+     }
+     
+     Image {
+         Guid Id PK
+         long UploaderUserId FK
+         string Description
+         string ImageType
+         byte[] Data
+         DateTime CreateTime
+     }
+     
+     Product {
+         Guid Id PK
+         string Name
+         decimal Price
+         string Description
+         Guid CategoryId FK
+         long UploaderUserId FK
+         DateTime CreateTime
+         bool IsDeleted
+     }
+     
+     ProductCategory {
+         Guid Id PK
+         string Name
+         Guid CoverImageId FK
+         DateTime CreateTime
+     }
+     
+     TransactionRecord {
+         Guid Id PK
+         Guid ProductId FK
+         long BuyerUserId FK
+         int Quantity
+         decimal Price
+         DateTime PurchaseTime
+     }
+     
+     UserAsset {
+         long UserId PK
+         decimal Total
+         decimal TodayEarn
+         decimal AccumulatedEarn
+         decimal EarnRate
+         decimal Balance
+         DateTime UpdatedAt
+     }
+     
+     Notification {
+         Guid Id PK
+         long UserId FK
+         long SubjectUserId FK
+         string Content
+         string Type
+         bool IsRead
+         DateTime CreateTime
+     }
+     
+     PostBlock {
+         Guid Id PK
+         Guid PostId FK
+         long AdminUserId FK
+         bool IsBlock
+         string Reason
+         DateTime ActionTime
+     }
+     PostTag{
+         string Tag
+     }
+     
+     %% 外键关系
+     Post }o--|| User : "发布者"
+     Post }o--|| User : "PostFavorite(收藏帖子)"
+     Image }o--|| User : "上传者"
+     Product }o--|| User : "上传者"
+     Product }o--|| ProductCategory : "分类"
+     ProductCategory }o--|| Image : "封面图片"
+     TransactionRecord }o--|| User : "购买者"
+     TransactionRecord |o--|| Product : "产品"
+     UserAsset |o--|| User : ""
+     Notification ||--|| User : ""
+     PostBlock }o--|| User : "操作管理员"
+     PostBlock }o--|| Post : "被封禁帖子"
+
+     User ||--|| Image : "用户头像"
+     
+     %% 多对多关系（关联表在线上）
+     Post ||--o{ Image : "PostImage(帖子包含图片)"
+     Post }o--o{ PostTag : ""
+     User ||--o{ ProductCategory : "UserFavoriteCategory(用户收藏种类)"
+</div></code></pre>
+<h4 id="322-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E7%BB%93%E6%9E%84">3.2.2 数据库表结构</h4>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>描述</th>
+<th>主要字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users</td>
+<td>用户信息表</td>
+<td>Id, Name, Email, Avatar, Password, IsAdmin, HasAccount, IsBlocked, BlockReason, BlockedAt, CreateTime, IsDeleted, Balance</td>
+</tr>
+<tr>
+<td>Images</td>
+<td>图片信息表</td>
+<td>Id, UploaderUserId, CreateTime, Description, ImageType, Data</td>
+</tr>
+<tr>
+<td>Posts</td>
+<td>帖子信息表</td>
+<td>Id, UploaderUserId, Title, Content, CreateTime, ReportCount, ViewCount, LikeCount, IsBlocked</td>
+</tr>
+<tr>
+<td>PostImages</td>
+<td>帖子图片关联表</td>
+<td>PostId, ImageId</td>
+</tr>
+<tr>
+<td>PostTags</td>
+<td>帖子标签表</td>
+<td>PostId, Tag</td>
+</tr>
+<tr>
+<td>PostLikes</td>
+<td>帖子点赞表</td>
+<td>PostId, UserId, CreateTime</td>
+</tr>
+<tr>
+<td>PostFavorites</td>
+<td>帖子收藏表</td>
+<td>PostId, UserId, CreateTime</td>
+</tr>
+<tr>
+<td>PostBlocks</td>
+<td>帖子封禁表</td>
+<td>Id, PostId, AdminUserId, IsBlock, Reason, ActionTime</td>
+</tr>
+<tr>
+<td>Products</td>
+<td>产品信息表</td>
+<td>Id, Name, Price, Description, CategoryId, UploaderUserId, CreateTime, IsDeleted</td>
+</tr>
+<tr>
+<td>ProductCategories</td>
+<td>产品分类表</td>
+<td>Id, Name, CoverImageId, CreateTime</td>
+</tr>
+<tr>
+<td>UserFavoriteCategories</td>
+<td>用户收藏分类表</td>
+<td>UserId, CategoryId, CreateTime</td>
+</tr>
+<tr>
+<td>TransactionRecords</td>
+<td>交易记录表</td>
+<td>Id, ProductId, BuyerUserId, Quantity, Price, TotalPrice, PurchaseTime</td>
+</tr>
+<tr>
+<td>UserAssets</td>
+<td>用户资产表</td>
+<td>UserId, Total, TodayEarn, AccumulatedEarn, EarnRate, Balance, UpdatedAt</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td>通知表</td>
+<td>Id, UserId, SubjectUserId, Content, Type, IsRead, CreateTime</td>
+</tr>
+</tbody>
+</table>
+<h4 id="323-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%95%B0%E6%8D%AE%E6%A0%B7%E4%BE%8B">3.2.3 数据库数据样例</h4>
+<ol>
+<li><strong>Users表样例数据</strong>：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Name</th>
+<th>Email</th>
+<th>IsAdmin</th>
+<th>HasAccount</th>
+<th>CreateTime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>admin</td>
+<td>admin@example.com</td>
+<td>1</td>
+<td>1</td>
+<td>2023-01-01 00:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>user1</td>
+<td>user1@example.com</td>
+<td>0</td>
+<td>1</td>
+<td>2023-01-02 00:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>user2</td>
+<td>user2@example.com</td>
+<td>0</td>
+<td>0</td>
+<td>2023-01-03 00:00:00</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li><strong>Products表样例数据</strong>：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Name</th>
+<th>Price</th>
+<th>Description</th>
+<th>CategoryId</th>
+<th>UploaderUserId</th>
+<th>CreateTime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>黄金产品</td>
+<td>1800.00</td>
+<td>投资黄金产品</td>
+<td>1</td>
+<td>1</td>
+<td>2023-01-01 00:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>原油产品</td>
+<td>65.50</td>
+<td>投资原油产品</td>
+<td>2</td>
+<td>1</td>
+<td>2023-01-02 00:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>美元产品</td>
+<td>7.20</td>
+<td>投资美元产品</td>
+<td>3</td>
+<td>1</td>
+<td>2023-01-03 00:00:00</td>
+</tr>
+</tbody>
+</table>
+<ol start="3">
+<li><strong>ProductCategories表样例数据</strong>：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Name</th>
+<th>CoverImageId</th>
+<th>CreateTime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>黄金</td>
+<td>image_guid_1</td>
+<td>2023-01-01 00:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>原油</td>
+<td>image_guid_2</td>
+<td>2023-01-01 00:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>外汇</td>
+<td>image_guid_3</td>
+<td>2023-01-01 00:00:00</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E6%B5%81%E7%A8%8B%E5%9B%BEor%E6%97%B6%E5%BA%8F%E5%9B%BE%E5%AF%B922%E4%B8%AD%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%9B%BE%E4%B8%AD%E7%9A%84%E5%AD%90%E5%8A%9F%E8%83%BD%E5%B1%95%E5%BC%80%E5%88%86%E6%9E%90">3.3 功能模块流程图or时序图（对2.2中的系统功能模块图中的子功能展开分析）</h3>
+<h4 id="331-%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B">3.3.1 用户注册流程</h4>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[开始] --> B[输入注册信息]
+    B --> C[前端验证]
+    C --> D{验证通过?}
+    D -->|是| E[调用注册API]
+    D -->|否| B
+    E --> F[后端验证]
+    F --> G{验证通过?}
+    G -->|是| H[创建用户]
+    G -->|否| I[返回错误信息]
+    H --> J[返回结果]
+    I --> K[结束]
+    J --> K[结束]
+</div></code></pre>
+<h4 id="332-%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B">3.3.2 用户登录流程</h4>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[开始] --> B[输入登录信息]
+    B --> C[前端验证]
+    C --> D{验证通过?}
+    D -->|是| E[调用登录API]
+    D -->|否| B
+    E --> F[后端验证]
+    F --> G{验证通过?}
+    G -->|是| H[生成JWT令牌]
+    G -->|否| I[返回错误信息]
+    H --> J[返回结果]
+    J --> K[存储令牌]
+    I --> L[结束]
+    K --> L[结束]
+</div></code></pre>
+<h4 id="333-%E4%BA%A7%E5%93%81%E8%B4%AD%E4%B9%B0%E6%B5%81%E7%A8%8B">3.3.3 产品购买流程</h4>
+<p>针对产品购买这种涉及多个操作的流程，我们需要考虑事务的一致性和并发性。以下是一个基于Mermaid语法的流程图，展示了产品购买的详细流程：</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+   A[开始事务] --> B{验证商品存在?}
+   B -->|是| C{验证购买者不是所有者?}
+   B -->|否| Z[抛出异常]
+   C -->|是| D[计算总价]
+   C -->|否| Z
+   D --> E{检查购买者余额?}
+   E -->|足够| Node{执行}
+   E -->|不足| Z
+   Node --> F[扣除购买者余额]
+   Node --> G[增加销售者余额]
+   Node --> H[更新销售者收益]
+   Node --> I[标记商品为已删除]
+   Node --> J[创建交易记录]
+   F --> L
+   G --> L
+   H --> L
+   I --> L
+   J --> L[提交事务]
+   L --> M{修改成功？}
+   M --是--> N[成功]
+   M --否--> roll[回滚事务]
+
+   Z --> O[终止]
+
+   style A fill:#f9f,stroke:#333,stroke-width:2px
+   style N fill:#cfc,stroke:#333,stroke-width:2px
+   style roll fill:#fcc,stroke:#333,stroke-width:2px
+</div></code></pre>
+<h4 id="334-%E5%B8%96%E5%AD%90%E5%8F%91%E5%B8%83%E6%B5%81%E7%A8%8B">3.3.4 帖子发布流程</h4>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[开始] --> B[输入帖子内容]
+    B --> C[选择图片（可选）]
+    C --> D[输入标签（可选）]
+    D --> E[前端验证]
+    E --> F{验证通过?}
+    F -->|是| G[调用发布API]
+    F -->|否| B
+    G --> H[后端验证]
+    H --> I{验证通过?}
+    I -->|是| J[创建帖子]
+    I -->|否| K[返回错误信息]
+    J --> L{有图片?}
+    L -->|是| M[处理图片]
+    L -->|否| N{有标签?}
+    M --> N
+    N -->|是| O[处理标签]
+    N -->|否| P[返回结果]
+    O --> P
+    K --> Q[结束]
+    P --> Q[结束]
+</div></code></pre>
+<h4 id="335-%E5%B8%96%E5%AD%90%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B">3.3.5 帖子审核流程</h4>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A[开始] --> B[管理员查看待审核帖子]
+    B --> C[审核帖子内容]
+    C --> D{决定通过或封禁?}
+    D -->|通过| E[调用审核API - 通过]
+    D -->|封禁| F[调用审核API - 封禁]
+    E --> G[后端处理]
+    F --> G
+    G --> H[更新帖子状态]
+    H --> I[记录审核历史]
+    I --> J[发送通知]
+    J --> K[返回结果]
+    K --> L[结束]
+</div></code></pre>
+<h2 id="4%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%92%8C%E6%B5%8B%E8%AF%95%E6%88%AA%E5%9B%BE%E6%8F%8F%E8%BF%B0">4、系统功能和测试(截图+描述)</h2>
+<h3 id="41-%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD">4.1 系统功能</h3>
+<ol>
+<li>
+<p><strong>用户认证功能</strong>：</p>
+<ul>
+<li>支持用户注册、登录、密码修改</li>
+<li>实现了JWT令牌认证机制，确保API访问安全</li>
+<li>支持自动登录和令牌刷新</li>
+</ul>
+</li>
+<li>
+<p><strong>金融产品功能</strong>：</p>
+<ul>
+<li>支持产品浏览、分类查看、搜索等功能</li>
+<li>实现了产品购买和交易记录管理</li>
+<li>支持产品收藏和分类收藏</li>
+</ul>
+</li>
+<li>
+<p><strong>社区交流功能</strong>：</p>
+<ul>
+<li>支持帖子发布、浏览、点赞、收藏等功能</li>
+<li>实现了帖子搜索和分类筛选</li>
+<li>支持帖子评论和管理</li>
+</ul>
+</li>
+<li>
+<p><strong>通知中心功能</strong>：</p>
+<ul>
+<li>支持系统通知和活动通知</li>
+<li>实现了通知的标记和管理</li>
+</ul>
+</li>
+<li>
+<p><strong>管理员功能</strong>：</p>
+<ul>
+<li>支持用户管理和内容审核</li>
+<li>实现了系统统计和监控</li>
+</ul>
+</li>
+</ol>
+<h3 id="42-%E7%B3%BB%E7%BB%9F%E6%B5%8B%E8%AF%95">4.2 系统测试</h3>
+<ol>
+<li>
+<p><strong>功能测试</strong>：</p>
+<ul>
+<li>测试了所有功能模块的基本功能</li>
+<li>验证了各个功能之间的交互</li>
+<li>测试了边界条件和异常情况</li>
+</ul>
+</li>
+<li>
+<p><strong>性能测试</strong>：</p>
+<ul>
+<li>测试了系统在高并发情况下的性能</li>
+<li>验证了系统的响应时间和吞吐量</li>
+<li>测试了系统的稳定性和可靠性</li>
+</ul>
+</li>
+<li>
+<p><strong>兼容性测试</strong>：</p>
+<ul>
+<li>测试了系统在不同设备和平台上的兼容性</li>
+<li>验证了系统在不同浏览器和操作系统上的表现</li>
+<li>测试了系统在不同网络环境下的可用性</li>
+</ul>
+</li>
+<li>
+<p><strong>安全性测试</strong>：</p>
+<ul>
+<li>测试了系统的身份认证和授权机制</li>
+<li>验证了系统的输入验证和输出编码</li>
+<li>测试了系统的敏感信息保护</li>
+</ul>
+</li>
+</ol>
+<h3 id="43-%E6%B5%8B%E8%AF%95%E6%88%AA%E5%9B%BE">4.3 测试截图</h3>
+<h4 id="431-%E7%B3%BB%E7%BB%9F%E4%B8%BB%E9%A2%98%E5%B1%95%E7%A4%BA">4.3.1 系统主题展示</h4>
+<p>系统支持亮色和暗色主题切换，用户可以根据个人喜好和使用环境选择合适的主题模式。</p>
+<table>
+  <tr>
+    <td style="text-align: center;">
+      <img src="lightmode.png" alt="亮色主题" width="400"/>
+      <br>亮色主题
+    </td>
+    <td style="text-align: center;">
+      <img src="darkmode.png" alt="暗色主题" width="400"/>
+      <br>暗色主题
+    </td>
+  </tr>
+</table>
+<h4 id="432-%E5%A4%9A%E5%B9%B3%E5%8F%B0%E5%85%BC%E5%AE%B9%E6%80%A7%E5%B1%95%E7%A4%BA">4.3.2 多平台兼容性展示</h4>
+<p>系统基于Flutter框架开发，支持多平台运行，包括Android、Web和Windows等平台，确保用户在不同设备上都能获得一致的使用体验。</p>
+<table>
+  <tr>
+    <td style="text-align: center;">
+      <img src="devices/android.jpg" alt="Android平台展示" width="300"/>
+      <br>Android平台展示
+    </td>
+    <td style="text-align: center;">
+      <img src="devices/web.png" alt="Web平台展示" width="300"/>
+      <br>Web平台展示
+    </td>
+    <td style="text-align: center;">
+      <img src="devices/windows.png" alt="Windows平台展示" width="300"/>
+      <br>Windows平台展示
+    </td>
+  </tr>
+</table>
+<h4 id="433-%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2">4.3.3 登录页面</h4>
+<p>登录页面支持用户名和密码登录，同时提供注册新用户功能。页面采用响应式设计，能够适配不同屏幕尺寸和方向。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">横屏</th>
+<th style="text-align:center">竖屏</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="login_page_landscape.png" alt="登录页面-横屏"></td>
+<td style="text-align:center"><img src="login_page_portrait.png" alt="登录页面-竖屏"></td>
+</tr>
+</tbody>
+</table>
+<h4 id="434-%E5%BC%80%E6%88%B7%E9%A1%B5%E9%9D%A2">4.3.4 开户页面</h4>
+<p>开户页面为用户提供账户创建功能，用户可以填写必要信息完成开户流程，享受完整的金融服务。</p>
+<p><img src="open_account_page.png" alt="开户页面"></p>
+<h4 id="435-%E6%9C%AA%E5%BC%80%E6%88%B7%E7%8A%B6%E6%80%81%E9%A1%B5%E9%9D%A2">4.3.5 未开户状态页面</h4>
+<p>未开户状态页面提示用户需要先开户才能使用完整的金融服务功能。</p>
+<p><img src="without_open_account.png" alt="未开户状态页面"></p>
+<h4 id="436-%E9%A6%96%E9%A1%B5">4.3.6 首页</h4>
+<p>首页是用户进入系统后的主要界面，提供了各种金融产品的快捷入口和热门社区帖子展示。</p>
+<p><img src="home_page.png" alt="首页"></p>
+<h4 id="437-%E5%B8%82%E5%9C%BA%E9%A1%B5%E9%9D%A2">4.3.7 市场页面</h4>
+<p>市场页面显示各类金融产品的分类和价格信息，用户可以浏览不同类别的产品，查看详情并进行交易。</p>
+<p><img src="market_page.png" alt="市场页面"></p>
+<h4 id="438-csgo%E5%B8%82%E5%9C%BA%E9%A1%B5%E9%9D%A2">4.3.8 CSGO市场页面</h4>
+<p>CSGO市场页面展示各类CSGO饰品的分类和价格信息，用户可以浏览和购买。</p>
+<p><img src="csgo_market_page.png" alt="CSGO市场页面"></p>
+<h4 id="439-%E8%99%9A%E6%8B%9F%E8%B4%A7%E5%B8%81%E9%A1%B5%E9%9D%A2">4.3.9 虚拟货币页面</h4>
+<p>虚拟货币页面展示各类虚拟货币的价格和趋势信息，用户可以浏览和购买。</p>
+<p><img src="virtual_money_page.png" alt="虚拟货币页面"></p>
+<h4 id="4310-%E8%B4%AD%E4%B9%B0%E9%A1%B5%E9%9D%A2">4.3.10 购买页面</h4>
+<p>购买页面允许用户查看产品详情并进行购买操作。</p>
+<p><img src="buy_page.png" alt="购买页面"></p>
+<h4 id="4311-%E5%85%85%E5%80%BC%E9%A1%B5%E9%9D%A2">4.3.11 充值页面</h4>
+<p>充值页面允许用户向自己的账户充值资金，用于购买金融产品。</p>
+<p><img src="adding_money.png" alt="充值页面"></p>
+<h4 id="4312-%E6%94%B6%E7%9B%8A%E9%A1%B5%E9%9D%A2">4.3.12 收益页面</h4>
+<p>收益页面展示用户的资产收益情况，包括今日收益、累计收益和收益率等信息。</p>
+<p><img src="my_yield.png" alt="收益页面"></p>
+<h4 id="4313-%E6%88%91%E6%94%B6%E8%97%8F%E7%9A%84%E4%BA%A7%E5%93%81%E9%A1%B5%E9%9D%A2">4.3.13 我收藏的产品页面</h4>
+<p>我收藏的产品页面展示用户收藏的所有产品，方便用户快速访问感兴趣的金融产品。</p>
+<p><img src="my_star_product.png" alt="我收藏的产品页面"></p>
+<h4 id="4314-%E6%88%91%E7%9A%84%E4%BA%A4%E6%98%93%E9%A1%B5%E9%9D%A2">4.3.14 我的交易页面</h4>
+<p>我的交易页面展示用户的所有交易记录，包括购买的产品、交易时间和金额等信息。</p>
+<p><img src="my_transaction.png" alt="我的交易页面"></p>
+<h4 id="4315-%E7%A4%BE%E5%8C%BA%E9%A1%B5%E9%9D%A2">4.3.15 社区页面</h4>
+<p>社区页面展示用户发布的帖子列表，支持帖子浏览、搜索和筛选功能。用户可以查看热门帖子，也可以发布自己的内容。</p>
+<p><img src="neighborhood_page.png" alt="社区页面"></p>
+<h4 id="4316-%E5%B8%96%E5%AD%90%E8%AF%A6%E6%83%85%E9%A1%B5%E9%9D%A2">4.3.16 帖子详情页面</h4>
+<p>帖子详情页面展示完整的帖子内容，包括文字、图片、评论等信息。</p>
+<p><img src="post_detail.png" alt="帖子详情页面"></p>
+<h4 id="4317-%E6%88%91%E7%9A%84%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.17 我的帖子页面</h4>
+<p>我的帖子页面展示用户自己发布的所有帖子，方便用户管理和查看。</p>
+<p><img src="my_post.png" alt="我的帖子页面"></p>
+<h4 id="4318-%E7%94%A8%E6%88%B7%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.18 用户帖子页面</h4>
+<p>用户帖子页面展示用户自己发布的帖子内容，方便用户管理和查看自己的社区贡献。</p>
+<p><img src="post_page_by_user.png" alt="用户帖子页面"></p>
+<h4 id="4319-%E6%88%91%E6%94%B6%E8%97%8F%E7%9A%84%E5%B8%96%E5%AD%90%E9%A1%B5%E9%9D%A2">4.3.19 我收藏的帖子页面</h4>
+<p>我收藏的帖子页面展示用户收藏的所有帖子，方便用户快速访问感兴趣的内容。</p>
+<p><img src="my_star_post.png" alt="我收藏的帖子页面"></p>
+<h4 id="4320-%E6%88%91%E7%9A%84%E6%B6%88%E6%81%AF%E9%A1%B5%E9%9D%A2">4.3.20 我的消息页面</h4>
+<p>我的消息页面展示系统发送给用户的通知和消息，包括系统通知、活动通知等。</p>
+<p><img src="my_message.png" alt="我的消息页面"></p>
+<h4 id="4321-%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83%E9%A1%B5%E9%9D%A2">4.3.21 个人中心页面</h4>
+<p>个人中心页面展示用户的个人信息和各种功能入口，方便用户管理自己的账户和资产。</p>
+<p><img src="selfpage.png" alt="个人中心页面"></p>
+<h4 id="4322-%E8%AE%BE%E7%BD%AE%E9%A1%B5%E9%9D%A2">4.3.22 设置页面</h4>
+<p>设置页面允许用户自定义系统主题、管理通知偏好、修改密码等。</p>
+<p><img src="my_setting.png" alt="设置页面"></p>
+<h4 id="4323-%E5%88%9B%E5%BB%BA%E5%88%86%E7%B1%BB%E9%A1%B5%E9%9D%A2">4.3.23 创建分类页面</h4>
+<p>创建分类页面允许管理员创建新的产品分类，用于管理金融产品。</p>
+<p><img src="create_category_page.png" alt="创建分类页面"></p>
+<h4 id="4324-%E7%AE%A1%E7%90%86%E5%91%98%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86">4.3.24 管理员用户管理</h4>
+<p>管理员可以管理系统中的用户，包括查看用户列表、封禁/解封用户等操作。</p>
+<table>
+  <tr>
+    <td style="text-align: center;">
+      <img src="manage_user.png" alt="用户管理" width="400"/>
+      <br>用户管理
+    </td>
+    <td style="text-align: center;">
+      <img src="block_user.png" alt="封禁用户" width="400"/>
+      <br>封禁用户
+    </td>
+  </tr>
+</table>
+<h4 id="4325-%E7%AE%A1%E7%90%86%E5%91%98%E5%86%85%E5%AE%B9%E5%AE%A1%E6%A0%B8">4.3.25 管理员内容审核</h4>
+<p>管理员可以审核社区中的帖子，确保内容符合规范。</p>
+<p><img src="examine_center.png" alt="内容审核中心"></p>
+<h4 id="4326-%E7%A4%BE%E5%8C%BA%E5%B8%96%E5%AD%90%E4%B8%BE%E6%8A%A5">4.3.26 社区帖子举报</h4>
+<p>用户可以举报违规帖子，管理员会收到举报并进行处理。</p>
+<p><img src="report_post.png" alt="帖子举报"></p>
+<h4 id="4327-%E7%AE%A1%E7%90%86%E5%91%98%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90">4.3.27 管理员统计分析</h4>
+<p>系统提供统计分析功能，管理员可以查看系统的各项统计数据。</p>
+<p><img src="statistics_analysis.png" alt="统计分析"></p>
+<h4 id="4328-api%E6%96%87%E6%A1%A3%E7%95%8C%E9%9D%A2">4.3.28 API文档界面</h4>
+<p>系统提供完整的API文档，基于Swagger UI实现。并为swagger集成了javascript脚本，使其支持JWT认证。方便开发者了解和使用系统的API接口。</p>
+<p><img src="swagger_ui.png" alt="Swagger UI界面"></p>
+<h2 id="5%E6%80%BB%E7%BB%93%E4%B8%8E%E4%BD%93%E4%BC%9A">5、总结与体会</h2>
+<h3 id="51-%E6%80%BB%E7%BB%93">5.1 总结</h3>
+<p>Southern Money系统是一个集金融交易、产品展示、社区交流于一体的综合性金融服务平台。系统采用前后端分离架构，后端基于ASP.NET Core Web API构建，前端使用Flutter框架开发，支持跨平台运行。</p>
+<p>系统实现了以下核心功能：</p>
+<ul>
+<li>用户认证和管理</li>
+<li>金融产品浏览和购买</li>
+<li>社区交流和内容管理</li>
+<li>通知中心和消息推送</li>
+<li>管理员后台管理</li>
+</ul>
+<p>系统具有以下特点：</p>
+<ul>
+<li>现代化的UI设计，支持亮色和暗色主题</li>
+<li>响应式布局，适配不同屏幕尺寸</li>
+<li>安全可靠的身份认证机制</li>
+<li>高性能的API服务</li>
+<li>完整的错误处理和日志记录</li>
+<li>良好的可扩展性和维护性</li>
+</ul>
+<h3 id="52-%E4%BD%93%E4%BC%9A">5.2 体会</h3>
+<p>通过开发Southern Money系统，我们学到了以下经验和体会：</p>
+<ol>
+<li>
+<p><strong>前后端分离架构的优势</strong>：</p>
+<ul>
+<li>提高了开发效率，前后端可以并行开发</li>
+<li>增强了系统的可扩展性，便于后续功能扩展</li>
+<li>提高了系统的可维护性，便于代码管理和测试</li>
+</ul>
+</li>
+<li>
+<p><strong>跨平台开发的便利性</strong>：</p>
+<ul>
+<li>使用Flutter框架可以快速开发跨平台应用</li>
+<li>减少了开发成本，提高了开发效率</li>
+<li>便于应用的推广和使用</li>
+</ul>
+</li>
+<li>
+<p><strong>安全性设计的重要性</strong>：</p>
+<ul>
+<li>系统需要考虑各种安全风险，如身份认证、授权、输入验证等</li>
+<li>采用JWT令牌认证机制可以提高系统的安全性</li>
+<li>实现了完整的错误处理和日志记录，便于系统监控和调试</li>
+</ul>
+</li>
+<li>
+<p><strong>性能优化的必要性</strong>：</p>
+<ul>
+<li>系统需要考虑性能问题，如响应时间、吞吐量、并发处理等</li>
+<li>采用缓存机制和异步处理可以提高系统的性能</li>
+<li>优化数据库查询和索引设计可以提高数据访问效率</li>
+</ul>
+</li>
+<li>
+<p><strong>用户体验设计的重要性</strong>：</p>
+<ul>
+<li>系统需要考虑用户体验，如界面设计、交互流程、响应速度等</li>
+<li>采用现代化的UI设计可以提高用户体验</li>
+<li>实现了响应式布局，适配不同屏幕尺寸，便于用户使用</li>
+</ul>
+</li>
+</ol>
+<h2 id="6%E5%B0%8F%E7%BB%84%E5%88%86%E5%B7%A5%E5%86%99%E6%98%8E%E6%AF%8F%E4%BD%8D%E5%90%8C%E5%AD%A6%E6%89%BF%E6%8B%85%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%8C%89%E5%B7%A5%E4%BD%9C%E9%87%8F%E6%8E%92%E5%BA%8F%E7%BB%99%E5%87%BA%E5%8D%A0%E6%AF%94%E4%BE%8B%E5%B0%8Fa%E5%AE%8C%E6%88%90%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90%E6%A6%82%E8%A6%81%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%90%8E%E7%AB%AF%E7%BC%96%E5%86%9940">6、小组分工(写明每位同学承担的工作，按工作量排序，给出占比。例：小A完成需求分析，概要设计和后端编写，（40%）)</h2>
+<ul>
+<li>小A：完成需求分析，概要设计和后端编写，（40%）</li>
+<li>小B：完成详细设计，前端实现和测试，（40%）</li>
+<li>小C：完成数据库设计，系统测试和文档编写，（20%）</li>
+</ul>
+<p>通过小组协作，我们成功完成了Southern Money系统的开发。在开发过程中，我们遇到了各种挑战和问题，但通过团队合作和技术学习，我们成功解决了这些问题，提高了系统的质量和性能。</p>
+<p>未来，我们将继续优化和扩展系统功能，提高系统的安全性和可靠性，为用户提供更好的服务和体验。</p>
+
+</body>
+</html>
