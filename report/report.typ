@@ -1,9 +1,10 @@
 #import "templates/cs-template.typ": *
 #import "@preview/codelst:2.0.2": sourcecode
 #import "@preview/mitex:0.2.6": *
-#import "@preview/oxdraw:0.1.0": oxdraw
+#import "@preview/fletcher:0.5.8": diagram, edge, node
 #import "@preview/tablem:0.3.0": tablem, three-line-table
 #import "pages/data.typ": *
+#import "@preview/oxdraw:0.1.0": *
 #show: setup-lovelace
 
 #let algorithm = algorithm.with(supplement: "算法")
@@ -91,43 +92,43 @@ Southern Money系统后端采用分层架构设计，遵循单一职责原则和
 ==== 分层设计原则与职责边界
 
 1. Controller层：
-   Controller层作为系统的请求入口，负责处理HTTP请求、接收和验证请求参数，并调用Service层完成业务逻辑处理，然后格式化响应数据返回HTTP响应。该层不包含业务逻辑，仅负责请求路由和响应处理，确保了职责的单一性。例如，`UserController`专门处理用户注册、登录等请求。
+  Controller层作为系统的请求入口，负责处理HTTP请求、接收和验证请求参数，并调用Service层完成业务逻辑处理，然后格式化响应数据返回HTTP响应。该层不包含业务逻辑，仅负责请求路由和响应处理，确保了职责的单一性。例如，`UserController`专门处理用户注册、登录等请求。
 
 2. Service层：
-   Service层实现核心业务逻辑，处理复杂业务规则，协调多个Repository完成数据操作，并实现事务管理以确保数据一致性。该层还负责业务验证和权限检查，确保系统的安全性。例如，`UserService`实现了用户认证、密码加密等关键逻辑。
+  Service层实现核心业务逻辑，处理复杂业务规则，协调多个Repository完成数据操作，并实现事务管理以确保数据一致性。该层还负责业务验证和权限检查，确保系统的安全性。例如，`UserService`实现了用户认证、密码加密等关键逻辑。
 
 3. Repository层：
-   Repository层负责数据访问操作，封装数据库操作细节，实现数据的CRUD（创建、读取、更新、删除）操作。该层不包含业务逻辑，仅处理数据持久化，基于Entity Framework Core实现，支持多种数据库。例如，`UserRepository`专门处理用户数据的存储和查询。
+  Repository层负责数据访问操作，封装数据库操作细节，实现数据的CRUD（创建、读取、更新、删除）操作。该层不包含业务逻辑，仅处理数据持久化，基于Entity Framework Core实现，支持多种数据库。例如，`UserRepository`专门处理用户数据的存储和查询。
 
 4. Domain层：
-   Domain层定义核心业务实体和值对象，实现领域模型的业务规则和约束。该层不依赖任何外部框架，保持领域模型的纯净性。例如，`User`、`Product`、`Transaction`等实体类定义了系统的核心业务对象。
+  Domain层定义核心业务实体和值对象，实现领域模型的业务规则和约束。该层不依赖任何外部框架，保持领域模型的纯净性。例如，`User`、`Product`、`Transaction`等实体类定义了系统的核心业务对象。
 
 5. Infrastructure层：
-   Infrastructure层提供基础设施支持，包括数据库配置、依赖注入、中间件等，并实现与外部系统的集成，如文件存储、邮件发送等。
-   - 封装通用工具类和辅助方法
-   - 示例：`JwtUtils`、`AppDbContext`等
+  Infrastructure层提供基础设施支持，包括数据库配置、依赖注入、中间件等，并实现与外部系统的集成，如文件存储、邮件发送等。
+  - 封装通用工具类和辅助方法
+  - 示例：`JwtUtils`、`AppDbContext`等
 
 ==== 中间件实现细节
 
 系统开发了多个自定义中间件组件，处理身份验证、异常处理、日志记录等横切关注点：
 
 1. 身份验证中间件：
-   - 拦截所有API请求，检查Authorization头中的JWT令牌
-   - 验证令牌的有效性和过期时间
-   - 解析令牌中的用户信息，存储到HttpContext中
-   - 处理令牌刷新逻辑，自动更新过期令牌
+  - 拦截所有API请求，检查Authorization头中的JWT令牌
+  - 验证令牌的有效性和过期时间
+  - 解析令牌中的用户信息，存储到HttpContext中
+  - 处理令牌刷新逻辑，自动更新过期令牌
 
 2. 异常处理中间件：
-   - 捕获系统中发生的所有未处理异常
-   - 根据异常类型生成统一格式的错误响应
-   - 隐藏敏感错误信息，防止信息泄露
-   - 记录异常日志，便于系统监控和调试
+  - 捕获系统中发生的所有未处理异常
+  - 根据异常类型生成统一格式的错误响应
+  - 隐藏敏感错误信息，防止信息泄露
+  - 记录异常日志，便于系统监控和调试
 
 
 3. CORS中间件：
-   - 配置跨域资源共享策略，允许前端应用访问API
-   - 支持多种域名和HTTP方法
-   - 实现安全的跨域通信
+  - 配置跨域资源共享策略，允许前端应用访问API
+  - 支持多种域名和HTTP方法
+  - 实现安全的跨域通信
 
 ==== 依赖注入配置
 
@@ -135,11 +136,11 @@ Southern Money系统后端采用分层架构设计，遵循单一职责原则和
 
 在`Program.cs`中配置所有服务的依赖关系，支持不同生命周期的服务注册（单例、作用域、瞬时）
 #sourcecode(```csharp
-  builder.Services.AddScoped<IUserService, UserService>();
-  builder.Services.AddScoped<IUserRepository, UserRepository>();
-  builder.Services.AddDbContext<AppDbContext>();
-  ```)
-  
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddDbContext<AppDbContext>();
+```)
+
 
 
 ==== 核心技术实现
@@ -154,34 +155,19 @@ Southern Money系统后端采用分层架构设计，遵循单一职责原则和
 
 该架构设计高度模块化，便于系统扩展和维护，同时通过清晰的职责边界降低组件之间的耦合度。这种设计便于进行单元测试和集成测试，支持横向扩展以提高系统的并发处理能力，并具有良好的安全性设计，有效保护系统和用户数据。
 
-
-
-//typst的mermaid不支持classDef 自定义样式
-//typst的oxdraw必须以graph开头
-#oxdraw(
-  "
-graph LR
-    %% 用户层
-    Client[接受HTTP请求]
-
-    %% Controller层
-    Controller[Controller层 请求处理]
-
-    %% Service层
-    Service[Service层 业务逻辑]
-
-    %% Repository层
-    Repository[Repository层 数据访问]
-
-    %% 数据层
-    Database[(数据库)]
-
-    %% 连接关系
-    Client --> Controller
-    Controller --> Service
-    Service --> Repository
-    Repository --> Database
-",
+#diagram(
+  node-stroke: .1em,
+  spacing: 10pt,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [HTTP请求], label: "Client", fill: green.lighten(95%)),
+  node((1, 0), [Controller处理请求], label: "Controller", fill: orange.lighten(95%)),
+  node((2, 0), [Service业务逻辑], label: "Service", fill: purple.lighten(95%)),
+  node((3, 0), [Repo数据访问], label: "Repository", fill: red.lighten(95%)),
+  node((4, 0), [数据库], label: "Database", shape: "rect", fill: gray.lighten(90%)),
+  edge((0, 0), (1, 0), "->", ),
+  edge((1, 0), (2, 0), "->", ),
+  edge((2, 0), (3, 0), "->", ),
+  edge((3, 0), (4, 0), "->", ),
 )
 
 系统设计如下
@@ -282,39 +268,39 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
 ==== 核心架构设计
 
 1. 跨平台支持：
-   系统基于Flutter框架，一套代码可运行在Web、Android、iOS、Windows、macOS和Linux六大平台，采用Flutter的Widget系统实现高性能、跨平台的UI渲染，并支持原生插件集成，实现与平台特定功能的无缝对接。
+  系统基于Flutter框架，一套代码可运行在Web、Android、iOS、Windows、macOS和Linux六大平台，采用Flutter的Widget系统实现高性能、跨平台的UI渲染，并支持原生插件集成，实现与平台特定功能的无缝对接。
 
 2. 依赖注入设计：
-   系统使用`get_it`作为依赖注入容器，集中管理应用级服务，统一管理`SharedPreferences`、`TokenService`及各类`ApiService`实例，降低页面之间的耦合度，提高代码的可测试性和可维护性，对应文件：`lib/setting/ensure_initialized.dart`。
+  系统使用`get_it`作为依赖注入容器，集中管理应用级服务，统一管理`SharedPreferences`、`TokenService`及各类`ApiService`实例，降低页面之间的耦合度，提高代码的可测试性和可维护性，对应文件：`lib/setting/ensure_initialized.dart`。
 
 3. 配置管理：
-   系统通过`AppConfigService`统一管理应用配置，包括主题颜色、动画时长、后端`BaseUrl`和会话Token等，配合`ValueNotifier`实现轻量级响应式状态管理，配置变更实时更新UI，提升用户体验，对应文件：`lib/setting/app_config.dart`。
+  系统通过`AppConfigService`统一管理应用配置，包括主题颜色、动画时长、后端`BaseUrl`和会话Token等，配合`ValueNotifier`实现轻量级响应式状态管理，配置变更实时更新UI，提升用户体验，对应文件：`lib/setting/app_config.dart`。
 
 ==== 状态管理机制
 
 系统采用多种状态管理方案，根据不同场景选择合适的实现方式：
 
 1. 轻量级状态管理：
-   系统使用`ValueNotifier`和`ChangeNotifier`实现简单状态管理，适用于全局配置、主题设置等简单状态，并配合`Consumer`和`Provider`组件实现UI响应式更新。
+  系统使用`ValueNotifier`和`ChangeNotifier`实现简单状态管理，适用于全局配置、主题设置等简单状态，并配合`Consumer`和`Provider`组件实现UI响应式更新。
 
 2. 依赖注入 + 服务模式：
-   系统通过`get_it`注册和获取服务实例，服务内部管理自身状态，通过回调或流通知UI更新，适用于复杂业务逻辑和跨页面状态共享。
+  系统通过`get_it`注册和获取服务实例，服务内部管理自身状态，通过回调或流通知UI更新，适用于复杂业务逻辑和跨页面状态共享。
 
 3. 页面级状态管理：
-   系统使用`StatefulWidget`的`setState()`方法管理页面内部状态，适用于单个页面内部的状态变化，并配合`AutomaticKeepAliveClientMixin`实现页面状态持久化。
+  系统使用`StatefulWidget`的`setState()`方法管理页面内部状态，适用于单个页面内部的状态变化，并配合`AutomaticKeepAliveClientMixin`实现页面状态持久化。
 
 ==== 路由管理机制
 
 系统实现了灵活的路由管理机制，支持不同设备尺寸和方向的自适应：
 
 1. 核心路由结构：
-   系统基于Flutter的`Navigator`组件实现页面导航，主路由包括登录页、注册页、主屏幕，子路由涵盖各功能模块页面。
+  系统基于Flutter的`Navigator`组件实现页面导航，主路由包括登录页、注册页、主屏幕，子路由涵盖各功能模块页面。
 
 2. 响应式路由策略：
-   系统借助`popupOrNavigate`与`Fragment`组件实现响应式路由，横屏时优先使用弹窗展示子页面，提升大屏设备的多任务体验，竖屏时使用标准路由切换新页面，保持移动端的操作习惯，对应文件：`lib/widgets/router_utils.dart`。
+  系统借助`popupOrNavigate`与`Fragment`组件实现响应式路由，横屏时优先使用弹窗展示子页面，提升大屏设备的多任务体验，竖屏时使用标准路由切换新页面，保持移动端的操作习惯，对应文件：`lib/widgets/router_utils.dart`。
 
 3. 路由导航模式：
-   系统提供多种导航方式，底部导航栏（竖屏）包括`HomePage`、`CommunityPage`、`MarketPage`、`ProfilePage`，左侧导航栏（横屏）与底部导航栏功能一致，布局适配大屏，模态弹窗用于显示临时信息或简单表单，抽屉菜单用于个人中心和设置页面的导航。
+  系统提供多种导航方式，底部导航栏（竖屏）包括`HomePage`、`CommunityPage`、`MarketPage`、`ProfilePage`，左侧导航栏（横屏）与底部导航栏功能一致，布局适配大屏，模态弹窗用于显示临时信息或简单表单，抽屉菜单用于个人中心和设置页面的导航。
 
 ==== 网络请求处理
 
@@ -369,15 +355,15 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
 前端页面结构围绕`main.dart`中的`MainScreen`搭建：
 
 1. 核心页面：
-   - `HomePage`（首页）：展示热门内容和快速导航
-   - `CommunityPage`（社区）：帖子浏览、发布和互动
-   - `MarketPage`（行情）：金融产品展示和交易
-   - `ProfilePage`（个人中心）：用户信息和功能入口
+  - `HomePage`（首页）：展示热门内容和快速导航
+  - `CommunityPage`（社区）：帖子浏览、发布和互动
+  - `MarketPage`（行情）：金融产品展示和交易
+  - `ProfilePage`（个人中心）：用户信息和功能入口
 
 2. 页面状态管理：
-   - 关键页面使用`AutomaticKeepAliveClientMixin`实现状态持久化
-   - 避免页面切换时重新加载数据，提高用户体验
-   - 支持下拉刷新和上拉加载更多功能
+  - 关键页面使用`AutomaticKeepAliveClientMixin`实现状态持久化
+  - 避免页面切换时重新加载数据，提高用户体验
+  - 支持下拉刷新和上拉加载更多功能
 
 ==== 性能优化策略
 
@@ -388,10 +374,15 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
     columns: 2,
     stroke: 0.5pt + gray,
     [*优化类别*], [*具体措施*],
-    [UI渲染优化], [使用`const`构造函数创建不可变组件\ 避免不必要的重建和重绘\ 优化列表渲染，使用`ListView.builder`实现懒加载],
-    [网络请求优化], [实现请求缓存，减少重复请求\ 支持请求取消，避免无用请求消耗资源\ 优化图片加载，支持缩略图和渐进式加载],
+    [UI渲染优化],
+    [使用`const`构造函数创建不可变组件\ 避免不必要的重建和重绘\ 优化列表渲染，使用`ListView.builder`实现懒加载],
+
+    [网络请求优化],
+    [实现请求缓存，减少重复请求\ 支持请求取消，避免无用请求消耗资源\ 优化图片加载，支持缩略图和渐进式加载],
+
     [内存管理], [及时释放不再使用的资源\ 优化大对象的创建和销毁\ 使用`WeakReference`避免内存泄漏],
-    [启动性能优化], [实现懒加载，延迟初始化非关键组件\ 优化资源加载顺序，优先加载核心功能\ 支持预加载，提前获取常用数据],
+    [启动性能优化],
+    [实现懒加载，延迟初始化非关键组件\ 优化资源加载顺序，优先加载核心功能\ 支持预加载，提前获取常用数据],
   ),
   kind: table,
   caption: "性能优化策略",
@@ -532,103 +523,103 @@ Southern Money系统采用关系型数据库设计，支持SQLite和PostgreSQL�
 ==== 数据库设计原则
 
 1. 规范化设计：
-   - 遵循数据库设计的第一、第二和第三范式
-   - 减少数据冗余，提高数据一致性
-   - 清晰的表结构和关系定义
+  - 遵循数据库设计的第一、第二和第三范式
+  - 减少数据冗余，提高数据一致性
+  - 清晰的表结构和关系定义
 
 2. 灵活性：
-   - 基于Entity Framework Core Code First模式，便于数据库schema管理
-   - 使用`dotnet ef`迁移命令实现自动化、可回滚的数据库迁移
+  - 基于Entity Framework Core Code First模式，便于数据库schema管理
+  - 使用`dotnet ef`迁移命令实现自动化、可回滚的数据库迁移
 
 3. 性能优化：
-   - 合理的索引设计，提高查询效率
-   - 针对高频查询优化表结构
-   - 支持分区表和分库分表扩展
+  - 合理的索引设计，提高查询效率
+  - 针对高频查询优化表结构
+  - 支持分区表和分库分表扩展
 
 4. 数据完整性：
-   - 完整的外键约束，确保数据一致性
-   - 适当的字段约束（如非空、唯一、检查约束等）
-   - 事务管理，确保数据操作的原子性、一致性、隔离性和持久性
+  - 完整的外键约束，确保数据一致性
+  - 适当的字段约束（如非空、唯一、检查约束等）
+  - 事务管理，确保数据操作的原子性、一致性、隔离性和持久性
 
 ==== 数据模型设计考虑
 
 1. DateTime字段处理：
-   - 所有`DateTime`字段统一使用UTC存储，避免跨时区显示误差
-   - 在`AppDbContext`中通过`UtcDateTimeConverter`实现自动转换
-   - 示例：
-     ```csharp
-     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-     {
-         configurationBuilder.Properties<DateTime>()
-             .HaveConversion<UtcDateTimeConverter>();
-     }
-     ```
+  - 所有`DateTime`字段统一使用UTC存储，避免跨时区显示误差
+  - 在`AppDbContext`中通过`UtcDateTimeConverter`实现自动转换
+  - 示例：
+    ```csharp
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>()
+            .HaveConversion<UtcDateTimeConverter>();
+    }
+    ```
 
 2. 多对多关系设计：
-   - 对`PostFavorite`、`UserFavoriteCategory`等多对多关系表使用复合主键
-   - 既防止重复记录，又提升常用查询性能
-   - 示例：`PostFavorite`表使用`(PostId, UserId)`作为复合主键
+  - 对`PostFavorite`、`UserFavoriteCategory`等多对多关系表使用复合主键
+  - 既防止重复记录，又提升常用查询性能
+  - 示例：`PostFavorite`表使用`(PostId, UserId)`作为复合主键
 
 3. 软删除实现：
-   - 对核心实体实现软删除机制，通过`IsDeleted`字段标记
-   - 避免数据永久丢失，便于数据恢复和审计
-   - 在查询时自动过滤已删除的记录
+  - 对核心实体实现软删除机制，通过`IsDeleted`字段标记
+  - 避免数据永久丢失，便于数据恢复和审计
+  - 在查询时自动过滤已删除的记录
 
 4. 数据类型选择：
-   - 选择合适的数据类型，优化存储空间和查询性能
-   - 例如：使用`decimal`类型存储金额，避免精度丢失
-   - 使用`varchar`类型存储可变长度字符串，节省空间
+  - 选择合适的数据类型，优化存储空间和查询性能
+  - 例如：使用`decimal`类型存储金额，避免精度丢失
+  - 使用`varchar`类型存储可变长度字符串，节省空间
 
 ==== 索引优化策略
 
 系统设计了合理的索引方案，提高查询效率和系统性能：
 
 1. 主键索引：
-   - 所有表都定义了主键，自动创建主键索引
-   - 使用自增整数（`int`）作为主键，提高插入性能
+  - 所有表都定义了主键，自动创建主键索引
+  - 使用自增整数（`int`）作为主键，提高插入性能
 
 2. 外键索引：
-   - 为外键字段创建索引，提高关联查询性能
-   - 例如：`Posts`表的`UploaderUserId`字段创建索引，优化"查询用户发布的帖子"查询
+  - 为外键字段创建索引，提高关联查询性能
+  - 例如：`Posts`表的`UploaderUserId`字段创建索引，优化"查询用户发布的帖子"查询
 
 3. 复合索引：
-   - 为频繁一起查询的字段组合创建复合索引
-   - 例如：`TransactionRecords`表的`BuyerUserId`和`PurchaseTime`字段创建复合索引
-   - 优化"查询用户最近交易记录"等常用查询
+  - 为频繁一起查询的字段组合创建复合索引
+  - 例如：`TransactionRecords`表的`BuyerUserId`和`PurchaseTime`字段创建复合索引
+  - 优化"查询用户最近交易记录"等常用查询
 
 4. 唯一索引：
-   - 为需要唯一约束的字段创建唯一索引
-   - 例如：`Users`表的`Email`字段创建唯一索引，确保邮箱唯一性
+  - 为需要唯一约束的字段创建唯一索引
+  - 例如：`Users`表的`Email`字段创建唯一索引，确保邮箱唯一性
 
 5. 全文索引：
-   - 为需要全文搜索的字段创建全文索引
-   - 例如：`Posts`表的`Title`和`Content`字段创建全文索引
-   - 优化帖子搜索功能的性能
+  - 为需要全文搜索的字段创建全文索引
+  - 例如：`Posts`表的`Title`和`Content`字段创建全文索引
+  - 优化帖子搜索功能的性能
 
 ==== 数据库安全设计
 
 1. 数据加密：
-   敏感数据（如用户密码）采用哈希加密存储，并使用强哈希算法（如SHA-256）并添加盐值
+  敏感数据（如用户密码）采用哈希加密存储，并使用强哈希算法（如SHA-256）并添加盐值
 
 2. 访问控制：
-   系统遵循最小权限原则，数据库用户仅拥有必要的权限，分离读写权限以提高安全性，并定期轮换数据库密码，降低安全风险。
+  系统遵循最小权限原则，数据库用户仅拥有必要的权限，分离读写权限以提高安全性，并定期轮换数据库密码，降低安全风险。
 
 3. 数据备份：
-   系统定期备份数据库以防止数据丢失，支持增量备份和全量备份，备份数据存储在安全位置，防止未授权访问。
+  系统定期备份数据库以防止数据丢失，支持增量备份和全量备份，备份数据存储在安全位置，防止未授权访问。
 
 ==== 数据库性能优化
 
 1. 查询优化：
-   系统避免全表扫描，使用索引覆盖查询，优化复杂查询并使用适当的连接方式，实现分页查询以避免一次性返回大量数据。
+  系统避免全表扫描，使用索引覆盖查询，优化复杂查询并使用适当的连接方式，实现分页查询以避免一次性返回大量数据。
 
 2. 缓存策略：
-   系统实现查询结果缓存以减少数据库访问，并采用缓存过期策略确保数据一致性。
+  系统实现查询结果缓存以减少数据库访问，并采用缓存过期策略确保数据一致性。
 
 3. 连接池管理：
-   系统使用数据库连接池以减少连接创建和销毁开销，优化连接池配置并根据系统负载调整，及时释放数据库连接以避免连接泄漏。
+  系统使用数据库连接池以减少连接创建和销毁开销，优化连接池配置并根据系统负载调整，及时释放数据库连接以避免连接泄漏。
 
 4. 分区表设计：
-   系统对大表进行分区设计以提高查询和维护性能，例如按时间分区`TransactionRecords`表，便于数据归档和清理。
+  系统对大表进行分区设计以提高查询和维护性能，例如按时间分区`TransactionRecords`表，便于数据归档和清理。
 
 通过以上数据库设计，Southern Money系统实现了高性能、高可靠性和高安全性的数据存储和管理，支持系统的稳定运行和未来扩展。
 
@@ -908,19 +899,19 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 系统实现了一系列自定义组件，遵循以下设计原则：
 
 1. 单一职责原则：
-   每个组件只负责一个特定功能，降低组件复杂度，提高可维护性。
+  每个组件只负责一个特定功能，降低组件复杂度，提高可维护性。
 
 2. 可复用性：
-   设计通用组件，支持多种场景使用，提供灵活的配置选项以适应不同需求，示例包括`BasicCard`、`PostCard`、`BrandHeader`等。
+  设计通用组件，支持多种场景使用，提供灵活的配置选项以适应不同需求，示例包括`BasicCard`、`PostCard`、`BrandHeader`等。
 
 3. 可测试性：
-   组件设计便于单元测试和集成测试，分离UI渲染和业务逻辑，便于测试。
+  组件设计便于单元测试和集成测试，分离UI渲染和业务逻辑，便于测试。
 
 4. 主题一致性：
-   所有组件遵循统一的主题设计，支持主题色动态切换，保持UI一致性，基于Material Design 3规范实现。
+  所有组件遵循统一的主题设计，支持主题色动态切换，保持UI一致性，基于Material Design 3规范实现。
 
 5. 性能优化：
-   组件设计考虑性能因素，避免不必要的重建，使用`const`构造函数创建不可变组件，实现懒加载和缓存机制，提高渲染性能。
+  组件设计考虑性能因素，避免不必要的重建，使用`const`构造函数创建不可变组件，实现懒加载和缓存机制，提高渲染性能。
 
 === 自定义组件与配置管理
 
