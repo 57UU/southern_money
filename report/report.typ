@@ -158,7 +158,7 @@ builder.Services.AddDbContext<AppDbContext>();
 
 该架构设计高度模块化，便于系统扩展和维护，同时通过清晰的职责边界降低组件之间的耦合度。这种设计便于进行单元测试和集成测试，支持横向扩展以提高系统的并发处理能力，并具有良好的安全性设计，有效保护系统和用户数据。
 
-#let simplified_arch=diagram(
+#let simplified_arch = diagram(
   node-stroke: .1em,
   spacing: 10pt,
   node-fill: blue.lighten(95%),
@@ -415,7 +415,7 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
   node((1, 6), [错误处理], label: "ErrorHandler", fill: gray.lighten(90%)),
   edge((0, 0), (0, 1), "->"),
   edge((0, 1), (0, 2), "->"),
-  edge((0, 2), (0, 3),[], "->"),
+  edge((0, 2), (0, 3), [], "->"),
   edge((0, 3), (0, 4), [否], "->", stroke: green),
   edge((0, 3), "r,d", [是], "->", label-pos: .5, stroke: red),
   edge((1, 4), (1, 5), "->"),
@@ -650,59 +650,102 @@ Southern Money系统采用关系型数据库设计，支持SQLite和PostgreSQL�
 - 采用密码哈希存储技术，保障用户密码安全
 - 开发异常处理中间件，防止敏感信息泄露，提供友好错误提示
 
+==== JWT 访问令牌
 实施JWT令牌认证机制，确保API访问安全
-- 认证流程图：
 
-  #diagram(
-    spacing: 2em,
-    node-stroke: .1em,
-    edge-stroke: .1em,
-    node-fill: blue.lighten(95%),
-    node((0, 0), [接收API请求], label: "Request"),
-    node((0, 1), [令牌正确?], label: "TokenCheck?", shape: shapes.diamond, fill: yellow.lighten(95%)),
-    node((2, 1), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
-    node((0, 2), [提取token], label: "Extract"),
-    node((0, 3), [验证token有效性], label: "Validate", shape: shapes.diamond, fill: yellow.lighten(95%)),
-    node((2, 3), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
-    node((0, 4), [获取用户ID和角色信息], label: "GetUserInfo", fill: green.lighten(95%)),
-    node((0, 5), [将用户信息存储在Http上下文中], label: "StoreContext"),
-    node((0, 6), [继续处理请求], label: "Continue", fill: olive.lighten(95%)),
-    edge((0, 0), (0, 1), "->"),
-    edge((0, 1), (2, 1), [否], "->", stroke: red),
-    edge((0, 1), (0, 2), [是], "->"),
-    edge((0, 2), (0, 3), "->"),
-    edge((0, 3), (2, 3), [无效], "->", stroke: red),
-    edge((0, 3), (0, 4), [有效], "->", stroke: green),
-    edge((0, 4), (0, 5), "->"),
-    edge((0, 5), (0, 6), "->"),
-    edge((2.2, 1), "ddddd,ll", "->"),
-    edge((1.8, 3), "ddd,ll", "->"),
-  )
+JWT（JSON Web Token）是一种基于令牌的无状态认证机制，本系统采用JWT实现API的安全访问控制。
 
-- 授权流程图：
+#figure(
+  tablem[
+    | 组成部分 | 说明 |
+    |----------|------|
+    | Header（头部） | 包含令牌类型和签名算法信息 |
+    | Payload（载荷） | 包含用户ID、角色、过期时间等声明信息 |
+    | Signature（签名） | 使用密钥对Header和Payload进行签名，确保令牌完整性 |
+  ],
+  kind: table,
+  caption: "JWT令牌结构",
+)
 
-  #diagram(
-    spacing: 2em,
-    node-stroke: .1em,
-    edge-stroke: .1em,
-    node-fill: blue.lighten(95%),
-    node((0, 0), [控制器方法开始执行], label: "Start"),
-    node((0, 1), [需要授权?], label: "NeedAuth?", shape: shapes.diamond, fill: yellow.lighten(95%)),
-    node((0, 3), [继续执行方法逻辑], label: "Execute", fill: green.lighten(95%)),
-    node((2, 1), [上下文中是否包含User?], label: "HasUser?", shape: shapes.diamond, fill: yellow.lighten(95%)),
-    node((4, 1), [返回401 Unauthorized], label: "401", fill: red.lighten(95%)),
-    node((2, 2), [获取用户角色], label: "GetRole"),
-    node((2, 3), [用户具有所需角色?], label: "HasRole?", shape: shapes.diamond, fill: yellow.lighten(95%)),
-    node((4, 3), [返回403 Forbidden], label: "403", fill: red.lighten(95%)),
-    edge((0, 0), (0, 1), "->"),
-    edge((0, 1), (0, 3), [否], "->", stroke: green),
-    edge((0, 1), (2, 1), [是], "->"),
-    edge((2, 1), (4, 1), [否], "->", stroke: red),
-    edge((2, 1), (2, 2), [是], "->"),
-    edge((2, 2), (2, 3), "->"),
-    edge((2, 3), (4, 3), [否], "->", stroke: red),
-    edge((2, 3), (0, 3), [是], "->", stroke: green),
-  )
+
+系统采用标准的JWT认证流程，具体设计逻辑如下：
+
+1. 令牌生成：
+  用户登录成功后，后端根据用户ID、角色、过期时间等信息生成JWT令牌，并使用密钥进行签名。令牌有效期设置比较短（24小时），平衡安全性和用户体验。
+2. 令牌传递：
+  前端在每次API请求的HTTP头中携带JWT令牌（Authorization: Bearer <token>），实现无状态的身份认证。令牌存储在客户端本地，避免每次请求都重新登录，同时也减少密码泄露风险。
+3. 令牌验证：
+  后端中间件拦截所有API请求，提取并验证JWT令牌的有效性。验证内容包括：签名完整性、令牌格式、过期时间等。验证通过后，将用户信息存储在HttpContext中，供后续业务逻辑使用。
+4. 令牌刷新：
+  为提升用户体验，系统实现令牌刷新机制。当访问令牌即将过期时，前端使用刷新令牌获取新的访问令牌，避免用户频繁登录。刷新令牌具有更长的有效期，但仅用于获取新的访问令牌，不能直接访问API。
+
+JWT认证流程在设计中充分考虑了安全性：
+
+1. 密钥管理：使用强密钥对JWT令牌进行签名，密钥存储在安全位置，防止密钥泄露。
+2. 令牌过期：设置合理的令牌过期时间，避免令牌长期有效带来的安全风险。过期令牌自动失效，需要重新登录或刷新。
+
+JWT认证流程在设计中兼顾了性能优化：
+
+1. 无状态设计：JWT令牌本身包含所有必要信息，后端无需存储令牌状态，减少数据库查询（以往需要使用token池，其存储在数据库中），提升系统性能。
+2. 并发处理：令牌验证过程是去中心化的，且计算量小，支持高并发请求，不影响系统响应速度。
+
+==== 认证流程图：
+
+认证流程图展示了JWT令牌认证的完整执行过程：系统首先接收API请求并检查是否包含有效令牌，若包含则提取并验证令牌的签名、格式和过期时间，验证通过后解析JWT载荷获取用户ID和角色信息，将其存储到HttpContext中供后续业务逻辑使用，最终继续处理请求；若请求中无令牌或令牌无效，则继续处理请求但无法获取用户信息，这种设计支持公开接口和认证接口并存，通过多层验证确保安全性，同时无需查询数据库即可获取用户信息，提升了认证效率和用户体验。
+
+#diagram(
+  spacing: 2em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [接收API请求], label: "Request"),
+  node((0, 1), [令牌正确?], label: "TokenCheck?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+  node((2, 1), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
+  node((0, 2), [提取token], label: "Extract"),
+  node((0, 3), [验证token有效性], label: "Validate", shape: shapes.diamond, fill: yellow.lighten(95%)),
+  node((2, 3), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
+  node((0, 4), [获取用户ID和角色信息], label: "GetUserInfo", fill: green.lighten(95%)),
+  node((0, 5), [将用户信息存储在Http上下文中], label: "StoreContext"),
+  node((0, 6), [继续处理请求], label: "Continue", fill: olive.lighten(95%)),
+  edge((0, 0), (0, 1), "->"),
+  edge((0, 1), (2, 1), [否], "->", stroke: red),
+  edge((0, 1), (0, 2), [是], "->"),
+  edge((0, 2), (0, 3), "->"),
+  edge((0, 3), (2, 3), [无效], "->", stroke: red),
+  edge((0, 3), (0, 4), [有效], "->", stroke: green),
+  edge((0, 4), (0, 5), "->"),
+  edge((0, 5), (0, 6), "->"),
+  edge((2.2, 1), "ddddd,ll", "->"),
+  edge((1.8, 3), "ddd,ll", "->"),
+)
+
+==== 授权流程图：
+
+授权流程图展示了基于角色的访问控制（RBAC）执行过程：控制器方法开始执行后，首先判断是否需要授权，若不需要则直接执行业务逻辑；若需要授权则检查HttpContext中是否包含用户信息，不包含则返回401 Unauthorized错误，包含则获取用户角色并验证是否具有所需角色权限，具有则继续执行方法逻辑，不具有则返回403 Forbidden错误，这种设计通过声明式授权属性实现了灵活的权限控制，确保只有具备相应角色的用户才能访问受保护的资源。
+
+#diagram(
+  spacing: 2em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [控制器方法开始执行], label: "Start"),
+  node((0, 1), [需要授权?], label: "NeedAuth?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+  node((0, 3), [继续执行方法逻辑], label: "Execute", fill: green.lighten(95%)),
+  node((2, 1), [上下文中是否包含User?], label: "HasUser?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+  node((4, 1), [返回401 Unauthorized], label: "401", fill: red.lighten(95%)),
+  node((2, 2), [获取用户角色], label: "GetRole"),
+  node((2, 3), [用户具有所需角色?], label: "HasRole?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+  node((4, 3), [返回403 Forbidden], label: "403", fill: red.lighten(95%)),
+  edge((0, 0), (0, 1), "->"),
+  edge((0, 1), (0, 3), [否], "->", stroke: green),
+  edge((0, 1), (2, 1), [是], "->"),
+  edge((2, 1), (4, 1), [否], "->", stroke: red),
+  edge((2, 1), (2, 2), [是], "->"),
+  edge((2, 2), (2, 3), "->"),
+  edge((2, 3), (4, 3), [否], "->", stroke: red),
+  edge((2, 3), (0, 3), [是], "->", stroke: green),
+)
+
 - 为所有 Web API 统一封装`ApiResponse<T>`响应格式，前端能够通过`Success`、`Message`、`Data`等字段进行一致性错误处理，避免泄露堆栈等敏感信息。
 - 在图片上传接口中限制文件大小、校验 MIME 类型，并将图片数据与元信息分表存储，降低任意文件上传、恶意脚本执行等风险。
 - 通过`ExceptionHandlerMiddleware`拦截未处理异常，在生产环境中隐藏详细错误信息，只返回标准化错误响应，并记录日志便于排查。
@@ -978,9 +1021,9 @@ mindmap
 
 由于这个项目比较复杂，表与表之间的关系难以通过陈氏ER图展示，因此改作乌鸦脚图(crown-foot)描述数据库的实体关系图。
 
-在乌鸦脚ER图里：实体用矩形框表示，关系用连接线表示。其中，单条短竖线“|”代表“一”，三叉的“乌鸦脚”（}）代表“多”，小圆圈“o”则表示“可选”（零）。这些符号的组合明确定义了关系的基数：例如“
-”对“} ”表示经典的一对多关系，“} ”对“}
-”表示多对多关系。
+在乌鸦脚ER图里：实体用矩形框表示，关系用连接线表示。其中，单条短竖线“|”代表“一”，三叉的“乌鸦脚”（}）代表“多”，小圆圈“o”则表示“可选”（零）。这些符号的组合明确定义了关系的基数：例如“|”对“{”表示经典的一对多关系，“}”对“{”表示多对多关系。
+
+
 
 除开联结表，整个系统中的实体使用了10个表。由于属性过于复杂，这里显示了两个ER图，一个是简化版，一个是详细版：
 #figure(
@@ -996,6 +1039,89 @@ mindmap
   image("./er.jpg"),
   caption: "系统实体关系图(详细)",
 )
+
+==== ER设计逻辑阐述
+
+本系统的ER设计遵循了关系型数据库的规范化原则，同时结合业务需求进行了合理的反规范化优化，具体设计逻辑如下：
+
+===== 核心实体设计
+
+系统以用户实体为核心，所有业务活动都围绕用户展开。用户实体包含以下关键属性：
+- 基础信息：Id、Name、Email、Avatar
+- 账户状态：IsAdmin、HasAccount、IsBlocked、IsDeleted
+- 时间信息：CreateTime、BlockedAt、AccountOpenedAt
+- 安全信息：Password（哈希存储）
+
+用户实体的设计体现了单一职责原则，将用户的基本信息、状态信息、权限信息集中管理，便于统一认证和授权。
+
+===== 一对多关系设计
+
+系统中的主要一对多关系设计如下：
+
+1. 用户与帖子：一个用户可以发布多篇帖子，一篇帖子只能属于一个用户。这种设计符合现实世界的业务逻辑，明确了内容的归属关系，便于追踪内容发布者，实现用户内容管理和权限控制。
+
+2. 用户与商品：一个用户可以上传多个商品，一个商品只能属于一个上传用户。这种设计确保了商品来源的可追溯性，便于商品管理和交易纠纷处理。
+
+3. 用户与通知：一个用户可以接收多条通知，每条通知只能发送给一个接收用户。这种设计实现了个性化通知推送，确保通知的精准送达。
+
+4. 用户与资产：一个用户只能拥有一条资产记录，资产记录属于一个用户。这种一对一关系的设计确保了用户资产的唯一性和一致性，避免了数据冗余。
+
+5. 商品与分类：一个分类可以包含多个商品，一个商品只能属于一个分类。这种设计实现了商品的层级管理，便于商品检索和分类展示。
+
+===== 多对多关系设计
+
+系统中的多对多关系通过关联表实现，具体设计如下：
+
+1. 帖子与图片：通过PostImages关联表实现，一个帖子可以包含多张图片，一张图片也可以被多个帖子使用（如封面图）。这种设计实现了图片资源的复用，减少了存储空间占用，同时保持了内容的灵活性。
+
+2. 帖子与标签：通过PostTags关联表实现，一个帖子可以关联多个标签，一个标签也可以关联多个帖子。这种设计实现了内容的灵活分类和检索，便于用户通过标签发现相关内容。
+
+3. 帖子与用户互动：通过PostLikes和PostFavorites关联表分别实现点赞和收藏功能。一个帖子可以被多个用户点赞或收藏，一个用户也可以点赞或收藏多个帖子。这种设计实现了用户与内容的互动，增强了社区活跃度。
+
+4. 用户与分类收藏：通过UserFavoriteCategories关联表实现，一个用户可以收藏多个分类，一个分类也可以被多个用户收藏。这种设计实现了个性化推荐的基础，便于系统根据用户偏好推送相关内容。
+
+===== 业务约束设计
+
+系统在ER设计中充分考虑了业务约束，主要体现在：
+
+1. 软删除机制：通过IsDeleted字段实现软删除，保留数据历史，便于数据恢复和审计。
+
+2. 封禁管理：通过IsBlocked、BlockReason、BlockedAt字段实现用户和帖子的封禁管理，支持封禁原因记录和时间追踪。
+
+3. 事务完整性：TransactionRecord记录交易详情，包含ProductId、BuyerUserId、Quantity、Price、PurchaseTime等字段，确保交易的可追溯性和完整性。
+
+4. 权限控制：通过IsAdmin字段区分管理员和普通用户，配合PostBlock表实现内容审核和管理功能。
+
+===== 性能优化设计
+
+ER设计在规范化基础上进行了性能优化：
+
+
+1. 索引设计：主要外键字段（如UploaderUserId、CategoryId、BuyerUserId）建立索引，加速关联查询。
+
+2. 计算属性：TransactionRecord中的TotalPrice作为计算属性，通过Price和Quantity计算得出，避免数据不一致，以及减少冗余字段。
+
+===== 数据一致性保障
+
+ER设计通过以下机制保障数据一致性：
+
+1. 外键约束：所有关联表都通过外键约束保证引用完整性，防止孤立数据的产生。
+
+2. 级联操作：合理设置级联删除和更新规则，确保相关数据的一致性。
+
+3. 事务管理：关键业务操作（如交易、内容发布）通过事务保证原子性，要么全部成功，要么全部回滚。
+
+===== 扩展性设计
+
+ER设计充分考虑了系统的扩展性：
+
+1. 灵活的标签系统：PostTags表采用字符串存储标签，便于新增标签类型，无需修改表结构。
+
+2. 可扩展的通知类型：Notification表的Type字段采用字符串存储，便于扩展新的通知类型。
+
+3. 图片类型区分：Image表的ImageType字段区分不同类型的图片（头像、内容图、封面图等），便于统一管理和复用。
+
+本系统的ER设计在满足业务需求的同时，兼顾了数据规范性、查询性能、一致性和扩展性，为系统的稳定运行和功能扩展提供了坚实的数据基础。
 
 === 数据库表结构
 
@@ -1052,246 +1178,399 @@ mindmap
   caption: "数据库数据样例",
 )
 
+== 功能模块流程图
+
+本节通过流程图的形式详细展示了系统各核心功能模块的执行流程，包括用户注册、用户登录、产品购买等关键业务流程。每个流程图都清晰地描绘了从前端用户操作到后端处理再到结果返回的完整过程，展示了各环节之间的逻辑关系和判断条件。这些流程图有助于理解系统的工作机制，为系统开发、测试和维护提供了直观的参考。
+
 === 用户注册流程
-#oxdraw(
-  "
-graph LR
-    A[用户填写注册信息] --> B[前端验证]
-    B -->|验证通过| C[发送注册请求]
-    C --> D[后端验证]
-    D -->|验证通过| E[创建用户]
-    E --> F[返回成功]
-    D -->|验证失败| G[返回错误]
-    B -->|验证失败| H[提示错误]
-",
+
+用户注册流程包含前端和后端两层验证机制。前端验证主要负责检查用户输入的格式正确性，包括用户名长度、邮箱格式等基本规则，确保数据格式符合要求后再发送请求，减少不必要的网络传输。后端验证则进行更严格的数据校验，包括检查用户名和邮箱是否已被注册、密码哈希处理、数据完整性验证等，确保数据安全性和业务规则的正确性。双重验证机制有效提升了系统的安全性和用户体验。
+
+#let register_chart = diagram(
+  spacing: 2em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [用户填写注册信息], label: "FillInfo"),
+  node((0, 1), [前端验证], label: "FrontendValidate"),
+  node((0, 2), [发送注册请求], label: "SendRequest"),
+  node((0, 3), [后端验证], label: "BackendValidate"),
+  node((0, 4), [创建用户], label: "CreateUser"),
+  node((0, 5), [返回成功], label: "Success", fill: green.lighten(95%)),
+  node((0, 6), [返回错误], label: "Error", fill: red.lighten(95%)),
+  node((1, 1), [提示错误], label: "ShowError", fill: red.lighten(95%)),
+  edge((0, 0), (0, 1), "->"),
+  edge((0, 1), (0, 2), [验证通过], "->", stroke: green),
+  edge((0, 1), (1, 1), [验证失败], "->", stroke: red),
+  edge((0, 2), (0, 3), "->"),
+  edge((0, 3), (0, 4), [验证通过], "->", stroke: green),
+  edge((0, 3), (0, 6), [验证失败], "->", stroke: red),
+  edge((0, 4), (0, 5), "->"),
 )
+#figure(register_chart, caption: "用户注册流程")
 
 === 用户登录流程
-#oxdraw(
-  "
-graph LR
-    A[用户填写登录信息] --> B[前端验证]
-    B -->|验证通过| C[发送登录请求]
-    C --> D[后端验证]
-    D -->|验证通过| E[生成JWT令牌]
-    E --> F[返回令牌]
-    D -->|验证失败| G[返回错误]
-    B -->|验证失败| H[提示错误]
-",
+
+用户登录流程同样采用前后端双重验证机制。前端验证主要检查用户输入的完整性，确保用户名和密码字段不为空，并验证输入格式是否符合基本要求。后端验证则负责查询数据库验证用户身份，包括比对用户名是否存在、验证密码哈希是否匹配、检查用户账户状态（是否被封禁）等。验证通过后，后端生成JWT令牌并返回给前端，前端将令牌存储用于后续的身份认证，确保系统安全访问。
+
+#let login_chart = diagram(
+  spacing: 2em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [用户填写登录信息], label: "FillInfo"),
+  node((0, 1), [前端验证], label: "FrontendValidate"),
+  node((0, 2), [发送登录请求], label: "SendRequest"),
+  node((0, 3), [后端验证], label: "BackendValidate"),
+  node((0, 4), [生成JWT令牌], label: "GenerateToken"),
+  node((0, 5), [返回令牌], label: "ReturnToken", fill: green.lighten(95%)),
+  node((0, 6), [返回错误], label: "ReturnError", fill: red.lighten(95%)),
+  node((1, 1), [提示错误], label: "ShowError", fill: red.lighten(95%)),
+  edge((0, 0), (0, 1), "->"),
+  edge((0, 1), (0, 2), [验证通过], "->", stroke: green),
+  edge((0, 1), (1, 1), [验证失败], "->", stroke: red),
+  edge((0, 2), (0, 3), "->"),
+  edge((0, 3), (0, 4), [验证通过], "->", stroke: green),
+  edge((0, 3), (0, 6), [验证失败], "->", stroke: red),
+  edge((0, 4), (0, 5), "->"),
+)
+
+#figure(
+  login_chart,
+  caption: "用户登录流程",
 )
 
 === 产品购买流程
-#oxdraw(
-  "
-graph LR
-    A[用户选择产品] --> B[查看产品详情]
-    B --> C{产品状态正常?}
-    C -->|否| D[提示产品不可用]
-    C -->|是| E[填写购买数量]
-    E --> F{数量合法?}
-    F -->|否| G[提示数量错误]
-    F -->|是| H[确认购买]
-    H --> I[前端验证余额]
-    I -->|余额不足| J[提示充值]
-    I -->|余额充足| K[发送购买请求]
-    K --> L{用户状态正常?}
-    L -->|否| M[提示用户异常]
-    L -->|是| N[后端验证产品库存]
-    N -->|库存不足| O[提示库存不足]
-    N -->|库存充足| P[开始交易事务]
-    P --> Q[扣除用户余额]
-    Q --> R{扣款成功?}
-    R -->|否| S[回滚事务]
-    R -->|是| T[扣除产品库存]
-    T --> U{扣库存成功?}
-    U -->|否| S
-    U -->|是| V[生成交易记录]
-    V --> W{记录成功?}
-    W -->|否| S
-    W -->|是| X[提交事务]
-    X --> Y[发送交易成功通知]
-    Y --> Z[返回成功结果]
-    S --> AA[返回交易失败]
-",
+
+产品购买流程涉及复杂的业务逻辑和事务处理，前后端验证机制确保交易的安全性和数据一致性。前端验证主要检查购买数量是否为正整数、是否超过单次购买上限、用户余额是否充足等基本条件，提前拦截无效请求。后端验证则进行更全面的业务规则检查，包括验证产品是否存在且未下架、检查用户账户状态、验证用户余额是否足够支付、检查产品库存是否充足等。验证通过后，系统使用数据库事务确保交易的原子性，同时执行扣减用户余额、扣减产品库存、生成交易记录等操作，任何步骤失败都会触发事务回滚，确保数据一致性。交易成功后，系统会向用户发送购买通知。
+
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [用户选择产品], label: "Select"),
+    node((0, 1), [填写购买数量], label: "Quantity"),
+    node((0, 2), [前端验证], label: "FrontendValid?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 2), [提示错误], label: "Error", fill: red.lighten(95%)),
+    node((0, 3), [发送购买请求], label: "SendRequest"),
+    node((0, 4), [后端验证], label: "BackendValid?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 5), [执行交易事务], label: "Transaction"),
+    node((0, 6), [扣余额+扣库存+生成记录], label: "Update"),
+    node((0, 7), [事务成功?], label: "Success?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 7), [回滚事务], label: "Rollback", fill: red.lighten(95%)),
+    node((2, 8), [返回失败], label: "Fail", fill: red.lighten(95%)),
+    node((0, 8), [提交事务], label: "Commit", fill: green.lighten(95%)),
+    node((0, 9), [发送通知], label: "Notify"),
+    node((0, 10), [返回成功], label: "Success", fill: green.lighten(95%)),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), "->"),
+    edge((0, 2), (2, 2), [失败], "->", stroke: red),
+    edge((0, 2), (0, 3), [通过], "->", stroke: green),
+    edge((0, 3), (0, 4), "->"),
+    edge((0, 4), (2, 2), [失败], "->", stroke: red),
+    edge((0, 4), (0, 5), [通过], "->", stroke: green),
+    edge((0, 5), (0, 6), "->"),
+    edge((0, 6), (0, 7), "->"),
+    edge((0, 7), (2, 7), [否], "->", stroke: red),
+    edge((0, 7), (0, 8), [是], "->", stroke: green),
+    edge((2, 7), (2, 8), "->"),
+    edge((0, 8), (0, 9), "->"),
+    edge((0, 9), (0, 10), "->"),
+  ),
+  caption: "产品购买流程",
 )
 
 === 帖子发布流程
-#oxdraw(
-  "
-graph LR
-    A[用户填写帖子内容] --> B[上传图片(可选)]
-    B --> C{图片验证通过?}
-    C -->|否| D[提示图片错误]
-    C -->|是| E[前端内容验证]
-    E -->|验证失败| F[提示内容错误]
-    E -->|验证通过| G[发送发布请求]
-    G --> H{用户状态正常?}
-    H -->|否| I[提示用户异常]
-    H -->|是| J[后端内容验证]
-    J -->|验证失败| K[返回错误]
-    J -->|验证通过| L[检查内容合规性]
-    L -->|不合规| M[提示内容违规]
-    L -->|合规| N[保存帖子]
-    N --> O{保存成功?}
-    O -->|否| P[返回保存失败]
-    O -->|是| Q[保存帖子图片关联]
-    Q --> R{关联成功?}
-    R -->|否| S[删除已保存帖子]
-    R -->|是| T[更新帖子统计]
-    T --> U[返回发布成功]
-    S --> V[返回发布失败]
-",
+
+帖子发布流程包含多层验证机制，确保内容质量和系统安全。前端验证主要检查用户输入的基本格式，包括标题长度、内容长度、图片格式和大小等，确保数据符合基本要求后再上传。图片验证包括检查图片类型是否支持、文件大小是否在限制范围内。后端验证则进行更全面的检查，包括验证用户账户状态是否正常（是否被封禁或删除）、检查内容长度是否符合系统规定等。验证通过后，系统保存帖子及其图片关联关系，确保数据完整性。如果保存失败，系统会自动清理已创建的数据，避免产生脏数据。
+
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [用户填写帖子内容], label: "FillContent"),
+    node((0, 1), [上传图片(可选)], label: "UploadImage"),
+    node((0, 2), [图片验证通过?], label: "ImageValid?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 2), [提示图片错误], label: "ImageError", fill: red.lighten(95%)),
+    node((0, 3), [前端内容验证], label: "FrontendValid?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 3), [提示内容错误], label: "ContentError", fill: red.lighten(95%)),
+    node((0, 4), [发送发布请求], label: "SendRequest"),
+    node((0, 5), [用户状态正常?], label: "UserValid?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 5), [提示用户异常], label: "UserError", fill: red.lighten(95%)),
+    node((0, 6), [后端内容验证], label: "BackendValid"),
+    node((2, 6), [返回错误], label: "Error", fill: red.lighten(95%)),
+    node((0, 7), [保存帖子], label: "SavePost"),
+    node((0, 8), [保存成功?], label: "Saved?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 8), [返回保存失败], label: "SaveFail", fill: red.lighten(95%)),
+    node((0, 9), [保存帖子图片关联], label: "SaveImageRelation"),
+    node((0, 10), [关联成功?], label: "Linked?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 10), [删除已保存帖子], label: "DeletePost", fill: red.lighten(95%)),
+    node((0, 11), [更新帖子统计], label: "UpdateStats"),
+    node((0, 12), [返回发布成功], label: "Success", fill: green.lighten(95%)),
+    node((2, 11), [返回发布失败], label: "Fail", fill: red.lighten(95%)),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), "->"),
+    edge((0, 2), (2, 2), [否], "->", stroke: red),
+    edge((0, 2), (0, 3), [是], "->", stroke: green),
+    edge((0, 3), (2, 3), [验证失败], "->", stroke: red),
+    edge((0, 3), (0, 4), [验证通过], "->", stroke: green),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (2, 5), [否], "->", stroke: red),
+    edge((0, 5), (0, 6), [是], "->", stroke: green),
+    edge((0, 6), (2, 6), [验证失败], "->", stroke: red),
+    edge((0, 6), (0, 7), [验证通过], "->", stroke: green),
+    edge((0, 7), (0, 8), "->"),
+    edge((0, 8), (2, 8), [否], "->", stroke: red),
+    edge((0, 8), (0, 9), [是], "->", stroke: green),
+    edge((0, 9), (0, 10), "->"),
+    edge((0, 10), (2, 10), [否], "->", stroke: red),
+    edge((0, 10), (0, 11), [是], "->", stroke: green),
+    edge((0, 11), (0, 12), "->"),
+    edge((2, 10), (2, 11), "->"),
+  ),
+  caption: "帖子发布流程",
 )
 
 === 帖子审核流程
-#oxdraw(
-  "
-graph LR
-    A[用户发布帖子] --> B[系统自动审核]
-    B --> C{审核通过?}
-    C -->|不通过| D[帖子进入待审核区]
-    C -->|通过| E[帖子上线]
-    E --> F[用户浏览帖子]
-    F -->|发现违规内容| G[用户举报帖子]
-    D --> H[管理员查看待审核列表]
-    G --> I[系统记录举报信息]
-    I --> J[帖子举报计数+1]
-    J --> K[系统判断是否达到举报阈值]
-    K -->|是| L[帖子自动下架]
-    K -->|否| M[帖子继续显示]
-    L --> N[通知管理员]
-    H --> O[管理员审核帖子内容]
-    N --> O
-    O --> P{审核结果?}
-    P -->|通过| Q[帖子恢复上线/发布]
-    P -->|不通过| R[封禁帖子 (/admin/handleReport)]
-    Q --> S[更新帖子状态]
-    R --> T[系统记录封禁信息 (PostBlocks表)]
-    T --> U[通知帖子作者]
-    S --> V[更新举报状态]
-    V --> W[结束]
-    U --> W
-",
+
+帖子审核流程主要依赖用户举报机制来维护社区内容的安全性和合规性。用户在浏览帖子时，如发现违规内容可以发起举报。系统会记录举报信息并通知管理员介入处理。管理员审核通过后，帖子清除举报记录；审核不通过则封禁帖子，系统会在PostBlocks表中记录封禁信息并通知帖子作者。
+
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [用户发布帖子], label: "Publish"),
+    node((0, 1), [帖子上线], label: "Online"),
+    node((0, 2), [用户浏览帖子], label: "Browse"),
+    node((0, 3), [用户举报帖子], label: "Report"),
+    node((0, 4), [系统记录举报信息，并通知管理员审核], label: "Record"),
+    node((0, 5), [审核结果?], label: "Result?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 6), [清除举报记录], label: "ClearRecord", fill: green.lighten(95%)),
+    node((1, 5), [封禁帖子], label: "Block", fill: red.lighten(95%)),
+    node((1, 6), [系统记录封禁信息], label: "RecordBlock"),
+    node((1, 7), [通知帖子作者], label: "NotifyAuthor"),
+    node((0, 7), [结束], label: "End"),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), "->"),
+    edge((0, 2), (0, 3), [发现违规内容], "->", stroke: red),
+    edge((0, 3), (0, 4), "->"),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), [通过], "->", stroke: green),
+    edge((0, 5), (1, 5), [不通过], "->", stroke: red),
+    edge((0, 6), (0, 7), "->"),
+    edge((1, 5), (1, 6), "->"),
+    edge((1, 6), (1, 7), "->"),
+    edge((1, 7), (0, 7), "->"),
+  ),
+  caption: "帖子审核流程",
 )
 
 === 用户资产更新流程
-#oxdraw(
-  "
-graph LR
-    A[用户资产触发事件] --> B{事件类型?}
-    B -->|充值| C[用户发起充值请求 (/user/topup)]
-    B -->|购买产品| D[用户购买产品 (/transaction/buy)]
-    B -->|收益计算| E[系统定时计算收益]
 
-    C --> F[系统处理充值]
-    F --> G[更新用户余额]
+用户资产更新流程涉及多种业务场景，包括充值、购买产品和收益计算，每种场景都有严格的验证机制确保资产安全。充值场景中，前端验证充值金额是否为正数、是否在允许范围内，后端验证充值请求的合法性和支付渠道的可靠性。购买产品场景中，前端验证购买数量是否合法、用户余额是否充足，后端验证产品状态、库存情况以及用户账户状态，确保交易安全。收益计算场景由系统定时任务触发，后端根据产品价格波动计算用户收益，更新UserAsset表中的各项资产数据。所有资产更新操作都使用数据库事务确保数据一致性，任何异常都会触发回滚，避免资产数据错误。
 
-    D --> H[系统验证余额]
-    H -->|余额充足| I[处理交易]
-    H -->|余额不足| J[交易失败]
-    I --> K[扣除产品费用]
-    K --> L[生成交易记录]
-
-    E --> M[计算用户收益]
-    M --> N[更新收益数据]
-
-    G --> O[更新UserAsset表]
-    L --> O
-    N --> O
-    O --> P[返回最新资产数据]
-    J --> Q[返回错误信息]
-",
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [用户资产触发事件], label: "Trigger"),
+    node((0, 1), [事件类型?], label: "EventType?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 2), [用户发起充值请求], label: "Topup"),
+    node((0, 3), [系统处理充值], label: "ProcessTopup"),
+    node((0, 4), [更新用户余额], label: "UpdateBalance"),
+    node((1, 2), [用户购买产品], label: "BuyProduct"),
+    node((1, 3), [系统验证余额], label: "CheckBalance", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((1, 4), [处理交易], label: "ProcessTrans"),
+    node((1, 5), [扣除产品费用], label: "DeductFee"),
+    node((1, 6), [生成交易记录], label: "CreateRecord"),
+    node((2, 3), [交易失败], label: "Fail", fill: red.lighten(95%)),
+    node((2, 4), [返回错误信息], label: "Error", fill: red.lighten(95%)),
+    node((3, 2), [系统定时计算收益], label: "CalcProfit"),
+    node((3, 3), [计算用户收益], label: "Calculate"),
+    node((3, 4), [更新收益数据], label: "UpdateProfit"),
+    node((0, 5), [更新UserAsset表], label: "UpdateAsset"),
+    node((0, 6), [返回最新资产数据], label: "Success", fill: green.lighten(95%)),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), [充值], "->", stroke: green),
+    edge((0, 1), (1, 2), [购买产品], "->", stroke: green),
+    edge((0, 1), "rrr,d", [收益计算], "->", stroke: green),
+    edge((0, 2), (0, 3), "->"),
+    edge((0, 3), (0, 4), "->"),
+    edge((0, 4), (0, 5), "->"),
+    edge((1, 2), (1, 3), "->"),
+    edge((1, 3), (1, 4), [余额充足], "->", stroke: green),
+    edge((1, 3), (2, 3), [余额不足], "->", stroke: red),
+    edge((1, 4), (1, 5), "->"),
+    edge((1, 5), (1, 6), "->"),
+    edge((1, 6), (0, 5), "->"),
+    edge((2, 3), (2, 4), "->"),
+    edge((3, 2), (3, 3), "->"),
+    edge((3, 3), (3, 4), "->"),
+    edge((3, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), "->"),
+  ),
+  caption: "用户资产更新流程",
 )
 
 === 通知发送流程
-#oxdraw(
-  "
-graph LR
-    A[触发通知事件] --> B{事件类型?}
-    B -->|交易事件| C[交易完成]
-    B -->|系统事件| D[系统公告]
-    B -->|审核事件| E[内容审核结果]
-    B -->|其他事件| F[其他通知]
 
-    C --> G[创建通知记录]
-    D --> G
-    E --> G
-    F --> G
+通知发送流程负责将各类业务事件及时推送给相关用户，确保用户能够及时获取重要信息。系统支持多种通知类型，包括交易事件（如购买成功、收益到账）、系统事件（如系统公告、维护通知）、审核事件（如帖子审核结果）以及其他自定义通知。前端验证主要检查通知请求的合法性，包括验证接收用户ID是否存在、通知内容长度是否在限制范围内等。后端验证则进行更全面的检查，包括验证通知类型是否合法、检查用户通知权限、验证通知内容是否包含敏感信息等。通知保存到Notifications表后，系统会根据推送方式进行分发，系统内通知通过更新未读计数提醒用户，同时支持外部推送服务扩展。用户查看通知后，系统会标记通知为已读状态。
 
-    G --> H[保存到Notifications表]
-    H --> I[推送通知]
-    I --> J{推送方式?}
-    J -->|系统内| K[更新未读计数]
-    J -->|其他方式| L[外部推送服务]
-
-    K --> M[用户接收通知]
-    L --> M
-    M --> N[用户查看通知 (/notification/my)]
-    N --> O[标记通知已读 (/notification/read)]
-    O --> P[更新通知状态]
-    P --> Q[结束]
-",
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [触发通知事件], label: "Trigger"),
+    node((0, 1), [事件类型?], label: "EventType?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 2), [交易完成], label: "Transaction"),
+    node((1, 2), [系统公告], label: "System"),
+    node((2, 2), [内容审核结果], label: "Audit"),
+    node((3, 2), [其他通知], label: "Other"),
+    node((0, 3), [创建通知记录], label: "CreateRecord"),
+    node((0, 4), [保存到Notifications表], label: "SaveToTable"),
+    node((0, 5), [推送通知], label: "Push"),
+    node((0, 6), [推送方式?], label: "PushMethod?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 7), [更新未读计数], label: "UpdateUnread"),
+    node((1, 7), [外部推送服务], label: "ExternalPush"),
+    node((0, 8), [用户接收通知], label: "Receive"),
+    node((0, 9), [用户查看通知], label: "View"),
+    node((0, 10), [标记通知已读], label: "MarkRead"),
+    node((0, 11), [更新通知状态], label: "UpdateStatus"),
+    node((0, 12), [结束], label: "End"),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), [交易事件], "->", stroke: green),
+    edge((0, 1), "r,d", [系统事件], "->", stroke: green),
+    edge((0, 1), "rr,d", [审核事件], "->", stroke: green),
+    edge((0, 1), "rrr,d", [其他事件], "->", stroke: green),
+    edge((0, 2), (0, 3), "->"),
+    edge((1, 2), "d,l", "->"),
+    edge((2, 2), "d,ll", "->"),
+    edge((3, 2), "d,lll", "->"),
+    edge((0, 3), (0, 4), "->"),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), "->"),
+    edge((0, 6), (0, 7), [系统内], "->", stroke: green),
+    edge((0, 6), (1, 7), [其他方式], "->", stroke: green),
+    edge((0, 7), (0, 8), "->"),
+    edge((1, 7), (0, 8), "->"),
+    edge((0, 8), (0, 9), "->"),
+    edge((0, 9), (0, 10), "->"),
+    edge((0, 10), (0, 11), "->"),
+    edge((0, 11), (0, 12), "->"),
+  ),
+  caption: "通知发送流程",
 )
 
 === 管理员处理用户流程
-#oxdraw(
-  "
-graph LR
-    A[管理员登录系统] --> B[进入管理后台]
-    B --> C[查看用户列表 (/admin/users)]
-    C --> D[搜索/筛选用户]
-    D --> E[查看用户详情 (/admin/users/{userId})]
-    E --> F{处理操作?}
-    F -->|封禁/解封| G[处理用户状态 (/admin/handleUser)]
-    F -->|设置管理员| H[设置管理员权限 (/admin/setAdmin)]
-    F -->|返回列表| C
 
-    G --> I[更新用户IsBlocked状态]
-    I --> J[记录处理原因]
+管理员处理用户流程提供了完整的用户管理功能，包括查看用户列表、搜索筛选用户、查看用户详情等基础操作。管理员可以对用户进行多种处理操作：封禁或解封用户账号、设置或取消管理员权限。封禁/解封操作会更新用户的IsBlocked状态，并记录处理原因，同时通过NotificationService向用户发送通知。设置管理员权限操作会更新用户的IsAdmin状态。所有操作完成后，系统会返回操作结果并记录相关日志，确保用户管理过程的可追溯性。
 
-    H --> K[更新用户IsAdmin状态]
-
-    J --> L[发送通知给用户]
-    K --> L
-
-    L --> M[返回操作结果]
-    M --> N[结束]
-",
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [管理员登录系统], label: "Login"),
+    node((0, 1), [进入管理后台], label: "Dashboard"),
+    node((0, 2), [查看用户列表], label: "UserList"),
+    node((0, 3), [搜索/筛选用户], label: "Search"),
+    node((0, 4), [查看用户详情], label: "UserDetail"),
+    node((0, 5), [处理操作?], label: "Action?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 6), [处理用户状态], label: "HandleStatus"),
+    node((0, 7), [更新用户IsBlocked状态], label: "UpdateBlocked"),
+    node((0, 8), [记录处理原因], label: "RecordReason"),
+    node((1, 6), [设置管理员权限], label: "SetAdmin"),
+    node((1, 7), [更新用户IsAdmin状态], label: "UpdateAdmin"),
+    node((0, 9), [发送通知给用户], label: "NotifyUser"),
+    node((0, 10), [返回操作结果], label: "Result"),
+    node((0, 11), [结束], label: "End"),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), "->"),
+    edge((0, 2), (0, 3), "->"),
+    edge((0, 3), (0, 4), "->"),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), [封禁/解封], "->", stroke: green),
+    edge((0, 5), (1, 6), [设置管理员], "->", stroke: green),
+    edge((0, 5), "r,uuu,l", [返回列表], "->", stroke: green, label-pos: .2),
+    edge((0, 6), (0, 7), "->"),
+    edge((0, 7), (0, 8), "->"),
+    edge((0, 8), (0, 9), "->"),
+    edge((1, 6), (1, 7), "->"),
+    edge((1, 7), (0, 9), "->"),
+    edge((0, 9), (0, 10), "->"),
+    edge((0, 10), (0, 11), "->"),
+  ),
+  caption: "管理员处理用户流程",
 )
 
 === 商品分类管理流程
-#oxdraw(
-  "
-graph LR
-    A[管理员登录系统] --> B[进入管理后台]
-    B --> C[查看分类列表 (/store/categories)]
-    C --> D{分类操作?}
-    D -->|创建分类| E[创建新分类 (/store/category/create)]
-    D -->|编辑分类| F[选择分类]
-    D -->|删除分类| G[选择分类]
-    D -->|查看分类商品| H[查看分类商品 (/store/categories/{id}/products)]
 
-    E --> I[填写分类信息]
-    I --> J[上传分类封面]
-    J --> K[保存分类数据]
+商品分类管理流程为管理员提供了完整的分类管理功能，包括创建新分类、编辑现有分类、删除分类以及查看分类下的商品列表。创建分类时，管理员需要填写分类信息并上传分类封面，系统会保存分类数据并更新分类列表。编辑分类时，管理员可以修改分类信息后保存。删除分类前，系统会检查该分类下是否有关联商品，如果有商品关联则提示无法删除，确保数据完整性。查看分类商品功能可以让管理员快速浏览某个分类下的所有商品。所有操作完成后，系统会返回操作结果，确保管理员能够及时了解操作状态。
 
-    F --> L[修改分类信息]
-    L --> K
-
-    G --> M[确认删除]
-    M --> N{是否有商品关联?}
-    N -->|是| O[提示有商品关联]
-    N -->|否| P[删除分类]
-
-    K --> Q[更新分类列表]
-    P --> Q
-    O --> C
-
-    Q --> R[返回操作结果]
-    R --> S[结束]
-    H --> T[返回商品列表]
-    T --> S
-",
+#figure(
+  diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [管理员登录系统], label: "Login"),
+    node((0, 1), [进入管理后台], label: "Dashboard"),
+    node((0, 2), [查看分类列表], label: "CategoryList"),
+    node((0, 3), [分类操作?], label: "Action?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 4), [创建新分类], label: "Create"),
+    node((0, 5), [填写分类信息], label: "FillInfo"),
+    node((0, 6), [上传分类封面], label: "UploadCover"),
+    node((0, 7), [保存分类数据], label: "Save"),
+    node((1, 4), [选择分类], label: "Select"),
+    node((1, 5), [修改分类信息], label: "ModifyInfo"),
+    node((1, 6), [保存分类数据], label: "Save"),
+    node((2, 4), [选择分类], label: "Select"),
+    node((2, 5), [确认删除], label: "Confirm"),
+    node((2, 6), [是否有商品关联?], label: "HasProducts?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 8), [提示有商品关联], label: "HasProducts", fill: red.lighten(95%)),
+    node((1, 8), [删除分类], label: "Delete"),
+    node((3, 4), [查看分类商品], label: "ViewProducts"),
+    node((3, 5), [返回商品列表], label: "ProductList"),
+    node((0, 8), [更新分类列表], label: "UpdateList"),
+    node((0, 9), [返回操作结果], label: "Result"),
+    node((0, 10), [结束], label: "End"),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 2), "->"),
+    edge((0, 2), (0, 3), "->"),
+    edge((0, 3), (0, 4), [创建分类], "->", stroke: green),
+    edge((0, 3), "r,d", [编辑分类], "->", stroke: green),
+    edge((0, 3), "rr,d", [删除分类], "->", stroke: green),
+    edge((0, 3), "rrr,d", [查看分类商品], "->", stroke: green),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), "->"),
+    edge((0, 6), (0, 7), "->"),
+    edge((0, 7), (0, 8), "->"),
+    edge((1, 4), (1, 5), "->"),
+    edge((1, 5), (1, 6), "->"),
+    edge((1, 6), (0, 8), "->"),
+    edge((2, 4), (2, 5), "->"),
+    edge((2, 5), (2, 6), "->"),
+    edge((2, 6), (2, 8), [是], "->", stroke: red),
+    edge((2, 6), (1, 8), [否], "->", stroke: green),
+    //edge((2, 7), (0, 2), "->"),
+    edge((1, 8), (0, 8), "->"),
+    edge((3, 4), (3, 5), "->"),
+    edge((3, 5), "ddddd,lll", "->"),
+    edge((0, 8), (0, 9), "->"),
+    edge((0, 9), (0, 10), "->"),
+  ),
+  caption: "商品分类管理流程",
 )
 
 = 系统功能和测试
@@ -1562,18 +1841,15 @@ CSGO市场页面展示各类CSGO饰品的分类和价格信息，用户可以浏
   [*功能名称*], [*功能描述*],
   [主题颜色设置], [允许用户自定义应用主题色，通过取色算法生成主题颜色，并持久化保存],
   [动画时长设置], [允许用户调整应用内动画过渡的时长，通过调用 `SettingDuration` 组件实现],
-  [API地址设置],
-  [动态配置后端服务地址，支持实时切换API环境，通过调用 `SetApiUrlPage` 组件并使用 `ValueNotifier` 实现配置变更的实时响应],
+  [API地址设置], [动态配置后端服务地址，支持实时切换API环境],
 
-  [关于我们], [展示应用的基本信息、开发者信息和版权声明，通过调用 `AboutUsPage` 组件实现],
-  [测试页面], [提供开发调试工具和测试功能，用于内部测试和问题排查，通过调用 `DebugPage` 组件实现],
-  [清除全部数据],
-  [清除所有应用数据（包括主题设置、API配置等），操作前显示确认对话框，通过 `appConfigService.clearAllData()` 实现],
+  [关于我们], [展示应用的基本信息、开发者信息和版权声明],
+  [测试页面], [提供开发调试工具和测试功能，用于内部测试和问题排查],
+  [清除全部数据], [清除所有应用数据（包括主题设置、API配置等），操作前显示确认对话框],
 
-  [退出登录],
-  [清除JWT令牌和用户会话信息，返回登录页面，操作前显示确认对话框，通过 `appConfigService.tokenService.clearTokens()` 实现],
+  [退出登录], [清除JWT令牌和用户会话信息，返回登录页面，操作前显示确认对话框],
 
-  [版本信息], [显示当前应用版本号，点击可查看详细版本信息，版本信息由 `VersionService` 管理],
+  [版本信息], [显示当前应用版本号，点击可查看详细版本信息],
 )
 
 #figure(t1, caption: "设置页面功能模块")
