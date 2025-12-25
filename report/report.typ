@@ -19,7 +19,7 @@
   grade: "2023",
   major: "人工智能",
   date: (2025, 12, 17),
-  abstract_zh: "在互联网金融快速发展的背景下，为解决金融产品信息分散、交易管理不便及用户互动不足等问题，本文设计并实现了一个集金融产品展示、交易管理与社区交流于一体的综合性金融服务平台——Southern Money 系统。系统采用前后端分离架构，后端基于 ASP.NET Core Web API 构建，前端使用 Flutter 框架实现跨平台开发，支持多终端运行；在数据层面结合 SQLite 与 PostgreSQL 数据库，在安全性方面引入 JWT 认证与权限控制机制。系统实现了用户管理、金融产品交易、社区互动、通知中心及管理员后台等功能，并通过功能、性能、兼容性和安全性测试验证了系统的稳定性与可行性，能够为用户提供安全、便捷且统一的金融服务体验。",
+  abstract_zh: "在互联网金融快速发展背景下，针对金融产品信息分散、交易管理不便及用户互动不足等问题，本文设计并实现了Southern Money系统，这是一个集金融产品展示、交易管理与社区交流于一体的综合性金融服务平台。系统采用前后端分离架构，后端基于ASP.NET Core Web API构建高性能服务，前端使用Flutter实现跨平台开发，支持多终端运行；数据层面结合SQLite与PostgreSQL数据库，安全性方面引入JWT认证与权限控制机制。系统实现了用户管理、金融产品交易、社区互动、通知中心及管理员后台等核心功能，并通过全面测试验证了稳定性与可行性，能够为用户提供安全、便捷且统一的金融服务体验。",
   keywords_zh: ("互联网金融", "数据库", "ASP.NET Core", "Flutter", "JWT 认证"),
   users: u57u + ", " + yyw + ", " + lpj + ", " + hr,
 )
@@ -63,15 +63,98 @@ Southern Money系统融合了现代金融科技与互联网社区理念，通过
   caption: "技术栈选择",
 )
 
+== 开发工具
+
+#figure(
+  three-line-table[
+    | 类别 | 工具名称 | 用途 |
+    |------|----------|------|
+    | 后端开发工具 | Visual Studio 2026 / VS Code | 后端应用开发、调试和部署 |
+    | 前端开发工具 | VS Code + Flutter插件 | 前端应用开发、热重载调试 |
+    | 数据库管理工具 | pgAdmin 4 | PostgreSQL数据库管理和维护 |
+    | API测试工具 | Postman | API接口测试和调试 |
+    | 性能测试工具 | JMeter | 系统性能和负载测试 |
+    | 版本控制工具 | Git | 代码版本管理和团队协作 |
+    | 构建工具 | dotnet CLI, Flutter CLI | 项目构建、测试和部署 |
+  ],
+  kind: table,
+  caption: "开发工具列表",
+)
+
 == 技术路线
 Southern Money系统采用前后端分离的现代化架构设计，具体技术路线如下：
 
 === 后端架构
+
+Southern Money系统后端采用分层架构设计，遵循单一职责原则和依赖倒置原则，实现了高度的模块化和可扩展性。后端架构主要包括以下几个核心部分：
+
+==== 分层设计原则与职责边界
+
+1. Controller层：
+   Controller层作为系统的请求入口，负责处理HTTP请求、接收和验证请求参数，并调用Service层完成业务逻辑处理，然后格式化响应数据返回HTTP响应。该层不包含业务逻辑，仅负责请求路由和响应处理，确保了职责的单一性。例如，`UserController`专门处理用户注册、登录等请求。
+
+2. Service层：
+   Service层实现核心业务逻辑，处理复杂业务规则，协调多个Repository完成数据操作，并实现事务管理以确保数据一致性。该层还负责业务验证和权限检查，确保系统的安全性。例如，`UserService`实现了用户认证、密码加密等关键逻辑。
+
+3. Repository层：
+   Repository层负责数据访问操作，封装数据库操作细节，实现数据的CRUD（创建、读取、更新、删除）操作。该层不包含业务逻辑，仅处理数据持久化，基于Entity Framework Core实现，支持多种数据库。例如，`UserRepository`专门处理用户数据的存储和查询。
+
+4. Domain层：
+   Domain层定义核心业务实体和值对象，实现领域模型的业务规则和约束。该层不依赖任何外部框架，保持领域模型的纯净性。例如，`User`、`Product`、`Transaction`等实体类定义了系统的核心业务对象。
+
+5. Infrastructure层：
+   Infrastructure层提供基础设施支持，包括数据库配置、依赖注入、中间件等，并实现与外部系统的集成，如文件存储、邮件发送等。
+   - 封装通用工具类和辅助方法
+   - 示例：`JwtUtils`、`AppDbContext`等
+
+==== 中间件实现细节
+
+系统开发了多个自定义中间件组件，处理身份验证、异常处理、日志记录等横切关注点：
+
+1. 身份验证中间件：
+   - 拦截所有API请求，检查Authorization头中的JWT令牌
+   - 验证令牌的有效性和过期时间
+   - 解析令牌中的用户信息，存储到HttpContext中
+   - 处理令牌刷新逻辑，自动更新过期令牌
+
+2. 异常处理中间件：
+   - 捕获系统中发生的所有未处理异常
+   - 根据异常类型生成统一格式的错误响应
+   - 隐藏敏感错误信息，防止信息泄露
+   - 记录异常日志，便于系统监控和调试
+
+
+3. CORS中间件：
+   - 配置跨域资源共享策略，允许前端应用访问API
+   - 支持多种域名和HTTP方法
+   - 实现安全的跨域通信
+
+==== 依赖注入配置
+
+系统采用ASP.NET Core内置的依赖注入容器，实现组件之间的解耦和依赖管理：
+
+在`Program.cs`中配置所有服务的依赖关系，支持不同生命周期的服务注册（单例、作用域、瞬时）
+#sourcecode(```csharp
+  builder.Services.AddScoped<IUserService, UserService>();
+  builder.Services.AddScoped<IUserRepository, UserRepository>();
+  builder.Services.AddDbContext<AppDbContext>();
+  ```)
+  
+
+
+==== 核心技术实现
+
 - 基于ASP.NET Core Web API构建高性能RESTful API服务
 - 采用Entity Framework Core实现高效数据库操作和ORM映射
 - 集成JWT身份认证与授权机制，保障API安全访问
-- 实施分层架构设计：Controller层（请求处理）、Service层（业务逻辑）、Repository层（数据访问）
-- 开发中间件组件处理身份验证、异常处理、日志记录等横切关注点
+- 实现完整的事务管理，确保数据一致性
+- 支持数据库迁移，便于系统升级和维护
+
+==== 架构优势
+
+该架构设计高度模块化，便于系统扩展和维护，同时通过清晰的职责边界降低组件之间的耦合度。这种设计便于进行单元测试和集成测试，支持横向扩展以提高系统的并发处理能力，并具有良好的安全性设计，有效保护系统和用户数据。
+
+
 
 //typst的mermaid不支持classDef 自定义样式
 //typst的oxdraw必须以graph开头
@@ -82,13 +165,13 @@ graph LR
     Client[接受HTTP请求]
 
     %% Controller层
-    Controller[Controller层<br/>请求处理]
+    Controller[Controller层 请求处理]
 
     %% Service层
-    Service[Service层<br/>业务逻辑]
+    Service[Service层 业务逻辑]
 
     %% Repository层
-    Repository[Repository层<br/>数据访问]
+    Repository[Repository层 数据访问]
 
     %% 数据层
     Database[(数据库)]
@@ -193,17 +276,64 @@ graph TD
 )
 
 === 前端架构
-- 基于Flutter框架开发跨平台应用，支持Web、Android、iOS、Windows、macOS、Linux六大平台
-- 开发状态管理库实现应用状态的高效管理
-- 使用`get_it`作为依赖注入容器，集中管理`SharedPreferences`、`TokenService`及各类`ApiService`实例，降低页面之间的耦合度（对应`lib/setting/ensure_initialized.dart`）。
-- 通过`AppConfigService`统一管理主题颜色、动画时长、后端`BaseUrl`和会话 Token，配合`ValueNotifier`实现轻量级响应式状态管理（对应`lib/setting/app_config.dart`）。
-- 网络层基于`Dio`与自定义`JwtInterceptor`/`JwtDio`，在拦截器中自动附加`Authorization`头、处理401错误并尝试刷新令牌，简化前端对认证细节的处理（对应`lib/webapi/JwtService.dart`及各`api_xxx.dart`）。
 
-前端页面结构围绕`main.dart`中的`MainScreen`搭建，采用“底部/侧边导航 + 多 Tab 页面”的形式：
-- 四个核心 Tab：`HomePage`（首页）、`CommunityPage`（社区）、`MarketPage`（行情）、`ProfilePage`（个人中心）。
-- 借助`popupOrNavigate`与`Fragment`组件，在横屏时优先使用弹窗展示子页面，在竖屏时使用路由切换新页面，提升大屏设备上的多任务体验（对应`lib/widgets/router_utils.dart`）。
+Southern Money系统前端基于Flutter框架开发，采用现代化的架构设计，实现了跨平台支持、高效状态管理和响应式UI设计。
 
-实施响应式UI设计，自动适配不同屏幕尺寸和设备类型
+==== 核心架构设计
+
+1. 跨平台支持：
+   系统基于Flutter框架，一套代码可运行在Web、Android、iOS、Windows、macOS和Linux六大平台，采用Flutter的Widget系统实现高性能、跨平台的UI渲染，并支持原生插件集成，实现与平台特定功能的无缝对接。
+
+2. 依赖注入设计：
+   系统使用`get_it`作为依赖注入容器，集中管理应用级服务，统一管理`SharedPreferences`、`TokenService`及各类`ApiService`实例，降低页面之间的耦合度，提高代码的可测试性和可维护性，对应文件：`lib/setting/ensure_initialized.dart`。
+
+3. 配置管理：
+   系统通过`AppConfigService`统一管理应用配置，包括主题颜色、动画时长、后端`BaseUrl`和会话Token等，配合`ValueNotifier`实现轻量级响应式状态管理，配置变更实时更新UI，提升用户体验，对应文件：`lib/setting/app_config.dart`。
+
+==== 状态管理机制
+
+系统采用多种状态管理方案，根据不同场景选择合适的实现方式：
+
+1. 轻量级状态管理：
+   系统使用`ValueNotifier`和`ChangeNotifier`实现简单状态管理，适用于全局配置、主题设置等简单状态，并配合`Consumer`和`Provider`组件实现UI响应式更新。
+
+2. 依赖注入 + 服务模式：
+   系统通过`get_it`注册和获取服务实例，服务内部管理自身状态，通过回调或流通知UI更新，适用于复杂业务逻辑和跨页面状态共享。
+
+3. 页面级状态管理：
+   系统使用`StatefulWidget`的`setState()`方法管理页面内部状态，适用于单个页面内部的状态变化，并配合`AutomaticKeepAliveClientMixin`实现页面状态持久化。
+
+==== 路由管理机制
+
+系统实现了灵活的路由管理机制，支持不同设备尺寸和方向的自适应：
+
+1. 核心路由结构：
+   系统基于Flutter的`Navigator`组件实现页面导航，主路由包括登录页、注册页、主屏幕，子路由涵盖各功能模块页面。
+
+2. 响应式路由策略：
+   系统借助`popupOrNavigate`与`Fragment`组件实现响应式路由，横屏时优先使用弹窗展示子页面，提升大屏设备的多任务体验，竖屏时使用标准路由切换新页面，保持移动端的操作习惯，对应文件：`lib/widgets/router_utils.dart`。
+
+3. 路由导航模式：
+   系统提供多种导航方式，底部导航栏（竖屏）包括`HomePage`、`CommunityPage`、`MarketPage`、`ProfilePage`，左侧导航栏（横屏）与底部导航栏功能一致，布局适配大屏，模态弹窗用于显示临时信息或简单表单，抽屉菜单用于个人中心和设置页面的导航。
+
+==== 网络请求处理
+
+系统实现了强大的网络请求处理机制，确保API调用的安全性和可靠性：
+
+#figure(
+  three-line-table[
+    | 处理机制 | 具体说明 |
+    | 网络层架构 | 基于`Dio`库实现HTTP请求，封装`JwtDio`类，集成JWT认证机制，实现自定义`JwtInterceptor`，自动处理令牌管理，对应文件：`lib/webapi/JwtService.dart`及各`api_xxx.dart` |
+    | 认证流程处理 | 在拦截器中自动附加`Authorization`头，处理401错误，自动尝试刷新令牌，刷新失败时跳转至登录页面，简化前端对认证细节的处理，提高开发效率 |
+    | 统一响应处理 | 封装统一的API响应格式，自动解析响应数据，转换为实体类，统一处理错误信息，提供友好的用户提示 |
+  ],
+  kind: table,
+  caption: "网络请求处理机制",
+)
+
+==== 响应式UI设计
+
+系统实施了全面的响应式UI设计，自动适配不同屏幕尺寸和设备类型：
 
 #figure(
   three-line-table[
@@ -217,7 +347,63 @@ graph TD
   caption: "响应式布局设计",
 )
 
-采用HTTP2库实现高效HTTP请求处理和拦截器机制，简化了认证流程，并实现JWT令牌自动管理与刷新机制，确保持续安全访问
+系统通过 MediaQuery 与 LayoutBuilder 实现流体布局，关键组件依可用空间自动调整信息密度与样式，并针对移动、桌面、Web 三端分别优化触控、键鼠及加载体验，完成全场景响应式适配。
+
+==== 组件设计原则
+
+系统实现了一系列自定义组件，遵循以下设计原则：
+
+#figure(
+  three-line-table[
+    | 设计原则 | 具体说明 |
+    | 单一职责原则 | 每个组件只负责一个特定功能，降低组件复杂度，提高可维护性 |
+    | 可复用性 | 设计通用组件，支持多种场景使用，提供灵活的配置选项，适应不同需求，示例：`BasicCard`、`PostCard`、`BrandHeader`等 |
+    | 主题一致性 | 所有组件遵循统一的主题设计，支持主题色动态切换，保持UI一致性，基于Material Design 3规范实现 |
+  ],
+  kind: table,
+  caption: "组件设计原则",
+)
+
+==== 页面结构设计
+
+前端页面结构围绕`main.dart`中的`MainScreen`搭建：
+
+1. 核心页面：
+   - `HomePage`（首页）：展示热门内容和快速导航
+   - `CommunityPage`（社区）：帖子浏览、发布和互动
+   - `MarketPage`（行情）：金融产品展示和交易
+   - `ProfilePage`（个人中心）：用户信息和功能入口
+
+2. 页面状态管理：
+   - 关键页面使用`AutomaticKeepAliveClientMixin`实现状态持久化
+   - 避免页面切换时重新加载数据，提高用户体验
+   - 支持下拉刷新和上拉加载更多功能
+
+==== 性能优化策略
+
+系统采用多种性能优化策略，确保应用流畅运行：
+
+#figure(
+  table(
+    columns: 2,
+    stroke: 0.5pt + gray,
+    [*优化类别*], [*具体措施*],
+    [UI渲染优化], [使用`const`构造函数创建不可变组件\ 避免不必要的重建和重绘\ 优化列表渲染，使用`ListView.builder`实现懒加载],
+    [网络请求优化], [实现请求缓存，减少重复请求\ 支持请求取消，避免无用请求消耗资源\ 优化图片加载，支持缩略图和渐进式加载],
+    [内存管理], [及时释放不再使用的资源\ 优化大对象的创建和销毁\ 使用`WeakReference`避免内存泄漏],
+    [启动性能优化], [实现懒加载，延迟初始化非关键组件\ 优化资源加载顺序，优先加载核心功能\ 支持预加载，提前获取常用数据],
+  ),
+  kind: table,
+  caption: "性能优化策略",
+)
+
+==== 代码组织规范
+
+系统遵循清晰的代码组织规范，按功能模块分层组织，UI、业务与数据分离，并集中管理图片字体等资源。提高代码的可维护性和可读性。
+
+
+下图展示了客户端的请求API抽象层设计，该层实现了智能的令牌管理和错误处理机制。系统采用HTTP请求的拦截器架构，在`JwtInterceptor`中自动处理所有认证相关逻辑，包括：在每次请求前自动附加Bearer令牌到Authorization请求头；当服务器返回401未授权错误时，自动触发令牌刷新流程；使用refresh token获取新的访问令牌对；刷新成功后自动重试原始请求，对业务代码完全透明；刷新失败时触发登录页面跳转，引导用户重新认证。此外，拦截器还实现了请求队列机制，当多个请求同时遇到令牌过期时，只执行一次刷新操作，其他请求排队等待，避免并发刷新导致的资源浪费。
+
 #oxdraw(
   "
 graph LR
@@ -340,12 +526,111 @@ graph TD
 )
 
 === 数据库设计
-- 在开发过程中，采用SQLite数据库进行原型设计和测试；在生产环境中，切换到PostgreSQL数据库以实现高并发和高数据吞吐量。
-- 设计规范化关系型数据模型，优化表结构和关联关系
-- 实现完整的数据完整性约束，确保数据一致性和可靠性
-- 采用 Entity Framework Core Code First 模式并配合`dotnet ef`迁移命令管理表结构，使得从 SQLite 切换到 PostgreSQL 的过程自动化、可回滚。
-- 对所有`DateTime`字段统一使用 UTC 存储，并在`AppDbContext`中通过`UtcDateTimeConverter`约束转换，避免跨时区显示误差。
-- 对`PostFavorite`、`UserFavoriteCategory`等多对多关系表使用复合主键，既防止重复收藏，又提升常用查询性能。
+
+Southern Money系统采用关系型数据库设计，支持SQLite和PostgreSQL两种数据库，实现了数据模型的规范化和高性能。
+
+==== 数据库设计原则
+
+1. 规范化设计：
+   - 遵循数据库设计的第一、第二和第三范式
+   - 减少数据冗余，提高数据一致性
+   - 清晰的表结构和关系定义
+
+2. 灵活性：
+   - 基于Entity Framework Core Code First模式，便于数据库schema管理
+   - 使用`dotnet ef`迁移命令实现自动化、可回滚的数据库迁移
+
+3. 性能优化：
+   - 合理的索引设计，提高查询效率
+   - 针对高频查询优化表结构
+   - 支持分区表和分库分表扩展
+
+4. 数据完整性：
+   - 完整的外键约束，确保数据一致性
+   - 适当的字段约束（如非空、唯一、检查约束等）
+   - 事务管理，确保数据操作的原子性、一致性、隔离性和持久性
+
+==== 数据模型设计考虑
+
+1. DateTime字段处理：
+   - 所有`DateTime`字段统一使用UTC存储，避免跨时区显示误差
+   - 在`AppDbContext`中通过`UtcDateTimeConverter`实现自动转换
+   - 示例：
+     ```csharp
+     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+     {
+         configurationBuilder.Properties<DateTime>()
+             .HaveConversion<UtcDateTimeConverter>();
+     }
+     ```
+
+2. 多对多关系设计：
+   - 对`PostFavorite`、`UserFavoriteCategory`等多对多关系表使用复合主键
+   - 既防止重复记录，又提升常用查询性能
+   - 示例：`PostFavorite`表使用`(PostId, UserId)`作为复合主键
+
+3. 软删除实现：
+   - 对核心实体实现软删除机制，通过`IsDeleted`字段标记
+   - 避免数据永久丢失，便于数据恢复和审计
+   - 在查询时自动过滤已删除的记录
+
+4. 数据类型选择：
+   - 选择合适的数据类型，优化存储空间和查询性能
+   - 例如：使用`decimal`类型存储金额，避免精度丢失
+   - 使用`varchar`类型存储可变长度字符串，节省空间
+
+==== 索引优化策略
+
+系统设计了合理的索引方案，提高查询效率和系统性能：
+
+1. 主键索引：
+   - 所有表都定义了主键，自动创建主键索引
+   - 使用自增整数（`int`）作为主键，提高插入性能
+
+2. 外键索引：
+   - 为外键字段创建索引，提高关联查询性能
+   - 例如：`Posts`表的`UploaderUserId`字段创建索引，优化"查询用户发布的帖子"查询
+
+3. 复合索引：
+   - 为频繁一起查询的字段组合创建复合索引
+   - 例如：`TransactionRecords`表的`BuyerUserId`和`PurchaseTime`字段创建复合索引
+   - 优化"查询用户最近交易记录"等常用查询
+
+4. 唯一索引：
+   - 为需要唯一约束的字段创建唯一索引
+   - 例如：`Users`表的`Email`字段创建唯一索引，确保邮箱唯一性
+
+5. 全文索引：
+   - 为需要全文搜索的字段创建全文索引
+   - 例如：`Posts`表的`Title`和`Content`字段创建全文索引
+   - 优化帖子搜索功能的性能
+
+==== 数据库安全设计
+
+1. 数据加密：
+   敏感数据（如用户密码）采用哈希加密存储，并使用强哈希算法（如SHA-256）并添加盐值
+
+2. 访问控制：
+   系统遵循最小权限原则，数据库用户仅拥有必要的权限，分离读写权限以提高安全性，并定期轮换数据库密码，降低安全风险。
+
+3. 数据备份：
+   系统定期备份数据库以防止数据丢失，支持增量备份和全量备份，备份数据存储在安全位置，防止未授权访问。
+
+==== 数据库性能优化
+
+1. 查询优化：
+   系统避免全表扫描，使用索引覆盖查询，优化复杂查询并使用适当的连接方式，实现分页查询以避免一次性返回大量数据。
+
+2. 缓存策略：
+   系统实现查询结果缓存以减少数据库访问，并采用缓存过期策略确保数据一致性。
+
+3. 连接池管理：
+   系统使用数据库连接池以减少连接创建和销毁开销，优化连接池配置并根据系统负载调整，及时释放数据库连接以避免连接泄漏。
+
+4. 分区表设计：
+   系统对大表进行分区设计以提高查询和维护性能，例如按时间分区`TransactionRecords`表，便于数据归档和清理。
+
+通过以上数据库设计，Southern Money系统实现了高性能、高可靠性和高安全性的数据存储和管理，支持系统的稳定运行和未来扩展。
 
 === 系统安全
 - 采用密码哈希存储技术，保障用户密码安全
@@ -414,7 +699,7 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
     |------|----------|
     | 浏览金融产品列表 | 用户可以在市场页面浏览所有可购买的金融产品，支持滑动查看 |
     | 按分类查看金融产品 | 产品按类型分类（如CSGO饰品、虚拟货币等），用户可快速筛选 |
-    | 搜索金融产品 | 支持按名称、价格范围等条件搜索产品，快速定位目标商品 |
+    | 搜索金融产品 | 支持按名称、价格范围等条件搜索产品，快速定位目标产品 |
     | 收藏感兴趣的产品分类 | 用户可以收藏感兴趣的分类，方便下次快速访问 |
     | 购买金融产品 | 用户可以选择产品、数量，确认后完成购买，自动生成交易记录 |
     | 查看交易记录 | 用户可以查看历史购买记录，包括购买时间、价格、数量等信息 |
@@ -499,15 +784,36 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
     | 角色 | 需求 | 前端页面/模块 | 后端接口/模块 |
     |------|------|---------------|----------------|
     | 普通用户 | 注册、登录、自动登录 | LoginPage、RegisterPage、AppConfigService | /login/register、/login/loginByPassword、/login/refreshToken (LoginController) |
+    | 普通用户 | 修改密码、忘记密码 | LoginPage、ProfileEditPage | /user/changePassword、/user/resetPassword (UserController) |
+    | 普通用户 | 个人信息编辑、头像上传 | ProfileEditPage | /user/updateInfo、/user/uploadAvatar (UserController) |
     | 普通用户 | 浏览行情和金融产品 | MarketPage、CsgoCategoryPage、CsgoProductsByCategory | /store/categories、/store/products、/store/categoryAvgPrice (StoreController) |
-    | 普通用户 | 社区发帖、浏览、点赞、收藏 | CommunityPage、PostViewer、MyPosts、MySelections | /posts/create、/posts/page、/posts/like、/posts/favorite、/posts/report 等 (PostController) |
+    | 普通用户 | 搜索金融产品 | MarketSearchPage | /store/search (StoreController) |
+    | 普通用户 | 收藏金融产品分类 | MarketPage | /store/favoriteCategory、/store/myFavoriteCategories (StoreController) |
     | 普通用户 | 购买产品与查看交易记录 | CsgoProductDetailPage、MyTransaction、MyYield | /transaction/buy、/transaction/myRecords、用户资产相关接口 (TransactionController、UserAssetService) |
+    | 普通用户 | 账户充值 | AddingMoneyPage | /user/topup (UserController) |
+    | 普通用户 | 社区发帖、浏览、点赞、收藏 | CommunityPage、PostViewer、MyPosts、MySelections | /posts/create、/posts/page、/posts/like、/posts/favorite、/posts/report (PostController) |
+    | 普通用户 | 社区帖子搜索 | CommunitySearchPage | /posts/search (PostController) |
+    | 普通用户 | 帖子评论、回复 | PostViewer | /comments/create、/comments/page (CommentController) |
+    | 普通用户 | 帖子举报 | PostViewer | /posts/report (PostController) |
     | 普通用户 | 通知中心与消息提醒 | MyMessage 页面、通知角标 | /notification/my、/notification/unread-count、/notification/read (NotificationController) |
-    | 管理员 | 用户管理与封禁 | 管理员入口、用户管理页面 | /admin/users、/admin/handleUser、/admin/setAdmin (AdminController) |
-    | 管理员 | 内容审核与系统统计 | 帖子审核页面、统计页面 | /admin/reportedPosts、/admin/handleReport、/admin/statistics (AdminController、PostService) |
+    | 普通用户 | 系统设置（主题、动画时长） | SettingPage、ChangeThemeColorPage、SettingDuration | 本地存储 (AppConfigService) |
+    | 普通用户 | API地址设置 | SetApiUrlPage | 本地存储 (AppConfigService) |
   ],
   kind: table,
-  caption: "需求与实现对应关系",
+  caption: "普通用户需求与实现对应关系",
+)
+
+#figure(
+  tablem[
+    | 角色 | 需求 | 前端页面/模块 | 后端接口/模块 |
+    |------|------|---------------|----------------|
+    | 管理员 | 用户管理与封禁 | 管理员入口、用户管理页面 | /admin/users、/admin/handleUser、/admin/setAdmin (AdminController) |
+    | 管理员 | 内容审核与系统统计 | 帖子审核页面、统计页面 | /admin/reportedPosts、/admin/handleReport、/admin/statistics (AdminController、PostService) |
+    | 管理员 | 产品分类管理 | CreateCategoryPage | /store/category/create、/store/category/update、/store/category/delete (StoreController) |
+    | 管理员 | 产品管理 | AdminProductPage | /store/product/create、/store/product/update、/store/product/delete (StoreController) |
+  ],
+  kind: table,
+  caption: "管理员需求与实现对应关系",
 )
 
 == 系统功能模块图
@@ -588,7 +894,7 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 
 - 首页 (Home)：采用模块化设计，包含快速导航和发现模块。使用 `SingleChildScrollView` 实现垂直滚动，页面状态通过 `AutomaticKeepAliveClientMixin` 持久化。热门内容通过自定义 `PostCard` 组件展示，支持下拉刷新。
 
-- 市场页面 (Market)：采用网格 (`GridView`) 与列表 (`ListView`) 混合布局。顶部提供分类筛选器（`FilterChip`），商品卡片清晰展示价格、收益率与风险等级图标，点击卡片通过 `PageView` 过渡至详情页。
+- 市场页面 (Market)：采用网格 (`GridView`) 与列表 (`ListView`) 混合布局。顶部提供分类筛选器（`FilterChip`），产品卡片清晰展示价格、收益率与风险等级图标，点击卡片通过 `PageView` 过渡至详情页。
 
 - 社区页面 (Community)：核心为帖子时间线。每个帖子项 (`PostCard`) 包含作者头像、内容预览、互动按钮（点赞、评论、收藏）。支持富文本与多图展示 (`PageView`)。
 
@@ -596,14 +902,42 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 
 - 主题设置页面：提供三种颜色选择模式（Block、Material、Advanced），支持实时预览主题色效果，通过 `ValueNotifier` 实现主题色的动态切换与持久化存储。
 
+
+=== 组件设计原则
+
+系统实现了一系列自定义组件，遵循以下设计原则：
+
+1. 单一职责原则：
+   每个组件只负责一个特定功能，降低组件复杂度，提高可维护性。
+
+2. 可复用性：
+   设计通用组件，支持多种场景使用，提供灵活的配置选项以适应不同需求，示例包括`BasicCard`、`PostCard`、`BrandHeader`等。
+
+3. 可测试性：
+   组件设计便于单元测试和集成测试，分离UI渲染和业务逻辑，便于测试。
+
+4. 主题一致性：
+   所有组件遵循统一的主题设计，支持主题色动态切换，保持UI一致性，基于Material Design 3规范实现。
+
+5. 性能优化：
+   组件设计考虑性能因素，避免不必要的重建，使用`const`构造函数创建不可变组件，实现懒加载和缓存机制，提高渲染性能。
+
 === 自定义组件与配置管理
 
 ==== 自定义组件
 为确保UI风格的一致性和开发效率，系统实现了一系列自定义组件：
-- `BasicCard`：基础卡片组件，包含圆角、阴影和背景色
-- `commonCard`：带标题和图标的卡片组件，用于信息展示
-- `PostCard`：帖子卡片组件，展示帖子内容、作者信息和互动按钮
-- `BrandHeader`：品牌头部组件，包含渐变背景和圆形logo
+
+#figure(
+  three-line-table[
+    | 组件名称 | 功能描述 |
+    | `BasicCard` | 基础卡片组件，包含圆角、阴影和背景色 |
+    | `commonCard` | 带标题和图标的卡片组件，用于信息展示 |
+    | `PostCard` | 帖子卡片组件，展示帖子内容、作者信息和互动按钮 |
+    | `BrandHeader` | 品牌头部组件，包含渐变背景和圆形logo |
+  ],
+  kind: table,
+  caption: "自定义组件列表",
+)
 
 ==== 配置管理
 系统通过 `AppConfigService` 统一管理应用配置，包括：
@@ -711,14 +1045,33 @@ graph LR
   "
 graph LR
     A[用户选择产品] --> B[查看产品详情]
-    B --> C[确认购买]
-    C --> D[前端验证余额]
-    D -->|余额充足| E[发送购买请求]
-    E --> F[后端处理交易]
-    F --> G[更新用户资产]
-    G --> H[生成交易记录]
-    H --> I[返回成功]
-    D -->|余额不足| J[提示充值]
+    B --> C{产品状态正常?}
+    C -->|否| D[提示产品不可用]
+    C -->|是| E[填写购买数量]
+    E --> F{数量合法?}
+    F -->|否| G[提示数量错误]
+    F -->|是| H[确认购买]
+    H --> I[前端验证余额]
+    I -->|余额不足| J[提示充值]
+    I -->|余额充足| K[发送购买请求]
+    K --> L{用户状态正常?}
+    L -->|否| M[提示用户异常]
+    L -->|是| N[后端验证产品库存]
+    N -->|库存不足| O[提示库存不足]
+    N -->|库存充足| P[开始交易事务]
+    P --> Q[扣除用户余额]
+    Q --> R{扣款成功?}
+    R -->|否| S[回滚事务]
+    R -->|是| T[扣除产品库存]
+    T --> U{扣库存成功?}
+    U -->|否| S
+    U -->|是| V[生成交易记录]
+    V --> W{记录成功?}
+    W -->|否| S
+    W -->|是| X[提交事务]
+    X --> Y[发送交易成功通知]
+    Y --> Z[返回成功结果]
+    S --> AA[返回交易失败]
 ",
 )
 
@@ -726,13 +1079,27 @@ graph LR
 #oxdraw(
   "
 graph LR
-    A[用户填写帖子内容] --> B[前端验证]
-    B -->|验证通过| C[发送发布请求]
-    C --> D[后端验证]
-    D -->|验证通过| E[保存帖子]
-    E --> F[返回成功]
-    D -->|验证失败| G[返回错误]
-    B -->|验证失败| H[提示错误]
+    A[用户填写帖子内容] --> B[上传图片(可选)]
+    B --> C{图片验证通过?}
+    C -->|否| D[提示图片错误]
+    C -->|是| E[前端内容验证]
+    E -->|验证失败| F[提示内容错误]
+    E -->|验证通过| G[发送发布请求]
+    G --> H{用户状态正常?}
+    H -->|否| I[提示用户异常]
+    H -->|是| J[后端内容验证]
+    J -->|验证失败| K[返回错误]
+    J -->|验证通过| L[检查内容合规性]
+    L -->|不合规| M[提示内容违规]
+    L -->|合规| N[保存帖子]
+    N --> O{保存成功?}
+    O -->|否| P[返回保存失败]
+    O -->|是| Q[保存帖子图片关联]
+    Q --> R{关联成功?}
+    R -->|否| S[删除已保存帖子]
+    R -->|是| T[更新帖子统计]
+    T --> U[返回发布成功]
+    S --> V[返回发布失败]
 ",
 )
 
@@ -740,21 +1107,30 @@ graph LR
 #oxdraw(
   "
 graph LR
-    A[用户发布帖子] --> B[帖子上线]
-    B --> C[用户浏览帖子]
-    C -->|发现违规内容| D[用户举报帖子]
-    D --> E[系统记录举报信息]
-    E --> F[帖子举报计数+1]
-    F --> G[管理员查看举报列表<br/>(/admin/reportedPosts)]
-    G --> H[管理员审核帖子内容]
-    H --> I{审核结果?}
-    I -->|通过| J[保持帖子上线]
-    I -->|不通过| K[封禁帖子<br/>(/admin/handleReport)]
-    K --> L[系统记录封禁信息<br/>(PostBlocks表)]
-    L --> M[通知帖子作者]
-    J --> N[更新举报状态]
-    N --> O[结束]
-    M --> O
+    A[用户发布帖子] --> B[系统自动审核]
+    B --> C{审核通过?}
+    C -->|不通过| D[帖子进入待审核区]
+    C -->|通过| E[帖子上线]
+    E --> F[用户浏览帖子]
+    F -->|发现违规内容| G[用户举报帖子]
+    D --> H[管理员查看待审核列表]
+    G --> I[系统记录举报信息]
+    I --> J[帖子举报计数+1]
+    J --> K[系统判断是否达到举报阈值]
+    K -->|是| L[帖子自动下架]
+    K -->|否| M[帖子继续显示]
+    L --> N[通知管理员]
+    H --> O[管理员审核帖子内容]
+    N --> O
+    O --> P{审核结果?}
+    P -->|通过| Q[帖子恢复上线/发布]
+    P -->|不通过| R[封禁帖子 (/admin/handleReport)]
+    Q --> S[更新帖子状态]
+    R --> T[系统记录封禁信息 (PostBlocks表)]
+    T --> U[通知帖子作者]
+    S --> V[更新举报状态]
+    V --> W[结束]
+    U --> W
 ",
 )
 
@@ -763,8 +1139,8 @@ graph LR
   "
 graph LR
     A[用户资产触发事件] --> B{事件类型?}
-    B -->|充值| C[用户发起充值请求<br/>(/user/topup)]
-    B -->|购买产品| D[用户购买产品<br/>(/transaction/buy)]
+    B -->|充值| C[用户发起充值请求 (/user/topup)]
+    B -->|购买产品| D[用户购买产品 (/transaction/buy)]
     B -->|收益计算| E[系统定时计算收益]
 
     C --> F[系统处理充值]
@@ -810,8 +1186,8 @@ graph LR
 
     K --> M[用户接收通知]
     L --> M
-    M --> N[用户查看通知<br/>(/notification/my)]
-    N --> O[标记通知已读<br/>(/notification/read)]
+    M --> N[用户查看通知 (/notification/my)]
+    N --> O[标记通知已读 (/notification/read)]
     O --> P[更新通知状态]
     P --> Q[结束]
 ",
@@ -822,12 +1198,12 @@ graph LR
   "
 graph LR
     A[管理员登录系统] --> B[进入管理后台]
-    B --> C[查看用户列表<br/>(/admin/users)]
+    B --> C[查看用户列表 (/admin/users)]
     C --> D[搜索/筛选用户]
-    D --> E[查看用户详情<br/>(/admin/users/{userId})]
+    D --> E[查看用户详情 (/admin/users/{userId})]
     E --> F{处理操作?}
-    F -->|封禁/解封| G[处理用户状态<br/>(/admin/handleUser)]
-    F -->|设置管理员| H[设置管理员权限<br/>(/admin/setAdmin)]
+    F -->|封禁/解封| G[处理用户状态 (/admin/handleUser)]
+    F -->|设置管理员| H[设置管理员权限 (/admin/setAdmin)]
     F -->|返回列表| C
 
     G --> I[更新用户IsBlocked状态]
@@ -848,12 +1224,12 @@ graph LR
   "
 graph LR
     A[管理员登录系统] --> B[进入管理后台]
-    B --> C[查看分类列表<br/>(/store/categories)]
+    B --> C[查看分类列表 (/store/categories)]
     C --> D{分类操作?}
-    D -->|创建分类| E[创建新分类<br/>(/store/category/create)]
+    D -->|创建分类| E[创建新分类 (/store/category/create)]
     D -->|编辑分类| F[选择分类]
     D -->|删除分类| G[选择分类]
-    D -->|查看分类商品| H[查看分类商品<br/>(/store/categories/{id}/products)]
+    D -->|查看分类商品| H[查看分类商品 (/store/categories/{id}/products)]
 
     E --> I[填写分类信息]
     I --> J[上传分类封面]
@@ -893,47 +1269,14 @@ graph LR
 
 通过这一完整场景展示，可以看出各模块之间在前后端层面的协作关系。
 
-== 系统测试
-系统测试包括以下方面：
+== 功能测试
 
-1. 功能测试：
-  - 测试了所有功能模块的基本功能
-  - 验证了各个功能之间的交互
-  - 测试了边界条件和异常情况
-
-2. 性能测试：
-  - 测试了系统在高并发情况下的性能
-  - 验证了系统的响应时间和吞吐量
-  - 测试了系统的稳定性和可靠性
-
-3. 兼容性测试：
-  - 测试了系统在不同设备和平台上的兼容性
-  - 验证了系统在不同浏览器和操作系统上的表现
-  - 测试了系统在不同网络环境下的可用性
-
-4. 安全性测试：
-  - 测试了系统的身份认证和授权机制
-  - 验证了系统的输入验证和输出编码
-  - 测试了系统的敏感信息保护
-
-代表性测试用例示例：
-
-- 功能测试用例：
-  - 正常登录：输入正确用户名和密码，期望返回有效 Token 并跳转到主界面。
-  - 错误登录：输入错误密码，期望返回错误提示且不下发 Token。
-  - 购买流程：在已开户且余额充足的前提下完成一次购买，校验交易记录与用户资产是否同步更新。
-- 接口与异常测试用例：
-  - 未登录访问受保护接口（如`/posts/create`、`/transaction/buy`），期望返回 401。
-  - 使用过期 Token 调用 API，触发前端刷新流程并成功重试或提示重新登录。
-  - 后端抛出未处理异常时，前端收到统一格式的错误响应而非堆栈信息。
-- 兼容性测试用例：
-  - 在 Android 设备、Windows 桌面和 Web 浏览器上分别运行应用，检查页面布局是否一致、功能是否完整。
-  - 在横屏/竖屏、窄屏/宽屏设备上验证导航栏位置、弹窗/页面切换行为是否符合设计。
+功能测试覆盖了系统所有功能模块，包括用户管理、金融产品、交易管理、社区交流和通知中心等。测试了基本功能、功能交互、边界条件和异常情况。
 
 == 测试截图
 === 系统主题展示
 
-系统支持亮色和暗色主题切换。且支持随这系统主题自动切换。
+系统支持亮色和暗色主题切换，且支持随着系统主题自动切换。
 
 #figure(
   table(
