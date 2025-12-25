@@ -1,10 +1,13 @@
 #import "templates/cs-template.typ": *
 #import "@preview/codelst:2.0.2": sourcecode
 #import "@preview/mitex:0.2.6": *
-#import "@preview/fletcher:0.5.8": diagram, edge, node
+#import "@preview/fletcher:0.5.8": diagram, edge, node, shapes
 #import "@preview/tablem:0.3.0": tablem, three-line-table
 #import "pages/data.typ": *
 #import "@preview/oxdraw:0.1.0": *
+#import "@preview/pintorita:0.1.4"
+#show raw.where(lang: "pintora"): it => pintorita.render(it.text, style: "default")
+
 #show: setup-lovelace
 
 #let algorithm = algorithm.with(supplement: "算法")
@@ -164,10 +167,10 @@ builder.Services.AddDbContext<AppDbContext>();
   node((2, 0), [Service业务逻辑], label: "Service", fill: purple.lighten(95%)),
   node((3, 0), [Repo数据访问], label: "Repository", fill: red.lighten(95%)),
   node((4, 0), [数据库], label: "Database", shape: "rect", fill: gray.lighten(90%)),
-  edge((0, 0), (1, 0), "->", ),
-  edge((1, 0), (2, 0), "->", ),
-  edge((2, 0), (3, 0), "->", ),
-  edge((3, 0), (4, 0), "->", ),
+  edge((0, 0), (1, 0), "->"),
+  edge((1, 0), (2, 0), "->"),
+  edge((2, 0), (3, 0), "->"),
+  edge((3, 0), (4, 0), "->"),
 )
 
 系统设计如下
@@ -395,19 +398,38 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
 
 下图展示了客户端的请求API抽象层设计，该层实现了智能的令牌管理和错误处理机制。系统采用HTTP请求的拦截器架构，在`JwtInterceptor`中自动处理所有认证相关逻辑，包括：在每次请求前自动附加Bearer令牌到Authorization请求头；当服务器返回401未授权错误时，自动触发令牌刷新流程；使用refresh token获取新的访问令牌对；刷新成功后自动重试原始请求，对业务代码完全透明；刷新失败时触发登录页面跳转，引导用户重新认证。此外，拦截器还实现了请求队列机制，当多个请求同时遇到令牌过期时，只执行一次刷新操作，其他请求排队等待，避免并发刷新导致的资源浪费。
 
-#oxdraw(
-  "
-graph LR
-    Request[发起HTTP请求]-->Interceptor[拦截器：添加访问令牌]
-    Interceptor-->Remote[远程资源]
-    Remote-->Expire{令牌过期错误？}
-    Expire-->|是|TokenRefresh[刷新令牌]
-    TokenRefresh-->RefreshResult{刷新成功？}
-    RefreshResult-->|成功|Remote
-    RefreshResult-->|失败|ErrorHandler[错误处理]
-    Expire-->|否|Response[正常响应]
-",
+
+#let graph_client_api = diagram(
+  spacing: 2em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+  node-fill: blue.lighten(95%),
+  node((0, 0), [发起HTTP请求], label: "Request"),
+  node((0, 1), [拦截器：添加访问令牌], label: "Interceptor", fill: orange.lighten(95%)),
+  node((0, 2), [远程资源], label: "Remote", fill: purple.lighten(95%)),
+  node((0, 3), [令牌过期错误？], label: "Expire", shape: shapes.diamond, fill: red.lighten(95%)),
+  node((0, 4), [正常响应], label: "Response", fill: olive.lighten(95%)),
+  node((1, 4), [刷新令牌], label: "TokenRefresh", fill: green.lighten(95%)),
+  node((1, 5), [刷新成功？], label: "RefreshResult", shape: shapes.diamond, fill: teal.lighten(95%)),
+  node((1, 6), [错误处理], label: "ErrorHandler", fill: gray.lighten(90%)),
+  edge((0, 0), (0, 1), "->"),
+  edge((0, 1), (0, 2), "->"),
+  edge((0, 2), (0, 3), "->"),
+  edge((0, 3), (0, 4), [否], "->", stroke: green),
+  edge((0, 3), "r,d", [是], "->", label-pos: .5, stroke: red),
+  edge((1, 4), (1, 5), "->"),
+  edge((1, 5), "r,r,u,u,u,l,l,l", [成功], "->", label-pos: .8, stroke: green),
+  edge((1, 5), (1, 6), [失败], "->", label-pos: .5, stroke: red),
 )
+
+#figure(
+  graph_client_api,
+  caption: "请求API抽象层设计",
+)
+
+
+
+
 设计了这些页面，下图描述了这些页面的切换关系：
 #oxdraw(
   "
@@ -629,32 +651,56 @@ Southern Money系统采用关系型数据库设计，支持SQLite和PostgreSQL�
 
 实施JWT令牌认证机制，确保API访问安全
 - 认证流程图：
-  #oxdraw(
-    "
-     graph LR
-         A[接收API请求] --> D{令牌正确?}
-         D -->|否| E[继续处理请求，但无用户信息]
-         D -->|是| G[提取token]
-         G --> H[验证token有效性]
-         H -->|无效| E
-         H -->|有效| I[获取用户ID和角色信息]
-         I --> J[将用户信息存储在HttpContext中]
-         J --> K[继续处理请求]
-     ",
+
+  #diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [接收API请求], label: "Request"),
+    node((0, 1), [令牌正确?], label: "TokenCheck?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 1), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
+    node((0, 2), [提取token], label: "Extract"),
+    node((0, 3), [验证token有效性], label: "Validate", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((2, 3), [继续处理请求，但无用户信息], label: "NoUser", fill: gray.lighten(90%)),
+    node((0, 4), [获取用户ID和角色信息], label: "GetUserInfo", fill: green.lighten(95%)),
+    node((0, 5), [将用户信息存储在Http上下文中], label: "StoreContext"),
+    node((0, 6), [继续处理请求], label: "Continue", fill: olive.lighten(95%)),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (2, 1), [否], "->", stroke: red),
+    edge((0, 1), (0, 2), [是], "->"),
+    edge((0, 2), (0, 3), "->"),
+    edge((0, 3), (2, 3), [无效], "->", stroke: red),
+    edge((0, 3), (0, 4), [有效], "->", stroke: green),
+    edge((0, 4), (0, 5), "->"),
+    edge((0, 5), (0, 6), "->"),
+    edge((2.2, 1), "ddddd,ll", "->"),
+    edge((1.8, 3), "ddd,ll", "->"),
   )
+
 - 授权流程图：
-  #oxdraw(
-    "
-     graph LR
-         A[控制器方法开始执行] --> B{是否需要授权?}
-         B -->|否| C[继续执行方法逻辑]
-         B -->|是| D{HttpContext中是否包含User信息?}
-         D -->|否| E[返回401 Unauthorized]
-         D -->|是| F{获取用户角色}
-         F --> G{用户是否具有所需角色?}
-         G -->|否| H[返回403 Forbidden]
-         G -->|是| C
-     ",
+
+  #diagram(
+    spacing: 2em,
+    node-stroke: .1em,
+    edge-stroke: .1em,
+    node-fill: blue.lighten(95%),
+    node((0, 0), [控制器方法开始执行], label: "Start"),
+    node((0, 1), [需要授权?], label: "NeedAuth?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((0, 3), [继续执行方法逻辑], label: "Execute", fill: green.lighten(95%)),
+    node((2, 1), [上下文中是否包含User?], label: "HasUser?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((4, 1), [返回401 Unauthorized], label: "401", fill: red.lighten(95%)),
+    node((2, 2), [获取用户角色], label: "GetRole"),
+    node((2, 3), [用户具有所需角色?], label: "HasRole?", shape: shapes.diamond, fill: yellow.lighten(95%)),
+    node((4, 3), [返回403 Forbidden], label: "403", fill: red.lighten(95%)),
+    edge((0, 0), (0, 1), "->"),
+    edge((0, 1), (0, 3), [否], "->", stroke: green),
+    edge((0, 1), (2, 1), [是], "->"),
+    edge((2, 1), (4, 1), [否], "->", stroke: red),
+    edge((2, 1), (2, 2), [是], "->"),
+    edge((2, 2), (2, 3), "->"),
+    edge((2, 3), (4, 3), [否], "->", stroke: red),
+    edge((2, 3), (0, 3), [是], "->", stroke: green),
   )
 - 为所有 Web API 统一封装`ApiResponse<T>`响应格式，前端能够通过`Success`、`Message`、`Data`等字段进行一致性错误处理，避免泄露堆栈等敏感信息。
 - 在图片上传接口中限制文件大小、校验 MIME 类型，并将图片数据与元信息分表存储，降低任意文件上传、恶意脚本执行等风险。
@@ -808,57 +854,41 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 == 系统功能模块图
-#oxdraw(
-  "graph TD
-    A[Southern Money系统]
+整个系统架构如下：
 
-    %% 主要模块
-    B[用户管理模块]
-    C[金融产品模块]
-    D[交易管理模块]
-    E[社区论坛模块]
-    F[通知中心模块]
-    G[管理员模块]
-
-    %% 模块关系
-    A --> B
-    A --> C
-    A --> D
-    A --> E
-    A --> F
-    A --> G
-
-    %% 用户管理模块子功能
-    B --> B1[用户注册/登录]
-    B --> B2[个人信息管理]
-    B --> B3[开户管理]
-    B --> B4[资产查询]
-
-    %% 金融产品模块子功能
-    C --> C1[产品分类管理]
-    C --> C2[产品列表展示]
-    C --> C3[产品搜索]
-    C --> C4[产品收藏]
-
-    %% 交易管理模块子功能
-    D --> D1[产品购买]
-    D --> D2[交易记录查询]
-
-    %% 社区论坛模块子功能
-    E --> E1[帖子发布/浏览]
-    E --> E2[帖子点赞/收藏]
-    E --> E3[帖子搜索]
-    E --> E4[帖子审核]
-
-    %% 通知中心模块子功能
-    F --> F1[通知发送]
-    F --> F2[通知管理]
-
-    %% 管理员模块子功能
-    G --> G1[用户管理]
-    G --> G2[内容审核]
-    G --> G3[系统统计]
-",
+#let system_diagram = ```pintora
+mindmap
+@param layoutDirection LR
++ Southern Money 系统
+++  [ 用户管理模块 ]
++++ [ 用户注册/登录 ]
++++ [ 个人信息管理 ]
++++ [ 开户管理 ]
++++ [ 资产查询 ]
+++ [ 金融产品模块 ]
++++ [ 产品分类管理 ]
++++ [ 产品列表展示 ]
++++ [ 产品搜索 ]
++++ [ 产品收藏 ]
+++ [ 交易管理模块 ]
++++ [ 产品购买 ]
++++ [ 交易记录查询 ]
+++ [ 社区论坛模块 ]
++++ [ 帖子发布/浏览 ]
++++ [ 帖子点赞/收藏 ]
++++ [ 帖子搜索 ]
++++ [ 帖子审核 ]
+++ [ 通知中心模块 ]
++++ [ 通知发送 ]
++++ [ 通知管理 ]
+++ [ 管理员模块 ]
++++ [ 用户管理 ]
++++ [ 内容审核 ]
++++ [ 系统统计 ]
+```
+#figure(
+  system_diagram,
+  caption: "Southern Money 系统功能模块图",
 )
 
 = 详细设计
