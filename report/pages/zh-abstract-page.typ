@@ -22,7 +22,7 @@
         #major #h(5pt) 专业
         #v(20pt)
 
-        #text("作者",font: heiti) #h(5pt) #text(author,font: kaiti) #h(30pt) #text("指导老师",font: heiti) #h(5pt) #text(mentor,font: kaiti)
+        #text("学生",font: heiti) #h(5pt) #text(author,font: kaiti) #h(30pt) #text("指导老师",font: heiti) #h(5pt) #text(mentor,font: kaiti)
       
 
       #linebreak()
