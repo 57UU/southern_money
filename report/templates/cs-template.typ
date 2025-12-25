@@ -66,6 +66,8 @@
   )
 
   /* 目录与摘要 */
+  // 目录
+  chinese_outline()
   // 整体页眉
   show: _set_paper_page_header.with(anonymous: anonymous, title: title, users: users)
   // 整体段落与页面设置
@@ -85,8 +87,7 @@
     pagebreak()
   }
 
-  // 目录
-  //chinese_outline()
+  
 
   /* 正文 */
 

@@ -1,5 +1,6 @@
 // 默认本科生毕业论文的封面 (CS 格式)
 #import "../fonts/font-def.typ": *
+#import "data.typ": *
 
 #let paper_cover(cover_logo_path: "../assets/scu_black.png", anonymous, title, school, author, id, mentor, date, grade, major) = {
   align(center)[
@@ -80,14 +81,14 @@
       gutter: 3pt,
       row(
         info_key("课题负责人名（学号）："), 
-        info_value("")
+        info_value(u57u+[ ]+u57u_id)
       ),
       row(
         info_key("同组成员名单（角色）："),
-        info_value("")
+        info_value(yyw+[ ]+yyw_id)
       ),
-      info_value(""),
-      info_value(""),
+      info_value(lpj+[ ]+lpj_id),
+      info_value(hr+[ ]+hr_id),
       v(20pt),
       row(
         info_key("指导教师："),

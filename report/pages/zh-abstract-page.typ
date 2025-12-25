@@ -39,7 +39,7 @@
 
 
   
-  text(size: 10.5pt, tracking: -1pt, font: songti)[
+  text(size: 10.5pt, tracking: 0pt, font: songti)[
     #box(width: 2em)
     #text(weight: "bold", [关键词  ],font: heiti)
     #keywords.join("      ")
