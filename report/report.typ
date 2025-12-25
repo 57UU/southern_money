@@ -176,93 +176,9 @@ builder.Services.AddDbContext<AppDbContext>();
 
 系统设计如下
 
-#oxdraw(
-  "
-graph TD
-      subgraph 控制器层
-         UserController[UserController]
-         PostController[PostController]
-         StoreController[StoreController]
-         ImageBedController[ImageBedController]
-         AdminController[AdminController]
-         NotificationController[NotificationController]
-         TransactionController[TransactionController]
-      end
-
-      subgraph 服务层
-         UserService[UserService]
-         PostService[PostService]
-         ProductService[ProductService]
-         ImageBedService[ImageBedService]
-         AdminService[AdminService]
-         NotificationService[NotificationService]
-         TransactionService[TransactionService]
-         UserAssetService[UserAssetService]
-         ProductCategoryService[ProductCategoryService]
-         UserFavoriteCategoryService[UserFavoriteCategoryService]
-      end
-
-      subgraph 数据访问层
-         UserRepository[UserRepository]
-         PostRepository[PostRepository]
-         ImageRepository[ImageRepository]
-         ProductRepository[ProductRepository]
-         TransactionRepository[TransactionRepository]
-         UserAssetRepository[UserAssetRepository]
-         ProductCategoryRepository[ProductCategoryRepository]
-         UserFavoriteCategoryRepository[UserFavoriteCategoryRepository]
-         NotificationRepository[NotificationRepository]
-      end
-
-      subgraph 基础设施层
-         AppDbContext[AppDbContext]
-         JwtUtils[JwtUtils]
-      end
-
-      %% 控制器依赖服务
-      UserController --> UserService
-      PostController --> PostService
-      StoreController --> ProductService
-      StoreController --> UserAssetService
-      ImageBedController --> ImageBedService
-      AdminController --> AdminService
-      NotificationController --> NotificationService
-      TransactionController --> TransactionService
-
-      %% 服务依赖仓库和其他服务
-      AdminService --> UserRepository
-      AdminService --> ImageRepository
-      AdminService --> PostRepository
-      AdminService --> NotificationService
-      UserService --> UserRepository
-      PostService --> PostRepository
-      PostService --> ImageRepository
-      PostService --> NotificationService
-      PostService --> UserRepository
-      ProductService --> ProductRepository
-      ImageBedService --> ImageRepository
-      TransactionService --> TransactionRepository
-      TransactionService --> UserAssetRepository
-      TransactionService --> ProductRepository
-      UserAssetService --> UserAssetRepository
-      ProductCategoryService --> ProductCategoryRepository
-      UserFavoriteCategoryService --> UserFavoriteCategoryRepository
-      NotificationService --> NotificationRepository
-
-      %% 仓库依赖数据库上下文
-      UserRepository --> AppDbContext
-      PostRepository --> AppDbContext
-      ImageRepository --> AppDbContext
-      ProductRepository --> AppDbContext
-      TransactionRepository --> AppDbContext
-      UserAssetRepository --> AppDbContext
-      ProductCategoryRepository --> AppDbContext
-      UserFavoriteCategoryRepository --> AppDbContext
-      NotificationRepository --> AppDbContext
-
-      %% 服务依赖工具类
-      UserService --> JwtUtils
-",
+#figure(
+  image("backend-arch.jpg"),
+  caption: "后端层次图",
 )
 
 === 前端架构
@@ -432,112 +348,77 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
 
 
 设计了这些页面，下图描述了这些页面的切换关系：
-#oxdraw(
-  "
-graph TD
-      %% Entry Points
-      A[Login Page] -->|Login Success| B[Main App]
-      C[Register Page]
-      A <--> C
-
-      %% Main App Tab Navigation
-      B -->|Tab Switch| D[Home Page]
-      B -->|Tab Switch| E[Community Page]
-      B -->|Tab Switch| F[Market Page]
-      B -->|Tab Switch| G[Profile Page]
-      D <--> E <--> F <--> G <--> D
-
-      %% Home Page Flow
-      D -->|View Post| H[Post Page]
-      D -->|View Product| I[CSGO Product Detail Page]
-
-      %% Community Page Flow
-      E -->|View Post| H
-      E -->|Search| J[Community Search Page]
-      J -->|View Post| H
-      H -->|View User| K[Profile Page]
-      H -->|View Author| L[Posts by User]
-
-      %% Market Page Flow
-      F -->|View Category| M[CSGO Category Page]
-      F -->|Search| N[Market Search Page]
-      M -->|View Products| O[CSGO Products by Category]
-      O -->|View Detail| I
-      N -->|View Detail| I
-
-      %% Profile Page Flow
-      G -->|Edit Profile| P[Profile Edit Page]
-      G -->|My Posts| Q[My Posts]
-      G -->|My Collection| R[My Collection]
-      G -->|My Message| S[My Message]
-      G -->|My Selections| T[My Selections]
-      G -->|My Transaction| U[My Transaction]
-      G -->|Settings| V[Setting]
-      G -->|Open an Account| W[Open an Account]
-      Q -->|View Post| H
-
-      %% Settings Flow
-      V -->|Theme Color| X[Theme Color Page]
-      V -->|Duration Setting| Y[Setting Duration]
-      V -->|API Setting| Z[Set API Page]
-
-      %% Admin Flow
-      G -->|Admin Access| AA[Admin Page]
-      AA -->|Manage Users| AB[Admin Manage User]
-      AA -->|Censor Forum| AC[Admin Censor Forum]
-      AA -->|Post Block History| AD[Admin Post Block History]
-      AA -->|Statistics| AE[Admin Statistics]
-
-      %% CSGO Management Flow
-      AA -->|Create Category| AF[CSGO Category Create]
-      AA -->|Create Product| AG[CSGO Products Create]
-
-      %% Debug Flow
-      G -->|Debug| AH[Debug Page]
-
-      %% About Us
-      V -->|About Us| AI[About Us Page]
-",
+#figure(
+  image("frontend-page.jpg"),
+  caption: "前端页面切换关系",
 )
 运用依赖注入容器管理应用依赖，实现模块解耦。遵循SOLID原则中的单一职责和依赖倒置，提高系统的可维护性、可测试性和扩展性。
-下图依赖关系：
-#oxdraw(
-  "
-graph TD
-       subgraph \"核心依赖\"
-           SP[SharedPreferences] --> TS[TokenService]
-           SP --> PS[PasswordService]
-           TS --> ACS[AppConfigService]
-           PI[PackageInfo] --> VS[VersionService]
-       end
 
-       subgraph \"HTTP客户端\"
-           DIO[Dio]
-           ACS --> JD[JwtDio]
-           ALS[ApiLoginService] --> JD
-       end
 
-       subgraph \"API服务\"
-           JD --> APS[ApiPostService]
-           JD --> AUS[ApiUserService]
-           JD --> ANS[ApiNotificationService]
-           JD --> AIS[ApiImageService]
-           JD --> ASS[ApiStoreService]
-           JD --> ATS[ApiTransactionService]
-           JD --> AAdS[ApiAdminService]
 
-           DIO --> ALS
-           ACS --> ALS
+数据持久化层（绿色）：负责本地数据存储和配置管理，包括 SharedPreferences、TokenService、PasswordService、AppConfigService、PackageInfo 和 VersionService
 
-           DIO --> ATS2[ApiTestService]
-           ACS --> ATS2
+网络请求层（橙色）：基于 Dio 封装 HTTP 客户端，JwtDio 实现 JWT 认证拦截，自动处理令牌管理和刷新；ApiLoginService 比较特殊，它直接使用 Dio (原始的HTTP访问接口) 而非 JwtDio（自动注入JWT 令牌的HTTP接口），这是因为令牌刷新时需要调用登录接口，此时无法使用已过期的 JWT 令牌。
 
-           DIO --> AUS
-           ACS --> AIS
-       end
+API 服务层（蓝色）：各类业务 API 服务，统一使用 JwtDio 进行认证请求，包括 ApiPostService、ApiUserService、ApiNotificationService、ApiImageService、ApiStoreService、ApiTransactionService、ApiAdminService 和 ApiTestService
 
-",
+#let color_light = 90%
+#let dependency_graph = diagram(
+  spacing: 1.5em,
+  node-stroke: .1em,
+  edge-stroke: .1em,
+
+  node((0, 0), [PackageInfo], label: "PI", fill: green.lighten(color_light)),
+  node((1, 0), [VersionService], label: "VS", fill: green.lighten(color_light)),
+
+  node((0, 1), [SharedPreferences], label: "SP", fill: green.lighten(color_light)),
+  node((1, 1), [TokenService], label: "TS", fill: green.lighten(color_light)),
+  node((2, 1), [PasswordService], label: "PS", fill: green.lighten(color_light)),
+  node((3, 1), [AppConfigService], label: "ACS", fill: green.lighten(color_light)),
+
+  node((0, 3), [Dio], label: "DIO", fill: orange.lighten(color_light)),
+  node((1, 3), [JwtDio], label: "JD", fill: orange.lighten(color_light)),
+  node((2, 3), [ApiLoginService], label: "ALS", fill: orange.lighten(color_light)),
+
+  node((0, 5), [ApiPostService], label: "APS", fill: blue.lighten(color_light)),
+  node((1, 5), [ApiUserService], label: "AUS", fill: blue.lighten(color_light)),
+  node((2, 5), [ApiNotificationService], label: "ANS", fill: blue.lighten(color_light)),
+  node((3, 5), [ApiImageService], label: "AIS", fill: blue.lighten(color_light)),
+  node((0, 6), [ApiStoreService], label: "ASS", fill: blue.lighten(color_light)),
+  node((1, 6), [ApiTransactionService], label: "ATS", fill: blue.lighten(color_light)),
+  node((2, 6), [ApiAdminService], label: "AAdS", fill: blue.lighten(color_light)),
+  node((3, 6), [ApiTestService], label: "ATS2", fill: blue.lighten(color_light)),
+
+
+  edge((0, 0), (1, 0), "->"),
+
+  edge((0, 1), (1, 1), "->"),
+  edge((0, 1), (2, 1), "->"),
+  edge((1, 1), (3, 1), "->"),
+
+  edge((3, 1), (1, 3), "->"),
+  edge((2, 3), (1, 3), "->"),
+
+  edge((1, 3), (0, 5), "->"),
+  edge((1, 3), (1, 5), "->"),
+  edge((1, 3), (2, 5), "->"),
+  edge((1, 3), (3, 5), "->"),
+  edge((1, 3), (0, 6), "->"),
+  edge((1, 3), (1, 6), "->"),
+  edge((1, 3), (2, 6), "->"),
+  edge((1, 3), (3, 6), "->"),
+
+  edge((0, 3), (2, 3), "->"),
+  edge((3, 1), (2, 3), "->"),
+
+  edge((0, 3), (3, 6), "->"),
+  edge((3, 1), (3, 6), "->"),
+
+  edge((0, 3), (1, 5), "->"),
+  edge((3, 1), (3, 5), "->"),
 )
+
+#figure(dependency_graph, caption: "依赖关系图")
 
 === 数据库设计
 
@@ -760,6 +641,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 === 普通用户需求
 
 1. 用户管理：
+
+用户管理模块是系统的基础功能，为用户提供完整的账户管理能力，包括注册、登录、个人信息维护等核心功能。该模块确保用户能够安全地创建和管理自己的账户，为后续的金融交易和社区互动提供身份基础。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -774,6 +658,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 2. 金融产品：
+
+金融产品模块是系统的核心交易功能，为用户提供金融产品的浏览、搜索、购买和管理能力。该模块支持多种产品分类和灵活的筛选机制，帮助用户快速找到感兴趣的产品，并提供完整的交易记录追踪，满足用户的投资和交易需求。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -790,6 +677,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 3. 社区交流：
+
+社区交流模块为用户提供内容分享和互动的平台，支持用户发布帖子、浏览内容、点赞收藏和评论互动等功能。该模块通过丰富的互动机制增强用户粘性，促进用户之间的知识分享和经验交流，打造活跃的金融社区氛围。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -807,6 +697,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 4. 通知中心：
+
+通知中心模块为用户提供系统消息的接收和管理功能，确保用户能够及时获取系统推送的重要通知。该模块支持通知的查看和已读标记，帮助用户高效管理通知信息，不错过任何重要动态。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -818,8 +711,12 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
   caption: "通知中心功能列表",
 )
 
-== 管理员需求
+=== 管理员需求
+
 1. 用户管理：
+
+管理员用户管理模块为管理员提供对系统用户的全面管理能力，包括用户信息查看、账户状态控制等功能。该模块帮助管理员维护系统秩序，及时处理违规用户，保障平台的安全和稳定运行。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -833,6 +730,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 2. 内容管理：
+
+管理员内容管理模块为管理员提供对社区内容的审核和管理能力，包括帖子审核、违规内容删除、分类管理等功能。该模块帮助管理员维护社区秩序，确保平台内容的合规性和质量，为用户提供良好的交流环境。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -846,6 +746,9 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 3. 系统管理：
+
+管理员系统管理模块为管理员提供系统级别的管理能力，包括数据统计、配置管理、举报处理等功能。该模块帮助管理员全面掌握系统运行状况，及时处理用户反馈，优化系统配置，确保平台的稳定运营和持续改进。
+
 #figure(
   tablem[
     | 功能 | 具体描述 |
@@ -858,7 +761,7 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
   caption: "管理员系统管理功能列表",
 )
 
-== 需求与实现对应关系
+=== 需求与实现对应关系
 
 本节通过表格形式详细展示了系统需求与具体实现之间的映射关系。表格按照用户角色（普通用户、管理员）进行分类，列出了每个角色的功能需求、对应的前端页面/模块以及后端接口/模块。这种对应关系清晰地呈现了从需求分析到技术实现的完整路径，便于理解系统各功能的实现方式和技术架构，同时也为后续的系统维护和功能扩展提供了重要参考。
 
@@ -1084,7 +987,7 @@ mindmap
 
 系统在ER设计中充分考虑了业务约束，主要体现在：
 
-1. 软删除机制：通过IsDeleted字段实现软删除，保留数据历史，便于数据恢复和审计。
+1. 软删除机制：通过IsDeleted字段实现软删除，保留数据历史，便于数据恢复和审计。同时满足监管需求，防止用户做了违规操作后“毁尸灭迹”。
 
 2. 封禁管理：通过IsBlocked、BlockReason、BlockedAt字段实现用户和帖子的封禁管理，支持封禁原因记录和时间追踪。
 
