@@ -158,7 +158,7 @@ builder.Services.AddDbContext<AppDbContext>();
 
 该架构设计高度模块化，便于系统扩展和维护，同时通过清晰的职责边界降低组件之间的耦合度。这种设计便于进行单元测试和集成测试，支持横向扩展以提高系统的并发处理能力，并具有良好的安全性设计，有效保护系统和用户数据。
 
-#diagram(
+#let simplified_arch=diagram(
   node-stroke: .1em,
   spacing: 10pt,
   node-fill: blue.lighten(95%),
@@ -172,6 +172,7 @@ builder.Services.AddDbContext<AppDbContext>();
   edge((2, 0), (3, 0), "->"),
   edge((3, 0), (4, 0), "->"),
 )
+#figure(simplified_arch, caption: "后端层次图")
 
 系统设计如下
 
@@ -406,7 +407,7 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
   node-fill: blue.lighten(95%),
   node((0, 0), [发起HTTP请求], label: "Request"),
   node((0, 1), [拦截器：添加访问令牌], label: "Interceptor", fill: orange.lighten(95%)),
-  node((0, 2), [远程资源], label: "Remote", fill: purple.lighten(95%)),
+  node((0, 2), [访问远程资源], label: "Remote", fill: purple.lighten(95%)),
   node((0, 3), [令牌过期错误？], label: "Expire", shape: shapes.diamond, fill: red.lighten(95%)),
   node((0, 4), [正常响应], label: "Response", fill: olive.lighten(95%)),
   node((1, 4), [刷新令牌], label: "TokenRefresh", fill: green.lighten(95%)),
@@ -414,7 +415,7 @@ Southern Money系统前端基于Flutter框架开发，采用现代化的架构�
   node((1, 6), [错误处理], label: "ErrorHandler", fill: gray.lighten(90%)),
   edge((0, 0), (0, 1), "->"),
   edge((0, 1), (0, 2), "->"),
-  edge((0, 2), (0, 3), "->"),
+  edge((0, 2), (0, 3),[], "->"),
   edge((0, 3), (0, 4), [否], "->", stroke: green),
   edge((0, 3), "r,d", [是], "->", label-pos: .5, stroke: red),
   edge((1, 4), (1, 5), "->"),
@@ -816,6 +817,8 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 
 == 需求与实现对应关系
 
+本节通过表格形式详细展示了系统需求与具体实现之间的映射关系。表格按照用户角色（普通用户、管理员）进行分类，列出了每个角色的功能需求、对应的前端页面/模块以及后端接口/模块。这种对应关系清晰地呈现了从需求分析到技术实现的完整路径，便于理解系统各功能的实现方式和技术架构，同时也为后续的系统维护和功能扩展提供了重要参考。
+
 #figure(
   tablem[
     | 角色 | 需求 | 前端页面/模块 | 后端接口/模块 |
@@ -854,7 +857,8 @@ Southern Money系统面向两类主要用户：普通用户和管理员。系统
 )
 
 == 系统功能模块图
-整个系统架构如下：
+
+Southern Money 系统采用模块化设计思想，将整个平台划分为六大核心功能模块，各模块之间通过清晰的接口进行数据交互与功能协作。用户管理模块负责用户身份认证与个人信息维护；金融产品模块提供产品展示与分类服务；交易管理模块处理购买流程与交易记录；社区论坛模块支持用户内容创作与互动；通知中心模块实现消息推送与管理；管理员模块提供系统运营与内容审核功能。这种模块化架构有效降低了系统耦合度，提升了可维护性与扩展性。
 
 #let system_diagram = ```pintora
 mindmap
@@ -995,6 +999,8 @@ mindmap
 
 === 数据库表结构
 
+系统采用关系型数据库设计，共包含15个核心数据表（10个实体以及5个关联表），覆盖用户管理、内容发布、产品交易、资产管理等业务领域。下表详细列出了各表的名称、主要字段及功能说明，这些表通过外键关联形成完整的数据关系网络，支撑系统的各项业务功能。
+
 #figure(
   tablem[
     | 表名 | 主要字段 | 说明 |
@@ -1021,13 +1027,26 @@ mindmap
 
 === 数据库数据样例
 
+以下展示了系统中各数据库表的样例数据，这些数据反映了系统在实际运行中的典型数据形态。样例数据涵盖了用户、帖子、产品、交易等核心业务场景，帮助理解各表之间的关联关系和数据存储格式。
+
 #figure(
   tablem[
     | 表名 | 样例数据 |
     |------|----------|
-    | Users | (1, 'user1', 'user1\@example.com', 'hash1', '2025-01-01') |
-    | Products | (1, 'CSGO饰品', 100.0, '精美饰品', 1, '2025-01-01') |
-    | Categories | (1, 'CSGO饰品', '游戏饰品分类') |
+    | Users | (1, '张三', 'zhangsan\@example.com', 'avatar_guid_1', 'hashed_password_1', false, true, false, null, null, '2025-01-01 08:00:00', false) |
+    | Images | ('img_guid_1', 1, '2025-01-01 08:00:00', '用户头像', 'avatar', [binary_data]) |
+    | Posts | ('post_guid_1', 1, '2025-01-01 09:00:00', 'CSGO饰品交易心得', '今天分享一下我的交易经验...', 0, 150, 25, false) |
+    | PostImages | ('post_guid_1', 'img_guid_2') |
+    | PostTags | ('post_guid_1', 'CSGO') |
+    | PostLikes | ('post_guid_1', 2, '2025-01-01 10:00:00') |
+    | PostFavorites | ('post_guid_1', 2, '2025-01-01 10:00:00') |
+    | PostBlocks | ('block_guid_1', 'post_guid_2', true, '违规内容', '2025-01-02 14:00:00', 1) |
+    | Products | ('prod_guid_1', 'AK-47 红线', 1800.00, '崭新出厂', 'cat_guid_1', 1, '2025-01-01 08:00:00', false) |
+    | ProductCategories | ('cat_guid_1', 'CSGO饰品', 'cover_img_guid_1', '2025-01-01 00:00:00') |
+    | UserFavoriteCategories | (2, 'cat_guid_1', '2025-01-01 12:00:00') |
+    | TransactionRecords | ('trans_guid_1', 'prod_guid_1', 2, 1, 1800.00, 1800.00, '2025-01-01 15:00:00') |
+    | UserAssets | (2, 50000.00, 1200.00, 15000.00, 0.024, 48200.00, '2025-01-01 23:59:59') |
+    | Notifications | ('notif_guid_1', 2, 1, '用户1赞了你的帖子', 'activity', false, '2025-01-01 10:00:00') |
   ],
   kind: table,
   caption: "数据库数据样例",
